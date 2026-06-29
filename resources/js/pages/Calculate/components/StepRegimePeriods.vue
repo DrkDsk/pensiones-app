@@ -6,7 +6,7 @@ import AppInput from '@/components/AppInput.vue';
 import { useRegimePeriods } from '../composables/useRegimePeriods';
 import { MAX_ADDITIONAL_REGIME_PERIODS } from '../constants/regimeTypes';
 import type {
-    CalculateForm,
+    CalculateForm, RegimePeriod,
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
@@ -33,6 +33,12 @@ const canAddRegimePeriod = computed(
 const formatTime = (value: number) =>
     Number.isFinite(value) && value > 0 ? value.toFixed(4) : '0.0000';
 
+const formatIntegratedBalance = (value: number) => {
+    return Number.isFinite(value) && value > 0
+        ? `${value.toFixed(2)}`
+        : '$0.00';
+};
+
 const periodError = (index: number, field: RegimePeriodField) =>
     props.stepErrors.regime_periods[index]?.[field] ?? '';
 
@@ -58,8 +64,9 @@ const updateRegimeName = (
     props.validateRegimePeriods();
 };
 
-const updateUMA = (index: number, value: string | number | undefined) => {
+const updateUMA = (index: number, value: string | number | undefined, period: RegimePeriod) => {
     updateRegimePeriodField(index, 'uma_value_year', value ? Number(value) : 0);
+    updateRegimePeriodField(index, 'integrated_balance', period.integrated_balance ?? 0);
     props.validateRegimePeriods();
 };
 
@@ -164,7 +171,7 @@ const updateContributionDate = (
                             />
                         </td>
 
-                        <td class="min-w-[28rem] px-4 py-4">
+                        <td class="min-w-md px-4 py-4">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <AppInput
                                     :model-value="
@@ -236,12 +243,29 @@ const updateContributionDate = (
                                 maxlength="100"
                                 :error="periodError(index, 'uma_value_year')"
                                 required
-                                @update:model-value="updateUMA(index, $event)"
+                                @update:model-value="
+                                    updateUMA(index, $event, period)
+                                "
                                 @blur="validateRegimePeriods"
                             />
                         </td>
 
                         <td class="min-w-56 px-4 py-4">
+                            <div class="grid gap-2" v-if="period.is_fixed">
+                                <span class="ui-label text-sm font-medium">
+                                    Saldo Integrado
+                                </span>
+                                <div
+                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                >
+                                    {{
+                                        formatIntegratedBalance(
+                                            period.integrated_balance ?? 0,
+                                        )
+                                    }}
+                                </div>
+                            </div>
+
                             <AppInput
                                 v-if="!period.is_fixed"
                                 :model-value="period.integrated_balance ?? 0"
