@@ -6,7 +6,8 @@ import AppInput from '@/components/AppInput.vue';
 import { useRegimePeriods } from '../composables/useRegimePeriods';
 import { MAX_ADDITIONAL_REGIME_PERIODS } from '../constants/regimeTypes';
 import type {
-    CalculateForm, RegimePeriod,
+    CalculateForm,
+    RegimePeriod,
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
@@ -64,9 +65,17 @@ const updateRegimeName = (
     props.validateRegimePeriods();
 };
 
-const updateUMA = (index: number, value: string | number | undefined, period: RegimePeriod) => {
+const updateUMA = (
+    index: number,
+    value: string | number | undefined,
+    period: RegimePeriod,
+) => {
     updateRegimePeriodField(index, 'uma_value_year', value ? Number(value) : 0);
-    updateRegimePeriodField(index, 'integrated_balance', period.integrated_balance ?? 0);
+    updateRegimePeriodField(
+        index,
+        'integrated_balance',
+        period.integrated_balance ?? 0,
+    );
     props.validateRegimePeriods();
 };
 
@@ -131,6 +140,12 @@ const updateContributionDate = (
                             class="w-32 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
                         >
                             UMA
+                        </th>
+
+                        <th
+                            class="w-32 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
+                        >
+                            Saldo Integrado
                         </th>
 
                         <th class="w-16 px-4 py-3">
