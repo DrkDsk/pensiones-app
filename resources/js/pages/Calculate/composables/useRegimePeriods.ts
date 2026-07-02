@@ -93,8 +93,8 @@ const createDynamicRegimePeriod = (): RegimePeriod => ({
     contribution_start_date: null,
     contribution_end_date: null,
     time: 0,
-    uma_value_year : null,
-    integrated_balance : null,
+    uma_value_year: null,
+    integrated_balance: null,
     is_fixed: false,
 });
 
@@ -184,7 +184,7 @@ export const useRegimePeriods = (form: CalculateForm) => {
             recalculatePeriodTime(period);
         }
 
-        if (field === 'integrated_balance') {
+        if (field === 'uma_value_year' && period.is_fixed) {
             recalculateIntegratedBalance(period);
         }
     };

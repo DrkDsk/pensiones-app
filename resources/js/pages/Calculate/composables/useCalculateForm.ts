@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
 import { createCalculateFormDefaults } from '../constants/formDefaults';
@@ -8,6 +8,12 @@ import type {
     ClientStepField,
     StepErrors,
 } from '../types/calculate';
+
+const toFiniteNumber = (value: unknown): number | null => {
+    const numericValue = Number(value);
+
+    return Number.isFinite(numericValue) ? numericValue : null;
+};
 
 export const createStepErrors = () =>
     reactive<StepErrors>({
@@ -33,6 +39,20 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         createCalculateFormDefaults(selectedClient),
     );
     const stepErrors = createStepErrors();
+    const average_daily_salary_last_250_weeks = computed(() => {
+        const total = form.regime_periods.reduce((sum, period) => {
+            const time = toFiniteNumber(period.time);
+            const integratedBalance = toFiniteNumber(period.integrated_balance);
+
+            if (time === null || integratedBalance === null) {
+                return sum;
+            }
+
+            return sum + time * integratedBalance;
+        }, 0);
+
+        return Number.isFinite(total) ? total / 5 : 0;
+    });
 
     const clearStepError = (field: ClientStepField) => {
         stepErrors[field] = '';
@@ -110,6 +130,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
 
     return {
         form,
+        average_daily_salary_last_250_weeks,
         stepErrors,
         clearStepError,
         clearStepErrors,

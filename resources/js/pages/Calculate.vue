@@ -32,6 +32,7 @@ const props = defineProps<{
 
 const {
     form,
+    average_daily_salary_last_250_weeks,
     stepErrors,
     clearStepError,
     clearStepErrors,
@@ -158,9 +159,17 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 2"
                             :form="form"
                             :step-errors="stepErrors"
+                            :average-daily-salary-last-250-weeks="
+                                average_daily_salary_last_250_weeks
+                            "
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
-                        <StepBeneficiaries v-else-if="currentStep === 3" />
+                        <StepBeneficiaries
+                            v-else-if="currentStep === 3"
+                            :average-daily-salary-last-250-weeks="
+                                average_daily_salary_last_250_weeks
+                            "
+                        />
                         <StepSummary v-else-if="currentStep === 4" />
                     </section>
                 </Transition>

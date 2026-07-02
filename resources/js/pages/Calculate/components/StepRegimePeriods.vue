@@ -7,7 +7,6 @@ import { useRegimePeriods } from '../composables/useRegimePeriods';
 import { MAX_ADDITIONAL_REGIME_PERIODS } from '../constants/regimeTypes';
 import type {
     CalculateForm,
-    RegimePeriod,
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
@@ -15,6 +14,7 @@ import type {
 const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
+    averageDailySalaryLast250Weeks: number;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -39,6 +39,12 @@ const formatIntegratedBalance = (value: number) => {
         ? `${value.toFixed(2)}`
         : '$0.00';
 };
+
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+    }).format(Number.isFinite(value) ? value : 0);
 
 const periodError = (index: number, field: RegimePeriodField) =>
     props.stepErrors.regime_periods[index]?.[field] ?? '';
@@ -65,17 +71,8 @@ const updateRegimeName = (
     props.validateRegimePeriods();
 };
 
-const updateUMA = (
-    index: number,
-    value: string | number | undefined,
-    period: RegimePeriod,
-) => {
+const updateUMA = (index: number, value: string | number | undefined) => {
     updateRegimePeriodField(index, 'uma_value_year', value ? Number(value) : 0);
-    updateRegimePeriodField(
-        index,
-        'integrated_balance',
-        period.integrated_balance ?? 0,
-    );
     props.validateRegimePeriods();
 };
 
@@ -258,9 +255,7 @@ const updateContributionDate = (
                                 maxlength="100"
                                 :error="periodError(index, 'uma_value_year')"
                                 required
-                                @update:model-value="
-                                    updateUMA(index, $event, period)
-                                "
+                                @update:model-value="updateUMA(index, $event)"
                                 @blur="validateRegimePeriods"
                             />
                         </td>
@@ -336,5 +331,16 @@ const updateContributionDate = (
             <Plus class="size-4" />
             Agregar periodo
         </AppButton>
+    </div>
+
+    <div
+        class="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
+    >
+        <span class="ui-label text-sm font-medium">
+            Salario Diario Promedio (últimas 250 semanas)
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ formatCurrency(props.averageDailySalaryLast250Weeks) }}
+        </span>
     </div>
 </template>
