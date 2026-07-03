@@ -20,13 +20,23 @@ export const formatPercentage = (value: number) =>
         maximumFractionDigits: 2,
     }).format(Number.isFinite(value) ? value : 0);
 
+export const RECOGNIZED_YEARS_AFTER_500_WEEKS = 18.5;
+
 export const useBeneficiaries = (
     averageDailySalaryLast250Weeks: MaybeRefOrGetter<number>,
 ) => {
     const basicAmountPercentage = ref<string | number>('');
+    const annualBasicAmountIncreasePercentage = ref<string | number>('');
+
+    const averageDailySalary = computed(
+        () => toFiniteNumber(toValue(averageDailySalaryLast250Weeks)) ?? 0,
+    );
 
     const basicAmountPercentageNumber = computed(() =>
         toFiniteNumber(basicAmountPercentage.value),
+    );
+    const annualBasicAmountIncreasePercentageNumber = computed(() =>
+        toFiniteNumber(annualBasicAmountIncreasePercentage.value),
     );
 
     const basicAmountPercentageError = computed(() => {
@@ -45,6 +55,22 @@ export const useBeneficiaries = (
         return '';
     });
 
+    const annualBasicAmountIncreasePercentageError = computed(() => {
+        if (annualBasicAmountIncreasePercentage.value === '') {
+            return '';
+        }
+
+        if (annualBasicAmountIncreasePercentageNumber.value === null) {
+            return 'Captura un porcentaje numerico.';
+        }
+
+        if (annualBasicAmountIncreasePercentageNumber.value < 0) {
+            return 'El porcentaje debe ser mayor o igual a 0.';
+        }
+
+        return '';
+    });
+
     const basicAmountFactor = computed(() => {
         if (
             basicAmountPercentageNumber.value === null ||
@@ -56,16 +82,19 @@ export const useBeneficiaries = (
         return basicAmountPercentageNumber.value / 100;
     });
 
-    const dailyAmount = computed(() => {
-        const averageDailySalary = toFiniteNumber(
-            toValue(averageDailySalaryLast250Weeks),
-        );
-
-        if (averageDailySalary === null) {
+    const annualBasicAmountIncreaseFactor = computed(() => {
+        if (
+            annualBasicAmountIncreasePercentageNumber.value === null ||
+            annualBasicAmountIncreasePercentageNumber.value < 0
+        ) {
             return 0;
         }
 
-        const value = averageDailySalary * basicAmountFactor.value;
+        return annualBasicAmountIncreasePercentageNumber.value / 100;
+    });
+
+    const dailyAmount = computed(() => {
+        const value = averageDailySalary.value * basicAmountFactor.value;
 
         return Number.isFinite(value) ? value : 0;
     });
@@ -74,6 +103,27 @@ export const useBeneficiaries = (
 
     const foxUpdateFactor = computed(() => annualBasicAmount.value * 1.11);
 
+    const dailyIncrease = computed(() => {
+        const value =
+            averageDailySalary.value * annualBasicAmountIncreaseFactor.value;
+
+        return Number.isFinite(value) ? value : 0;
+    });
+
+    const previousAnnualIncrease = computed(() => dailyIncrease.value * 365);
+
+    const incrementoAnualCuantiaBasica = computed(
+        () => previousAnnualIncrease.value * RECOGNIZED_YEARS_AFTER_500_WEEKS,
+    );
+
+    const incrementoFoxUpdateFactor = computed(
+        () => incrementoAnualCuantiaBasica.value * 1.11,
+    );
+
+    const cuantiaAnualPension = computed(
+        () => foxUpdateFactor.value + incrementoFoxUpdateFactor.value,
+    );
+
     return {
         basicAmountPercentage,
         basicAmountPercentageError,
@@ -81,5 +131,13 @@ export const useBeneficiaries = (
         dailyAmount,
         annualBasicAmount,
         foxUpdateFactor,
+        annualBasicAmountIncreasePercentage,
+        annualBasicAmountIncreasePercentageError,
+        annualBasicAmountIncreaseFactor,
+        dailyIncrease,
+        previousAnnualIncrease,
+        incrementoAnualCuantiaBasica,
+        incrementoFoxUpdateFactor,
+        cuantiaAnualPension,
     };
 };
