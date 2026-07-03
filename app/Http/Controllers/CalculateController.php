@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Calculate\StoreCalculateRequest;
 use App\Models\Client;
+use App\Models\ClientFamilyInformation;
 use App\UseCases\Calculate\SearchClientsUseCase;
 use App\UseCases\Calculate\StoreCalculateUseCase;
 use DateTimeInterface;
@@ -68,6 +69,27 @@ class CalculateController extends Controller
             'regime_end_date' => $this->serializeDate($client->getAttribute('regime_end_date')),
             'unemployment_assistance_discounted_weeks' => $client->unemployment_assistance_discounted_weeks,
             'notes' => $client->notes,
+            'family_information' => $this->serializeFamilyInformation(
+                $client->relationLoaded('familyInformation')
+                    ? $client->familyInformation
+                    : null,
+            ),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function serializeFamilyInformation(?ClientFamilyInformation $familyInformation): ?array
+    {
+        if (! $familyInformation instanceof ClientFamilyInformation) {
+            return null;
+        }
+
+        return [
+            'has_spouse' => $familyInformation->has_spouse,
+            'minor_or_student_children_count' => $familyInformation->minor_or_student_children_count,
+            'parents_count' => $familyInformation->parents_count,
         ];
     }
 

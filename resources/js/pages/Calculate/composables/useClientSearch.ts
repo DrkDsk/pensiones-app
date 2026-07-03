@@ -1,6 +1,7 @@
 import { computed, nextTick, ref } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
+import { createFamilyInformationDefaults } from '../constants/formDefaults';
 import type {
     CalculateForm,
     ClientStepField,
@@ -138,6 +139,7 @@ export const useClientSearch = ({
     const selectClient = (client: Client) => {
         form.client_id = client.id;
         clearClientFields();
+        form.family_information = createFamilyInformationDefaults(client);
         selectedClient.value = client;
         clientSearch.value =
             `${client.name ?? ''} ${client.last_name ?? ''}`.trim();

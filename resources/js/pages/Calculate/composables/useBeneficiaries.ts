@@ -167,8 +167,6 @@ export const useBeneficiaries = (
     const hasSpouse = computed(() => form.family_information.has_spouse === '1');
 
     const ayudaAsignacionFamiliar = computed(() => {
-        console.log(hasSpouse.value);
-
         const value = hasSpouse.value ? pensionPorEdadTrabajador.value * 0.15 : 0;
 
         return Number.isFinite(value) ? value : 0;
@@ -215,6 +213,22 @@ export const useBeneficiaries = (
         return Number.isFinite(value) ? value : 0;
     });
 
+    const totalAyudas = computed(() => {
+        const value =
+            ayudaAsignacionFamiliar.value +
+            ayudaHijosMenoresEstudiando.value +
+            ayudaAnualPadres.value +
+            ayudaAnualAsistencial.value;
+
+        return Number.isFinite(value) ? value : 0;
+    });
+
+    const cuantiaTotalPension = computed(() => {
+        const value = totalAyudas.value + pensionPorEdadTrabajador.value;
+
+        return Number.isFinite(value) ? value : 0;
+    });
+
     return {
         basicAmountPercentage,
         basicAmountPercentageError,
@@ -239,5 +253,7 @@ export const useBeneficiaries = (
         aplicaAyudaPadres,
         ayudaAnualPadres,
         ayudaAnualAsistencial,
+        totalAyudas,
+        cuantiaTotalPension,
     };
 };

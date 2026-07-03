@@ -36,6 +36,8 @@ const {
     aplicaAyudaPadres,
     ayudaAnualPadres,
     ayudaAnualAsistencial,
+    totalAyudas,
+    cuantiaTotalPension,
 } = useBeneficiaries(() => props.averageDailySalaryLast250Weeks, props.form);
 </script>
 
@@ -376,9 +378,7 @@ const {
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
                     {{
-                        formatCurrency(
-                            aplicaAyudaPadres ? cuantiaAnualPension : 0,
-                        )
+                        formatCurrency(cuantiaAnualPension)
                     }}
                 </div>
             </div>
@@ -390,7 +390,7 @@ const {
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{ formatPercentage(aplicaAyudaPadres ? 0.1 : 0) }}
+                    {{ formatPercentage(0.1) }}
                 </div>
             </div>
 
@@ -425,6 +425,51 @@ const {
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
                     {{ formatCurrency(ayudaAnualAsistencial) }}
+                </div>
+            </div>
+        </div>
+    </AppCard>
+
+    <AppCard variant="bordered" class="overflow-hidden">
+        <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <h3
+                class="text-lg font-semibold text-slate-900 dark:text-slate-100"
+            >
+                Cuantía Total de la Pensión
+            </h3>
+        </div>
+
+        <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Total Ayudas
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(totalAyudas) }}
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Cuentía Anual de la Pensión
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(pensionPorEdadTrabajador) }}
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Cuantía Total de la Pensión
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(cuantiaTotalPension) }}
                 </div>
             </div>
         </div>
