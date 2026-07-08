@@ -10,7 +10,6 @@ import type {
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
-import AppSelect from '@/components/AppSelect.vue';
 
 const props = defineProps<{
     form: CalculateForm;
