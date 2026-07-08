@@ -34,6 +34,16 @@ const canAddRegimePeriod = computed(
 const formatTime = (value: number) =>
     Number.isFinite(value) && value > 0 ? value.toFixed(4) : '0.0000';
 
+const formatDate = (dateString: string | null) => {
+    if (!dateString) {
+        return '';
+    }
+
+    const [year, month, day] = dateString.split('-');
+
+    return `${day}/${month}/${year}`;
+};
+
 const formatIntegratedBalance = (value: number) => {
     return Number.isFinite(value) && value > 0
         ? `${value.toFixed(2)}`
@@ -186,6 +196,7 @@ const updateContributionDate = (
                         <td class="min-w-md px-4 py-4">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <AppInput
+                                    v-if="!period.is_fixed"
                                     :model-value="
                                         period.contribution_start_date ?? ''
                                     "
@@ -207,6 +218,19 @@ const updateContributionDate = (
                                     "
                                     @blur="validateRegimePeriods"
                                 />
+
+                                <div class="grid gap-2" v-else>
+                                    <span class="ui-label text-sm font-medium">
+                                        Fecha inicio
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatDate(period.contribution_start_date)
+                                        }}
+                                    </div>
+                                </div>
 
                                 <AppInput
                                     :model-value="

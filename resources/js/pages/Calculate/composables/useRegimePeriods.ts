@@ -215,6 +215,38 @@ export const useRegimePeriods = (form: CalculateForm) => {
         recalculatePeriodTime(modalidad40);
     };
 
+    const syncModalidad10StartDate = () => {
+        const modalidad40 = form.regime_periods.find(
+            (period) => period.regime_type === 'modalidad_40',
+        );
+
+        if (!modalidad40) {
+            return;
+        }
+
+        const nextStartDate = addOneDay(modalidad40.contribution_end_date);
+
+        if (!nextStartDate) {
+            return;
+        }
+
+        const modalidad10 = form.regime_periods.find(
+            (period) => period.regime_type === 'modalidad_10',
+        );
+
+        if (!modalidad10) {
+            return;
+        }
+
+        modalidad10.contribution_start_date = nextStartDate;
+        recalculatePeriodTime(modalidad10);
+    };
+
+    const syncFixedRegimePeriodsDates = () => {
+        syncModalidad40StartDate();
+        syncModalidad10StartDate();
+    };
+
     const addDynamicRegimePeriod = () => {
         const additionalPeriodsCount = form.regime_periods.filter(
             (period) => !period.is_fixed,
@@ -232,13 +264,13 @@ export const useRegimePeriods = (form: CalculateForm) => {
 
         if (firstBaseIndex === -1) {
             form.regime_periods.push(newPeriod);
-            syncModalidad40StartDate();
+            syncFixedRegimePeriodsDates();
 
             return true;
         }
 
         form.regime_periods.splice(firstBaseIndex, 0, newPeriod);
-        syncModalidad40StartDate();
+        syncFixedRegimePeriodsDates();
 
         return true;
     };
@@ -251,7 +283,7 @@ export const useRegimePeriods = (form: CalculateForm) => {
         }
 
         form.regime_periods.splice(index, 1);
-        syncModalidad40StartDate();
+        syncFixedRegimePeriodsDates();
 
         return true;
     };
@@ -274,20 +306,17 @@ export const useRegimePeriods = (form: CalculateForm) => {
             field === 'contribution_end_date'
         ) {
             recalculatePeriodTime(period);
+            syncFixedRegimePeriodsDates();
         }
 
         if (field === 'uma_value_year' && period.is_fixed) {
             recalculateIntegratedBalance(period);
         }
-
-        if (!period.is_fixed) {
-            syncModalidad40StartDate();
-        }
     };
 
     ensureBaseRegimePeriods();
     recalculateAllPeriodTimes();
-    syncModalidad40StartDate();
+    syncFixedRegimePeriodsDates();
 
     return {
         addDynamicRegimePeriod,
@@ -298,6 +327,8 @@ export const useRegimePeriods = (form: CalculateForm) => {
         recalculateAllPeriodTimes,
         recalculatePeriodTime,
         removeRegimePeriod,
+        syncFixedRegimePeriodsDates,
+        syncModalidad10StartDate,
         syncModalidad40StartDate,
         updateRegimePeriodField,
     };
