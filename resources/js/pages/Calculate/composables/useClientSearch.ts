@@ -202,7 +202,14 @@ export const useClientSearch = ({
     ) => {
         form.client_id = null;
         selectedClient.value = null;
-        form.family_information[field] = String(value ?? '');
+
+        if (field === 'parents_count') {
+            form.family_information.parents_count =
+                value !== undefined && value !== '' ? Number(value) : '';
+        } else {
+            form.family_information[field] = String(value ?? '');
+        }
+
         manualCustomerMode.value = true;
         stepErrors.client_id = '';
         validateFamilyInformationField(form, stepErrors, field);

@@ -16,7 +16,7 @@ export interface CalculateClientForm {
 export interface CalculateFamilyInformationForm {
     has_spouse: string;
     minor_or_student_children_count: string;
-    parents_count: string;
+    parents_count: string | number;
 }
 
 export type RegimePeriod = {

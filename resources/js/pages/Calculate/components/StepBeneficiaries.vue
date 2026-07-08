@@ -70,7 +70,8 @@ const {
                     type="number"
                     min="0"
                     step="0.01"
-                    placeholder="13"
+                    placeholder="0"
+                    required
                     :error="basicAmountPercentageError"
                 />
             </div>
@@ -137,8 +138,9 @@ const {
                     label="Incremento Cuantía Básica (%)"
                     type="number"
                     min="0"
+                    required
                     step="0.01"
-                    placeholder="2"
+                    placeholder="0"
                     :error="annualBasicAmountIncreasePercentageError"
                 />
             </div>
@@ -258,12 +260,12 @@ const {
             <div class="grid gap-2">
                 <AppInput
                     v-model="cesantiaEdadAvanzada"
-                    label="Cesantía en Edad Avanzada"
+                    label="Cesantía en Edad Avanzada (%)"
                     type="number"
                     min="0"
+                    required
                     step="0.01"
-                    placeholder="75"
-                    :helper="formatPercentage(cesantiaEdadAvanzadaPorcentaje)"
+                    placeholder="0"
                     :error="cesantiaEdadAvanzadaError"
                 />
             </div>

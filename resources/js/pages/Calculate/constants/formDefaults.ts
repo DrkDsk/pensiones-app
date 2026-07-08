@@ -34,7 +34,7 @@ export const createFamilyInformationDefaults = (
         parents_count:
             familyInformation?.parents_count === undefined
                 ? ''
-                : String(familyInformation.parents_count),
+                : familyInformation.parents_count,
     };
 };
 

@@ -207,8 +207,17 @@ export const useBeneficiaries = (
         return Number.isFinite(value) ? value : 0;
     });
 
+    const aplicaAyudaAsistencial = computed(
+        () =>
+            !hasSpouse.value &&
+            minorOrStudentChildrenCount.value <= 0 &&
+            parentsCount.value <= 0,
+    );
+
     const ayudaAnualAsistencial = computed(() => {
-        const value = pensionPorEdadTrabajador.value * 0.15;
+        const value = aplicaAyudaAsistencial.value
+            ? pensionPorEdadTrabajador.value * 0.15
+            : 0;
 
         return Number.isFinite(value) ? value : 0;
     });
@@ -252,6 +261,7 @@ export const useBeneficiaries = (
         ayudaHijosMenoresEstudiando,
         aplicaAyudaPadres,
         ayudaAnualPadres,
+        aplicaAyudaAsistencial,
         ayudaAnualAsistencial,
         totalAyudas,
         cuantiaTotalPension,

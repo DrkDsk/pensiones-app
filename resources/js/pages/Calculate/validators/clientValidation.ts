@@ -78,8 +78,8 @@ const isAfterEighteenthBirthday = (value: string, birthdateValue: string) => {
     return date > eighteenthBirthday;
 };
 
-const isNonNegativeInteger = (value: string) =>
-    /^\d+$/.test(value) && Number(value) >= 0;
+const isNonNegativeInteger = (value: string | number) =>
+    /^\d+$/.test(String(value)) && Number(value) >= 0;
 
 export const validateClientField = (
     form: CalculateForm,

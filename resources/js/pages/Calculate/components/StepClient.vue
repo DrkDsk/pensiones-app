@@ -404,12 +404,9 @@ watch(
                     "
                 />
 
-                <AppInput
+                <AppSelect
                     :model-value="form.family_information.parents_count"
                     label="Padres"
-                    type="number"
-                    min="0"
-                    step="1"
                     :required="!form.client_id"
                     :error="stepErrors.parents_count"
                     @update:model-value="
@@ -420,7 +417,10 @@ watch(
                             requireRequiredFields: true,
                         })
                     "
-                />
+                >
+                    <option :value="1">1</option>
+                    <option :value="2">2</option>
+                </AppSelect>
             </div>
         </div>
 
