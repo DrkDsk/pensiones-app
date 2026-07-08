@@ -14,6 +14,7 @@ import type {
 const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
+    age: number;
     averageDailySalaryLast250Weeks: number;
     contributedWeeks: number;
     validateRegimePeriods: () => boolean;
@@ -31,6 +32,19 @@ const additionalPeriodsCount = computed(
 const canAddRegimePeriod = computed(
     () => additionalPeriodsCount.value < MAX_ADDITIONAL_REGIME_PERIODS,
 );
+
+const entitlementRetentionYears = computed(() => {
+    return props.age / 4 / 52;
+});
+
+const entitlementExpirationDate = computed(() => {
+    const years = entitlementRetentionYears.value * 365;
+
+    const operationTwo = entitlementRetentionYears.value / 4;
+    const operationThree = operationTwo + 1;
+
+    return years + operationThree;
+});
 
 const formatTime = (value: number) =>
     Number.isFinite(value) && value > 0 ? value.toFixed(2) : '0.00';
@@ -361,16 +375,28 @@ const updateContributionDate = (
     </div>
 
     <div
-        class="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
+        class="grid grid-cols-2 items-start justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
     >
         <span class="ui-label text-sm font-medium">
-            Salario Diario Promedio (últimas 250 semanas)
+            1) Salario Diario Promedio (últimas 250 semanas)
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
             {{ formatCurrency(props.averageDailySalaryLast250Weeks) }}
         </span>
         <span class="ui-label text-sm font-medium">
-            Número de semanas cotizadas
+            2) Número de semanas cotizadas
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.contributedWeeks }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            3) Fecha de vencimiento de derechos
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ entitlementExpirationDate }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            4) Fecha de vencimiento para llevar acabo la MOD40
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
             {{ props.contributedWeeks }}

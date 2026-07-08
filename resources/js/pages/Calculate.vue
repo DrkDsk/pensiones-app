@@ -164,6 +164,7 @@ const validateFamilyInformationField = (
                             :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
+                            :age="age"
                             :contributed-weeks="contributed_weeks"
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
