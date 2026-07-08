@@ -22,6 +22,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
 
         /** @var Collection<int, Client> $clients */
         $clients = Client::query()
+            ->with('familyInformation')
             ->when($normalizedTerm !== '', function ($query) use ($normalizedTerm): void {
                 $query->where(function ($query) use ($normalizedTerm): void {
                     $query

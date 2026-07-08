@@ -1,7 +1,38 @@
 <?php
 
 use App\Models\Client;
+use App\Models\ClientFamilyInformation;
 use App\Models\User;
+
+test('client search includes family information', function () {
+    $user = User::factory()->create();
+    $client = Client::query()->create([
+        'name' => 'Maria',
+        'last_name' => 'Lopez',
+        'curp' => 'LOMM800101HDFPRR09',
+        'birthdate' => '1980-01-01',
+        'nss' => '12345678901',
+        'unemployment_assistance_discounted_weeks' => 0,
+    ]);
+
+    ClientFamilyInformation::query()->create([
+        'client_id' => $client->id,
+        'has_spouse' => true,
+        'minor_or_student_children_count' => 2,
+        'parents_count' => 1,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->getJson(route('calculate.clients.search', ['search' => 'Maria']));
+
+    $response
+        ->assertOk()
+        ->assertJsonPath('clients.0.id', $client->id)
+        ->assertJsonPath('clients.0.family_information.has_spouse', true)
+        ->assertJsonPath('clients.0.family_information.minor_or_student_children_count', 2)
+        ->assertJsonPath('clients.0.family_information.parents_count', 1);
+});
 
 test('calculate store accepts an existing client id', function () {
     $user = User::factory()->create();

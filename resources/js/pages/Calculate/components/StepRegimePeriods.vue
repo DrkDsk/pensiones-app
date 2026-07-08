@@ -10,10 +10,12 @@ import type {
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
+import AppSelect from '@/components/AppSelect.vue';
 
 const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
+    averageDailySalaryLast250Weeks: number;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -32,6 +34,18 @@ const canAddRegimePeriod = computed(
 
 const formatTime = (value: number) =>
     Number.isFinite(value) && value > 0 ? value.toFixed(4) : '0.0000';
+
+const formatIntegratedBalance = (value: number) => {
+    return Number.isFinite(value) && value > 0
+        ? `${value.toFixed(2)}`
+        : '$0.00';
+};
+
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+    }).format(Number.isFinite(value) ? value : 0);
 
 const periodError = (index: number, field: RegimePeriodField) =>
     props.stepErrors.regime_periods[index]?.[field] ?? '';
@@ -55,6 +69,23 @@ const updateRegimeName = (
     value: string | number | undefined,
 ) => {
     updateRegimePeriodField(index, 'regime_name', value ? String(value) : '');
+    props.validateRegimePeriods();
+};
+
+const updateUMA = (index: number, value: string | number | undefined) => {
+    updateRegimePeriodField(index, 'uma_value_year', value ? Number(value) : 0);
+    props.validateRegimePeriods();
+};
+
+const updateIntegratedBalance = (
+    index: number,
+    value: string | number | undefined,
+) => {
+    updateRegimePeriodField(
+        index,
+        'integrated_balance',
+        value ? Number(value) : 0,
+    );
     props.validateRegimePeriods();
 };
 
@@ -102,6 +133,19 @@ const updateContributionDate = (
                         >
                             Tiempo
                         </th>
+
+                        <th
+                            class="w-32 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
+                        >
+                            UMA
+                        </th>
+
+                        <th
+                            class="w-32 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
+                        >
+                            Saldo Integrado
+                        </th>
+
                         <th class="w-16 px-4 py-3">
                             <span class="sr-only">Acciones</span>
                         </th>
@@ -140,7 +184,7 @@ const updateContributionDate = (
                             />
                         </td>
 
-                        <td class="min-w-[28rem] px-4 py-4">
+                        <td class="min-w-md px-4 py-4">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <AppInput
                                     :model-value="
@@ -203,6 +247,53 @@ const updateContributionDate = (
                             </div>
                         </td>
 
+                        <td class="min-w-56 px-4 py-4">
+                            <AppInput
+                                v-if="period.is_fixed"
+                                :model-value="period.uma_value_year ?? 0"
+                                label="Valor"
+                                placeholder="113.14"
+                                maxlength="100"
+                                :error="periodError(index, 'uma_value_year')"
+                                required
+                                @update:model-value="updateUMA(index, $event)"
+                                @blur="validateRegimePeriods"
+                            />
+                        </td>
+
+                        <td class="min-w-56 px-4 py-4">
+                            <div class="grid gap-2" v-if="period.is_fixed">
+                                <span class="ui-label text-sm font-medium">
+                                    Saldo Integrado
+                                </span>
+                                <div
+                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                >
+                                    {{
+                                        formatIntegratedBalance(
+                                            period.integrated_balance ?? 0,
+                                        )
+                                    }}
+                                </div>
+                            </div>
+
+                            <AppInput
+                                v-if="!period.is_fixed"
+                                :model-value="period.integrated_balance ?? 0"
+                                label="Saldo Integrado"
+                                placeholder="230.85"
+                                maxlength="100"
+                                :error="
+                                    periodError(index, 'integrated_balance')
+                                "
+                                required
+                                @update:model-value="
+                                    updateIntegratedBalance(index, $event)
+                                "
+                                @blur="validateRegimePeriods"
+                            />
+                        </td>
+
                         <td class="px-4 py-10 text-right">
                             <button
                                 v-if="!period.is_fixed"
@@ -241,5 +332,16 @@ const updateContributionDate = (
             <Plus class="size-4" />
             Agregar periodo
         </AppButton>
+    </div>
+
+    <div
+        class="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
+    >
+        <span class="ui-label text-sm font-medium">
+            Salario Diario Promedio (últimas 250 semanas)
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ formatCurrency(props.averageDailySalaryLast250Weeks) }}
+        </span>
     </div>
 </template>

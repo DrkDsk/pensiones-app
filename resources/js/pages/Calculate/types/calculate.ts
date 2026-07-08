@@ -16,7 +16,7 @@ export interface CalculateClientForm {
 export interface CalculateFamilyInformationForm {
     has_spouse: string;
     minor_or_student_children_count: string;
-    parents_count: string;
+    parents_count: string | number;
 }
 
 export type RegimePeriod = {
@@ -26,6 +26,8 @@ export type RegimePeriod = {
     contribution_start_date: string | null;
     contribution_end_date: string | null;
     time: number;
+    uma_value_year : number | null;
+    integrated_balance: number | null;
     is_fixed: boolean;
 };
 
@@ -73,7 +75,9 @@ export type RegimePeriodField =
     | 'regime_type'
     | 'regime_name'
     | 'contribution_start_date'
-    | 'contribution_end_date';
+    | 'contribution_end_date'
+    | 'uma_value_year'
+    | 'integrated_balance';
 
 export type RegimePeriodErrors = Partial<Record<RegimePeriodField, string>>;
 

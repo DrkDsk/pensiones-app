@@ -1,6 +1,7 @@
 import { computed, nextTick, ref } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
+import { createFamilyInformationDefaults } from '../constants/formDefaults';
 import type {
     CalculateForm,
     ClientStepField,
@@ -138,6 +139,7 @@ export const useClientSearch = ({
     const selectClient = (client: Client) => {
         form.client_id = client.id;
         clearClientFields();
+        form.family_information = createFamilyInformationDefaults(client);
         selectedClient.value = client;
         clientSearch.value =
             `${client.name ?? ''} ${client.last_name ?? ''}`.trim();
@@ -200,7 +202,14 @@ export const useClientSearch = ({
     ) => {
         form.client_id = null;
         selectedClient.value = null;
-        form.family_information[field] = String(value ?? '');
+
+        if (field === 'parents_count') {
+            form.family_information.parents_count =
+                value !== undefined && value !== '' ? Number(value) : '';
+        } else {
+            form.family_information[field] = String(value ?? '');
+        }
+
         manualCustomerMode.value = true;
         stepErrors.client_id = '';
         validateFamilyInformationField(form, stepErrors, field);

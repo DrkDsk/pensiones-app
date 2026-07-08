@@ -83,6 +83,9 @@ export const calculateRegimeTime = (
     endDate: string | null,
 ): number => Math.max(calculateDays360(startDate, endDate) / 360, 0);
 
+export const calculateIntegratedBalance = (umaValueYear: number): number =>
+    umaValueYear * 25;
+
 const createDynamicRegimePeriod = (): RegimePeriod => ({
     id: `dynamic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     regime_type: CUSTOM_REGIME_TYPE,
@@ -90,6 +93,8 @@ const createDynamicRegimePeriod = (): RegimePeriod => ({
     contribution_start_date: null,
     contribution_end_date: null,
     time: 0,
+    uma_value_year: null,
+    integrated_balance: null,
     is_fixed: false,
 });
 
@@ -120,6 +125,12 @@ export const useRegimePeriods = (form: CalculateForm) => {
         period.time = calculateRegimeTime(
             period.contribution_start_date,
             period.contribution_end_date,
+        );
+    };
+
+    const recalculateIntegratedBalance = (period: RegimePeriod) => {
+        period.integrated_balance = calculateIntegratedBalance(
+            period.uma_value_year ?? 0,
         );
     };
 
@@ -171,6 +182,10 @@ export const useRegimePeriods = (form: CalculateForm) => {
             field === 'contribution_end_date'
         ) {
             recalculatePeriodTime(period);
+        }
+
+        if (field === 'uma_value_year' && period.is_fixed) {
+            recalculateIntegratedBalance(period);
         }
     };
 
