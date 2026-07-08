@@ -1,5 +1,6 @@
 import { createBaseRegimePeriods } from '../constants/formDefaults';
 import {
+    BASE_REGIME_TYPES,
     CUSTOM_REGIME_TYPE,
     MAX_ADDITIONAL_REGIME_PERIODS,
 } from '../constants/regimeTypes';
@@ -86,6 +87,29 @@ export const calculateRegimeTime = (
 export const calculateIntegratedBalance = (umaValueYear: number): number =>
     umaValueYear * 25;
 
+const BASE_REGIME_TYPE_VALUES: string[] = BASE_REGIME_TYPES.map(
+    (regimeType) => regimeType.value,
+);
+
+export const isFixedRegimePeriod = (period: RegimePeriod): boolean =>
+    period.is_fixed || BASE_REGIME_TYPE_VALUES.includes(period.regime_type);
+
+export const addOneDay = (dateString: string | null): string | null => {
+    const dateParts = parseDateParts(dateString);
+
+    if (!dateParts) {
+        return null;
+    }
+
+    const date = new Date(
+        Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day),
+    );
+
+    date.setUTCDate(date.getUTCDate() + 1);
+
+    return date.toISOString().slice(0, 10);
+};
+
 const createDynamicRegimePeriod = (): RegimePeriod => ({
     id: `dynamic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     regime_type: CUSTOM_REGIME_TYPE,
@@ -99,16 +123,30 @@ const createDynamicRegimePeriod = (): RegimePeriod => ({
 });
 
 export const useRegimePeriods = (form: CalculateForm) => {
+    const sortBaseRegimePeriodsToEnd = () => {
+        const dynamicPeriods = form.regime_periods.filter(
+            (period) => !isFixedRegimePeriod(period),
+        );
+        const fixedPeriods = form.regime_periods.filter(isFixedRegimePeriod);
+
+        form.regime_periods.splice(
+            0,
+            form.regime_periods.length,
+            ...dynamicPeriods,
+            ...fixedPeriods,
+        );
+    };
+
     const ensureBaseRegimePeriods = () => {
         const basePeriods = createBaseRegimePeriods();
 
-        basePeriods.forEach((basePeriod, index) => {
+        basePeriods.forEach((basePeriod) => {
             const existingIndex = form.regime_periods.findIndex(
                 (period) => period.regime_type === basePeriod.regime_type,
             );
 
             if (existingIndex === -1) {
-                form.regime_periods.splice(index, 0, basePeriod);
+                form.regime_periods.push(basePeriod);
 
                 return;
             }
@@ -119,6 +157,8 @@ export const useRegimePeriods = (form: CalculateForm) => {
             form.regime_periods[existingIndex].regime_name =
                 basePeriod.regime_name;
         });
+
+        sortBaseRegimePeriodsToEnd();
     };
 
     const recalculatePeriodTime = (period: RegimePeriod) => {
@@ -138,7 +178,44 @@ export const useRegimePeriods = (form: CalculateForm) => {
         form.regime_periods.forEach(recalculatePeriodTime);
     };
 
-    const addRegimePeriod = () => {
+    const getLastDynamicRegimePeriod = (): RegimePeriod | null => {
+        for (let index = form.regime_periods.length - 1; index >= 0; index--) {
+            const period = form.regime_periods[index];
+
+            if (period && !period.is_fixed) {
+                return period;
+            }
+        }
+
+        return null;
+    };
+
+    const syncModalidad40StartDate = () => {
+        const lastDynamicPeriod = getLastDynamicRegimePeriod();
+
+        if (!lastDynamicPeriod) {
+            return;
+        }
+
+        const nextStartDate = addOneDay(lastDynamicPeriod.contribution_end_date);
+
+        if (!nextStartDate) {
+            return;
+        }
+
+        const modalidad40 = form.regime_periods.find(
+            (period) => period.regime_type === 'modalidad_40',
+        );
+
+        if (!modalidad40) {
+            return;
+        }
+
+        modalidad40.contribution_start_date = nextStartDate;
+        recalculatePeriodTime(modalidad40);
+    };
+
+    const addDynamicRegimePeriod = () => {
         const additionalPeriodsCount = form.regime_periods.filter(
             (period) => !period.is_fixed,
         ).length;
@@ -155,11 +232,13 @@ export const useRegimePeriods = (form: CalculateForm) => {
 
         if (firstBaseIndex === -1) {
             form.regime_periods.push(newPeriod);
+            syncModalidad40StartDate();
 
             return true;
         }
 
         form.regime_periods.splice(firstBaseIndex, 0, newPeriod);
+        syncModalidad40StartDate();
 
         return true;
     };
@@ -172,6 +251,7 @@ export const useRegimePeriods = (form: CalculateForm) => {
         }
 
         form.regime_periods.splice(index, 1);
+        syncModalidad40StartDate();
 
         return true;
     };
@@ -199,18 +279,26 @@ export const useRegimePeriods = (form: CalculateForm) => {
         if (field === 'uma_value_year' && period.is_fixed) {
             recalculateIntegratedBalance(period);
         }
+
+        if (!period.is_fixed) {
+            syncModalidad40StartDate();
+        }
     };
 
     ensureBaseRegimePeriods();
     recalculateAllPeriodTimes();
+    syncModalidad40StartDate();
 
     return {
-        addRegimePeriod,
+        addDynamicRegimePeriod,
+        addRegimePeriod: addDynamicRegimePeriod,
         calculateRegimeTime,
         ensureBaseRegimePeriods,
+        getLastDynamicRegimePeriod,
         recalculateAllPeriodTimes,
         recalculatePeriodTime,
         removeRegimePeriod,
+        syncModalidad40StartDate,
         updateRegimePeriodField,
     };
 };
