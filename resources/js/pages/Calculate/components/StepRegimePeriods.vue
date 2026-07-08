@@ -17,6 +17,9 @@ const props = defineProps<{
     age: number;
     averageDailySalaryLast250Weeks: number;
     contributedWeeks: number;
+    entitlementRetentionYears: number;
+    entitlementExpirationDate: string;
+    entitlementExpirationDateModalidad40: string;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -32,27 +35,6 @@ const additionalPeriodsCount = computed(
 const canAddRegimePeriod = computed(
     () => additionalPeriodsCount.value < MAX_ADDITIONAL_REGIME_PERIODS,
 );
-
-const entitlementRetentionYears = computed(() => {
-    return props.age / 4 / 52;
-});
-
-const entitlementExpirationDate = computed(() => {
-    const years = entitlementRetentionYears.value * 365;
-    const operationTwo = entitlementRetentionYears.value / 4 + 1;
-    const operationThree = years + operationTwo;
-    const regimeEndDate = props.form.client.regime_end_date;
-
-    return regimeEndDate + operationThree;
-});
-
-const entitlementExpirationDateModalidad40 = computed(() => {
-    const regimeEndDate = props.form.client.regime_end_date;
-
-    const years = 365 * 5;
-
-    return years + regimeEndDate;
-});
 
 const formatTime = (value: number) =>
     Number.isFinite(value) && value > 0 ? value.toFixed(2) : '0.00';
@@ -401,13 +383,13 @@ const updateContributionDate = (
             3) Fecha de vencimiento de derechos
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
-            {{ entitlementExpirationDate }}
+            {{ props.entitlementExpirationDate }}
         </span>
         <span class="ui-label text-sm font-medium">
             4) Fecha de vencimiento para llevar acabo la MOD40
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
-            {{ entitlementExpirationDateModalidad40 }}
+            {{ props.entitlementExpirationDateModalidad40 }}
         </span>
     </div>
 </template>

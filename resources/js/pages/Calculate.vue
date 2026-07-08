@@ -34,6 +34,10 @@ const {
     form,
     average_daily_salary_last_250_weeks,
     contributed_weeks,
+    ageInYears,
+    entitlementExpirationDate,
+    entitlementExpirationDateModalidad40,
+    entitlementRetentionYears,
     years_recognized,
     stepErrors,
     clearStepError,
@@ -164,8 +168,17 @@ const validateFamilyInformationField = (
                             :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
-                            :age="age"
+                            :age="ageInYears"
                             :contributed-weeks="contributed_weeks"
+                            :entitlement-retention-years="
+                                entitlementRetentionYears
+                            "
+                            :entitlement-expiration-date="
+                                entitlementExpirationDate
+                            "
+                            :entitlement-expiration-date-modalidad40="
+                                entitlementExpirationDateModalidad40
+                            "
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
                         <StepBeneficiaries

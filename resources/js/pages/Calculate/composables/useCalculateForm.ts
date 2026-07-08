@@ -15,6 +15,77 @@ const toFiniteNumber = (value: unknown): number | null => {
     return Number.isFinite(numericValue) ? numericValue : null;
 };
 
+type DateParts = {
+    year: number;
+    month: number;
+    day: number;
+};
+
+const parseDateParts = (value: string | null): DateParts | null => {
+    if (!value) {
+        return null;
+    }
+
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+
+    if (!match) {
+        return null;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    if (
+        date.getUTCFullYear() !== year ||
+        date.getUTCMonth() !== month - 1 ||
+        date.getUTCDate() !== day
+    ) {
+        return null;
+    }
+
+    return { year, month, day };
+};
+
+const addDays = (dateString: string | null, days: number): string => {
+    const dateParts = parseDateParts(dateString);
+
+    if (!dateParts || !Number.isFinite(days)) {
+        return '';
+    }
+
+    const date = new Date(
+        Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day),
+    );
+
+    date.setUTCDate(date.getUTCDate() + Math.floor(days));
+
+    return date.toISOString().slice(0, 10);
+};
+
+const calculateAgeInYears = (birthdate: string | null): number => {
+    const dateParts = parseDateParts(birthdate);
+
+    if (!dateParts) {
+        return 0;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - dateParts.year;
+    const currentMonth = today.getMonth() + 1;
+    const currentDay = today.getDate();
+
+    if (
+        currentMonth < dateParts.month ||
+        (currentMonth === dateParts.month && currentDay < dateParts.day)
+    ) {
+        age -= 1;
+    }
+
+    return Math.max(age, 0);
+};
+
 export const createStepErrors = () =>
     reactive<StepErrors>({
         client_id: '',
@@ -101,6 +172,26 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         return yearsReduced + yearsCompletedAfter500;
     })
 
+    const ageInYears = computed(() => calculateAgeInYears(form.client.birthdate));
+
+    const entitlementRetentionYears = computed(
+        () => ageInYears.value / 4 / 52,
+    );
+
+    const entitlementExpirationDate = computed(() => {
+        const daysFromRetentionYears = entitlementRetentionYears.value * 365;
+        const leapDaysAdjustment = entitlementRetentionYears.value / 4 + 1;
+
+        return addDays(
+            form.client.regime_end_date,
+            daysFromRetentionYears + leapDaysAdjustment,
+        );
+    });
+
+    const entitlementExpirationDateModalidad40 = computed(() =>
+        addDays(form.client.regime_end_date, 365 * 5),
+    );
+
     const clearStepError = (field: ClientStepField) => {
         stepErrors[field] = '';
     };
@@ -179,6 +270,10 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         form,
         average_daily_salary_last_250_weeks,
         contributed_weeks,
+        ageInYears,
+        entitlementExpirationDate,
+        entitlementExpirationDateModalidad40,
+        entitlementRetentionYears,
         years_recognized,
         stepErrors,
         clearStepError,
