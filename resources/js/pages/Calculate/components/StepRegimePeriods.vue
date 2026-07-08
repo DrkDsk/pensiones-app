@@ -407,7 +407,7 @@ const updateContributionDate = (
             4) Fecha de vencimiento para llevar acabo la MOD40
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
-            {{ props.contributedWeeks }}
+            {{ entitlementExpirationDateModalidad40 }}
         </span>
     </div>
 </template>
