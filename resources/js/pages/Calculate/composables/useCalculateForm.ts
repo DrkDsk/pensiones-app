@@ -34,11 +34,34 @@ export const createStepErrors = () =>
         regime_periods: [],
     });
 
+const table = [
+    [0, 0],
+    [13, 0.5],
+    [26.1, 1],
+];
+
+function searchValueAproxForYearReduced(value: number) {
+    let result = 0;
+
+    for (const [minValue, returnValue] of table) {
+        if (value >= minValue) {
+            result = returnValue;
+        } else {
+            break;
+        }
+    }
+
+    return result;
+}
+
 export const useCalculateForm = (selectedClient: Client | null) => {
+
     const form = useForm<CalculateFormData>(
         createCalculateFormDefaults(selectedClient),
     );
+
     const stepErrors = createStepErrors();
+
     const average_daily_salary_last_250_weeks = computed(() => {
         const total = form.regime_periods.reduce((sum, period) => {
             const time = toFiniteNumber(period.time);
@@ -53,6 +76,30 @@ export const useCalculateForm = (selectedClient: Client | null) => {
 
         return Number.isFinite(total) ? total / 5 : 0;
     });
+
+    const contributed_weeks = computed(() => {
+        const modalidad40 = form.regime_periods.find(
+            (period) => period.regime_type === 'modalidad_40',
+        );
+
+        if (!modalidad40) {
+            return 0;
+        }
+
+        return Number((1293 + modalidad40.time * 52 + 4).toFixed(0));
+    })
+
+    const years_recognized = computed(() => {
+        const weeksAfter500 = contributed_weeks.value - 500;
+        const yearsCompletedAfter500 = Number((weeksAfter500 / 52).toFixed(0));
+        const completedWeeksRecognizedAfter500Weeks =
+            yearsCompletedAfter500 * 52;
+        const weeksReduced =
+            weeksAfter500 - completedWeeksRecognizedAfter500Weeks;
+        const yearsReduced = searchValueAproxForYearReduced(weeksReduced);
+
+        return yearsReduced + yearsCompletedAfter500;
+    })
 
     const clearStepError = (field: ClientStepField) => {
         stepErrors[field] = '';
@@ -131,6 +178,8 @@ export const useCalculateForm = (selectedClient: Client | null) => {
     return {
         form,
         average_daily_salary_last_250_weeks,
+        contributed_weeks,
+        years_recognized,
         stepErrors,
         clearStepError,
         clearStepErrors,

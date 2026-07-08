@@ -15,6 +15,7 @@ const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
     averageDailySalaryLast250Weeks: number;
+    contributedWeeks: number;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -227,7 +228,9 @@ const updateContributionDate = (
                                         class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                                     >
                                         {{
-                                            formatDate(period.contribution_start_date)
+                                            formatDate(
+                                                period.contribution_start_date,
+                                            )
                                         }}
                                     </div>
                                 </div>
@@ -365,6 +368,12 @@ const updateContributionDate = (
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
             {{ formatCurrency(props.averageDailySalaryLast250Weeks) }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            Número de semanas cotizadas
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.contributedWeeks }}
         </span>
     </div>
 </template>

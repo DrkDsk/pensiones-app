@@ -33,6 +33,8 @@ const props = defineProps<{
 const {
     form,
     average_daily_salary_last_250_weeks,
+    contributed_weeks,
+    years_recognized,
     stepErrors,
     clearStepError,
     clearStepErrors,
@@ -162,6 +164,7 @@ const validateFamilyInformationField = (
                             :average-daily-salary-last-250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
+                            :contributed-weeks="contributed_weeks"
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
                         <StepBeneficiaries
@@ -170,6 +173,8 @@ const validateFamilyInformationField = (
                             :average-daily-salary-last-250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
+                            :years-recognized="years_recognized"
+                            :contributed-weeks="contributed_weeks"
                         />
                         <StepSummary v-else-if="currentStep === 4" />
                     </section>
