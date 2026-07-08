@@ -39,11 +39,19 @@ const entitlementRetentionYears = computed(() => {
 
 const entitlementExpirationDate = computed(() => {
     const years = entitlementRetentionYears.value * 365;
+    const operationTwo = entitlementRetentionYears.value / 4 + 1;
+    const operationThree = years + operationTwo;
+    const regimeEndDate = props.form.client.regime_end_date;
 
-    const operationTwo = entitlementRetentionYears.value / 4;
-    const operationThree = operationTwo + 1;
+    return regimeEndDate + operationThree;
+});
 
-    return years + operationThree;
+const entitlementExpirationDateModalidad40 = computed(() => {
+    const regimeEndDate = props.form.client.regime_end_date;
+
+    const years = 365 * 5;
+
+    return years + regimeEndDate;
 });
 
 const formatTime = (value: number) =>
