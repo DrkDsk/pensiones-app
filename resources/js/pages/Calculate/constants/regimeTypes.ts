@@ -9,5 +9,3 @@ export const BASE_REGIME_TYPES = REGIME_TYPES.filter(
 
 export const MAX_ADDITIONAL_REGIME_PERIODS = 20;
 export const CUSTOM_REGIME_TYPE = 'custom';
-
-export const regimeTypes = REGIME_TYPES;
