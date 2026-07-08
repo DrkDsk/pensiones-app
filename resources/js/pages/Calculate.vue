@@ -161,7 +161,7 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 2"
                             :form="form"
                             :step-errors="stepErrors"
-                            :average-daily-salary-last-250-weeks="
+                            :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
                             :contributed-weeks="contributed_weeks"
@@ -170,7 +170,7 @@ const validateFamilyInformationField = (
                         <StepBeneficiaries
                             v-else-if="currentStep === 3"
                             :form="form"
-                            :average-daily-salary-last-250-weeks="
+                            :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
                             :years-recognized="years_recognized"
