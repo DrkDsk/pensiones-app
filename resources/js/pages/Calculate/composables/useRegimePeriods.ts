@@ -147,7 +147,19 @@ export const useRegimePeriods = (form: CalculateForm) => {
             return false;
         }
 
-        form.regime_periods.push(createDynamicRegimePeriod());
+        const firstBaseIndex = form.regime_periods.findIndex((period) =>
+            ['modalidad_10', 'modalidad_40'].includes(period.regime_type),
+        );
+
+        const newPeriod = createDynamicRegimePeriod();
+
+        if (firstBaseIndex === -1) {
+            form.regime_periods.push(newPeriod);
+
+            return true;
+        }
+
+        form.regime_periods.splice(firstBaseIndex, 0, newPeriod);
 
         return true;
     };
