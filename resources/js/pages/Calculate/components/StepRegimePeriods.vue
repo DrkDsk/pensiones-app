@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Plus, Trash2 } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import AlertError from '@/components/AlertError.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppInput from '@/components/AppInput.vue';
 import { useRegimePeriods } from '../composables/useRegimePeriods';
@@ -21,6 +22,8 @@ const props = defineProps<{
     entitlementRetentionYears: number;
     entitlementExpirationDate: string;
     entitlementExpirationDateModalidad40: string;
+    hasRegimeTimeError: boolean;
+    regimeTimeErrorMessage: string;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -124,8 +127,18 @@ const updateContributionDate = (
         </p>
     </div>
 
+    <AlertError
+        title="Tiempo de cotización insuficiente"
+        :message="hasRegimeTimeError ? regimeTimeErrorMessage : ''"
+    />
+
     <div
-        class="overflow-hidden rounded-sm border border-slate-200 dark:border-slate-800"
+        class="overflow-hidden rounded-sm border transition-colors"
+        :class="
+            hasRegimeTimeError
+                ? 'border-danger ring-1 ring-danger/30'
+                : 'border-slate-200 dark:border-slate-800'
+        "
     >
         <div class="overflow-x-auto">
             <table

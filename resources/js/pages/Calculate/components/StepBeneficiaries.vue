@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import {
@@ -13,6 +14,10 @@ const props = defineProps<{
     contributedWeeks: number;
     yearsRecognized: number;
     form: CalculateForm;
+}>();
+
+const emit = defineEmits<{
+    'update:monthlyPension': [value: number];
 }>();
 
 const {
@@ -38,7 +43,21 @@ const {
     ayudaAnualAsistencial,
     totalAyudas,
     cuantiaTotalPension,
-} = useBeneficiaries(() => props.averageDailySalaryLast250Weeks, props.yearsRecognized, props.form);
+} = useBeneficiaries(
+    () => props.averageDailySalaryLast250Weeks,
+    props.yearsRecognized,
+    props.form,
+);
+
+const monthlyPension = computed(() => cuantiaTotalPension.value / 12);
+
+watch(
+    monthlyPension,
+    (value) => {
+        emit('update:monthlyPension', Number.isFinite(value) ? value : 0);
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -468,6 +487,26 @@ const {
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
                     {{ formatCurrency(cuantiaTotalPension) }}
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Pensión Anual
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(cuantiaTotalPension) }}
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium"> Mensual </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(monthlyPension) }}
                 </div>
             </div>
         </div>
