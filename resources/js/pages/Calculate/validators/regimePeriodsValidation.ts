@@ -296,7 +296,7 @@ export const validateRegimePeriods = (
             );
         }
 
-        if (
+        /*if (
             validationContext.regimeEndDate &&
             isValidDateValue(validationContext.regimeEndDate) &&
             isAfterDate(
@@ -309,7 +309,7 @@ export const validateRegimePeriods = (
                 'contribution_end_date',
                 'La fecha de fin no puede ser posterior a la baja de regimen.',
             );
-        }
+        }*/
     });
 
     const dynamicRegimeNameIndexes = new Map<string, number>();

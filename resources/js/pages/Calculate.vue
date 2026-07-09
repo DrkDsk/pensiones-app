@@ -35,6 +35,7 @@ const {
     average_daily_salary_last_250_weeks,
     contributed_weeks,
     ageInYears,
+    sum_time_regime_periods,
     entitlementExpirationDate,
     entitlementExpirationDateModalidad40,
     entitlementRetentionYears,
@@ -168,6 +169,7 @@ const validateFamilyInformationField = (
                             :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
+                            :sum_time_regime_periods="sum_time_regime_periods"
                             :age="ageInYears"
                             :contributed-weeks="contributed_weeks"
                             :entitlement-retention-years="

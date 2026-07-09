@@ -3,11 +3,7 @@ import { computed, reactive } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
 import { createCalculateFormDefaults } from '../constants/formDefaults';
-import type {
-    CalculateFormData,
-    ClientStepField,
-    StepErrors,
-} from '../types/calculate';
+import type { CalculateFormData, ClientStepField, StepErrors } from '../types/calculate';
 
 const toFiniteNumber = (value: unknown): number | null => {
     const numericValue = Number(value);
@@ -61,7 +57,11 @@ const addDays = (dateString: string | null, days: number): string => {
 
     date.setUTCDate(date.getUTCDate() + Math.floor(days));
 
-    return date.toISOString().slice(0, 10);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+
+    return `${day}/${month}/${year}`;
 };
 
 const calculateAgeInYears = (birthdate: string | null): number => {
@@ -148,6 +148,13 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         return Number.isFinite(total) ? total / 5 : 0;
     });
 
+    const sum_time_regime_periods = form.regime_periods.reduce(
+        (sum, period) => {
+            return sum + period.time;
+        },
+        0,
+    );
+
     const contributed_weeks = computed(() => {
         const modalidad40 = form.regime_periods.find(
             (period) => period.regime_type === 'modalidad_40',
@@ -172,20 +179,21 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         return yearsReduced + yearsCompletedAfter500;
     })
 
-    const ageInYears = computed(() => calculateAgeInYears(form.client.birthdate));
+    const ageInYears = computed(() => {
+        return calculateAgeInYears(form.client.birthdate);
+    });
 
     const entitlementRetentionYears = computed(
-        () => ageInYears.value / 4 / 52,
+        () => contributed_weeks.value / 4 / 52,
     );
 
     const entitlementExpirationDate = computed(() => {
         const daysFromRetentionYears = entitlementRetentionYears.value * 365;
-        const leapDaysAdjustment = entitlementRetentionYears.value / 4 + 1;
+        const leapDaysAdjustment = entitlementRetentionYears.value / 4;
+        const leapYear = leapDaysAdjustment + 1;
+        const adjustment = daysFromRetentionYears + leapYear;
 
-        return addDays(
-            form.client.regime_end_date,
-            daysFromRetentionYears + leapDaysAdjustment,
-        );
+        return addDays(form.client.regime_end_date, adjustment);
     });
 
     const entitlementExpirationDateModalidad40 = computed(() =>
@@ -270,6 +278,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         form,
         average_daily_salary_last_250_weeks,
         contributed_weeks,
+        sum_time_regime_periods,
         ageInYears,
         entitlementExpirationDate,
         entitlementExpirationDateModalidad40,

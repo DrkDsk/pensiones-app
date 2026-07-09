@@ -15,6 +15,7 @@ const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
     age: number;
+    sum_time_regime_periods: number;
     averageDailySalaryLast250Weeks: number;
     contributedWeeks: number;
     entitlementRetentionYears: number;
@@ -390,6 +391,12 @@ const updateContributionDate = (
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
             {{ props.entitlementExpirationDateModalidad40 }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            5) Tiempo de Cotización por empleo en los últimos 5 años
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.sum_time_regime_periods }}
         </span>
     </div>
 </template>
