@@ -7,7 +7,7 @@ import StepClient from './Calculate/components/StepClient.vue';
 import StepNavigation from './Calculate/components/StepNavigation.vue';
 import StepperHeader from './Calculate/components/StepperHeader.vue';
 import StepRegimePeriods from './Calculate/components/StepRegimePeriods.vue';
-import StepSummary from './Calculate/components/StepSummary.vue';
+import StepFinancing from './Calculate/components/StepFinancing.vue';
 import { useCalculateForm } from './Calculate/composables/useCalculateForm';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
@@ -192,7 +192,7 @@ const validateFamilyInformationField = (
                             :years-recognized="years_recognized"
                             :contributed-weeks="contributed_weeks"
                         />
-                        <StepSummary v-else-if="currentStep === 4" />
+                        <StepFinancing v-else-if="currentStep === 4" />
                     </section>
                 </Transition>
             </div>
