@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AppCard from '@/components/AppCard.vue';
 import type { Client } from '@/models/client';
 import StepBeneficiaries from './Calculate/components/StepBeneficiaries.vue';
@@ -29,6 +30,8 @@ const props = defineProps<{
         search: string;
     };
 }>();
+
+const monthlyPension = ref(0);
 
 const {
     form,
@@ -191,8 +194,13 @@ const validateFamilyInformationField = (
                             "
                             :years-recognized="years_recognized"
                             :contributed-weeks="contributed_weeks"
+                            @update:monthly-pension="monthlyPension = $event"
                         />
-                        <StepFinancing v-else-if="currentStep === 4" />
+                        <StepFinancing
+                            v-else-if="currentStep === 4"
+                            :form="form"
+                            :monthly-pension="monthlyPension"
+                        />
                     </section>
                 </Transition>
             </div>
