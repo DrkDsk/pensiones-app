@@ -33,6 +33,13 @@ const props = defineProps<{
 const {
     form,
     average_daily_salary_last_250_weeks,
+    contributed_weeks,
+    ageInYears,
+    sum_time_regime_periods,
+    entitlementExpirationDate,
+    entitlementExpirationDateModalidad40,
+    entitlementRetentionYears,
+    years_recognized,
     stepErrors,
     clearStepError,
     clearStepErrors,
@@ -159,17 +166,31 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 2"
                             :form="form"
                             :step-errors="stepErrors"
-                            :average-daily-salary-last-250-weeks="
+                            :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
+                            "
+                            :sum_time_regime_periods="sum_time_regime_periods"
+                            :age="ageInYears"
+                            :contributed-weeks="contributed_weeks"
+                            :entitlement-retention-years="
+                                entitlementRetentionYears
+                            "
+                            :entitlement-expiration-date="
+                                entitlementExpirationDate
+                            "
+                            :entitlement-expiration-date-modalidad40="
+                                entitlementExpirationDateModalidad40
                             "
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
                         <StepBeneficiaries
                             v-else-if="currentStep === 3"
                             :form="form"
-                            :average-daily-salary-last-250-weeks="
+                            :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "
+                            :years-recognized="years_recognized"
+                            :contributed-weeks="contributed_weeks"
                         />
                         <StepSummary v-else-if="currentStep === 4" />
                     </section>

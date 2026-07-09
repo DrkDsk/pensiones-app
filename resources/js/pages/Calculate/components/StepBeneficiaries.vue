@@ -2,7 +2,6 @@
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import {
-    RECOGNIZED_YEARS_AFTER_500_WEEKS,
     formatCurrency,
     formatPercentage,
     useBeneficiaries,
@@ -11,6 +10,8 @@ import type { CalculateForm } from '../types/calculate';
 
 const props = defineProps<{
     averageDailySalaryLast250Weeks: number;
+    contributedWeeks: number;
+    yearsRecognized: number;
     form: CalculateForm;
 }>();
 
@@ -29,7 +30,6 @@ const {
     cuantiaAnualPension,
     cesantiaEdadAvanzada,
     cesantiaEdadAvanzadaError,
-    cesantiaEdadAvanzadaPorcentaje,
     pensionPorEdadTrabajador,
     ayudaAsignacionFamiliar,
     ayudaHijosMenoresEstudiando,
@@ -38,7 +38,7 @@ const {
     ayudaAnualAsistencial,
     totalAyudas,
     cuantiaTotalPension,
-} = useBeneficiaries(() => props.averageDailySalaryLast250Weeks, props.form);
+} = useBeneficiaries(() => props.averageDailySalaryLast250Weeks, props.yearsRecognized, props.form);
 </script>
 
 <template>
@@ -174,7 +174,7 @@ const {
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{ RECOGNIZED_YEARS_AFTER_500_WEEKS.toFixed(2) }}
+                    {{ yearsRecognized }}
                 </div>
             </div>
 
@@ -379,9 +379,7 @@ const {
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{
-                        formatCurrency(cuantiaAnualPension)
-                    }}
+                    {{ formatCurrency(cuantiaAnualPension) }}
                 </div>
             </div>
 
@@ -443,9 +441,7 @@ const {
 
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <div class="grid gap-2">
-                <span class="ui-label text-sm font-medium">
-                    Total Ayudas
-                </span>
+                <span class="ui-label text-sm font-medium"> Total Ayudas </span>
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >

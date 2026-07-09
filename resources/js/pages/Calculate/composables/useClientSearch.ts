@@ -7,9 +7,37 @@ import type {
     ClientStepField,
     FamilyInformationField,
     ManualClientField,
-    StepErrors
+    StepErrors,
 } from '../types/calculate';
-import { validateClientField, validateFamilyInformationField } from '../validators/clientValidation';
+import {
+    validateClientField,
+    validateFamilyInformationField,
+} from '../validators/clientValidation';
+
+const normalizeDateValue = (value: string | null | undefined): string => {
+    if (!value) {
+        return '';
+    }
+
+    const dateValue = value.slice(0, 10);
+
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateValue) ? dateValue : '';
+};
+
+const hydrateClientForm = (form: CalculateForm, client: Client) => {
+    form.client.name = client.name ?? '';
+    form.client.last_name = client.last_name ?? '';
+    form.client.phone = client.phone ?? '';
+    form.client.email = client.email ?? '';
+    form.client.curp = client.curp ?? '';
+    form.client.birthdate = normalizeDateValue(client.birthdate);
+    form.client.nss = client.nss ?? '';
+    form.client.regime_end_date = normalizeDateValue(client.regime_end_date);
+    form.client.unemployment_assistance_discounted_weeks = String(
+        client.unemployment_assistance_discounted_weeks ?? '',
+    );
+    form.client.notes = client.notes ?? '';
+};
 
 export const useClientSearch = ({
     clients,
@@ -139,6 +167,7 @@ export const useClientSearch = ({
     const selectClient = (client: Client) => {
         form.client_id = client.id;
         clearClientFields();
+        hydrateClientForm(form, client);
         form.family_information = createFamilyInformationDefaults(client);
         selectedClient.value = client;
         clientSearch.value =

@@ -21,10 +21,9 @@ export const formatPercentage = (value: number) =>
         maximumFractionDigits: 2,
     }).format(Number.isFinite(value) ? value : 0);
 
-export const RECOGNIZED_YEARS_AFTER_500_WEEKS = 18.5;
-
 export const useBeneficiaries = (
     averageDailySalaryLast250Weeks: MaybeRefOrGetter<number>,
+    yearsRecognized: MaybeRefOrGetter<number>,
     form: CalculateForm,
 ) => {
     const basicAmountPercentage = ref<string | number>('');
@@ -146,7 +145,7 @@ export const useBeneficiaries = (
     const previousAnnualIncrease = computed(() => dailyIncrease.value * 365);
 
     const incrementoAnualCuantiaBasica = computed(
-        () => previousAnnualIncrease.value * RECOGNIZED_YEARS_AFTER_500_WEEKS,
+        () => previousAnnualIncrease.value * toValue(yearsRecognized),
     );
 
     const incrementoFoxUpdateFactor = computed(

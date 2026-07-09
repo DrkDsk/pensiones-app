@@ -155,7 +155,7 @@ watch(
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p
-                            class="text-xs font-semibold tracking-[0.2em] text-slate-500 uppercase dark:text-slate-400"
+                            class="text-xs font-semibold tracking-[0.3em] text-slate-500 uppercase dark:text-slate-400"
                         >
                             Cliente seleccionado
                         </p>

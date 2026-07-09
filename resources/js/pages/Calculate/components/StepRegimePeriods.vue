@@ -10,12 +10,17 @@ import type {
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
-import AppSelect from '@/components/AppSelect.vue';
 
 const props = defineProps<{
     form: CalculateForm;
     stepErrors: StepErrors;
+    age: number;
+    sum_time_regime_periods: number;
     averageDailySalaryLast250Weeks: number;
+    contributedWeeks: number;
+    entitlementRetentionYears: number;
+    entitlementExpirationDate: string;
+    entitlementExpirationDateModalidad40: string;
     validateRegimePeriods: () => boolean;
 }>();
 
@@ -33,7 +38,17 @@ const canAddRegimePeriod = computed(
 );
 
 const formatTime = (value: number) =>
-    Number.isFinite(value) && value > 0 ? value.toFixed(4) : '0.0000';
+    Number.isFinite(value) && value > 0 ? value.toFixed(2) : '0.00';
+
+const formatDate = (dateString: string | null) => {
+    if (!dateString) {
+        return '';
+    }
+
+    const [year, month, day] = dateString.split('-');
+
+    return `${day}/${month}/${year}`;
+};
 
 const formatIntegratedBalance = (value: number) => {
     return Number.isFinite(value) && value > 0
@@ -187,6 +202,7 @@ const updateContributionDate = (
                         <td class="min-w-md px-4 py-4">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <AppInput
+                                    v-if="!period.is_fixed"
                                     :model-value="
                                         period.contribution_start_date ?? ''
                                     "
@@ -208,6 +224,21 @@ const updateContributionDate = (
                                     "
                                     @blur="validateRegimePeriods"
                                 />
+
+                                <div class="grid gap-2" v-else>
+                                    <span class="ui-label text-sm font-medium">
+                                        Fecha inicio
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatDate(
+                                                period.contribution_start_date,
+                                            )
+                                        }}
+                                    </div>
+                                </div>
 
                                 <AppInput
                                     :model-value="
@@ -335,13 +366,37 @@ const updateContributionDate = (
     </div>
 
     <div
-        class="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
+        class="grid grid-cols-2 items-start justify-between gap-3 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900"
     >
         <span class="ui-label text-sm font-medium">
-            Salario Diario Promedio (últimas 250 semanas)
+            1) Salario Diario Promedio (últimas 250 semanas)
         </span>
         <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
             {{ formatCurrency(props.averageDailySalaryLast250Weeks) }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            2) Número de semanas cotizadas
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.contributedWeeks }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            3) Fecha de vencimiento de derechos
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.entitlementExpirationDate }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            4) Fecha de vencimiento para llevar acabo la MOD40
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.entitlementExpirationDateModalidad40 }}
+        </span>
+        <span class="ui-label text-sm font-medium">
+            5) Tiempo de Cotización por empleo en los últimos 5 años
+        </span>
+        <span class="font-mono text-sm text-slate-700 dark:text-slate-200">
+            {{ props.sum_time_regime_periods }}
         </span>
     </div>
 </template>
