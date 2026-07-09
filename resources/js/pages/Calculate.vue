@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
+import AppModal from '@/components/AppModal.vue';
 import type { Client } from '@/models/client';
 import StepBeneficiaries from './Calculate/components/StepBeneficiaries.vue';
 import StepClient from './Calculate/components/StepClient.vue';
@@ -32,6 +34,11 @@ const props = defineProps<{
 }>();
 
 const monthlyPension = ref(0);
+const showRegimeTimeModal = ref(false);
+const showRegimeTimeError = ref(false);
+const REGIME_TIME_MINIMUM = 5;
+const REGIME_TIME_ERROR_MESSAGE =
+    'No es posible avanzar al siguiente paso, debido a que el tiempo de cotización no es mayor a 5';
 
 const {
     form,
@@ -79,8 +86,11 @@ const enableManualMode = () => {
     manualCustomerMode.value = true;
 };
 
-const validateCurrentStep = (step: number) =>
-    validateCalculateStep(
+const validateCurrentStep = (
+    step: number,
+    options: { validateRegimeTimeMinimum?: boolean } = {},
+) => {
+    const stepIsValid = validateCalculateStep(
         step,
         form,
         stepErrors,
@@ -88,7 +98,34 @@ const validateCurrentStep = (step: number) =>
         enableManualMode,
     );
 
+    if (step !== 2) {
+        return stepIsValid;
+    }
+
+    if (sum_time_regime_periods.value >= REGIME_TIME_MINIMUM) {
+        showRegimeTimeError.value = false;
+
+        return stepIsValid;
+    }
+
+    if (options.validateRegimeTimeMinimum) {
+        showRegimeTimeError.value = true;
+        showRegimeTimeModal.value = true;
+
+        return false;
+    }
+
+    return stepIsValid;
+};
+
 const validateRegimePeriodsStep = () => validateCurrentStep(2);
+
+watch(sum_time_regime_periods, (totalTime) => {
+    if (totalTime >= REGIME_TIME_MINIMUM) {
+        showRegimeTimeError.value = false;
+        showRegimeTimeModal.value = false;
+    }
+});
 
 const {
     currentStep,
@@ -99,7 +136,8 @@ const {
     returnToClientStep,
 } = useCalculateSteps({
     steps: calculateSteps,
-    validateCurrentStep,
+    validateCurrentStep: (step) =>
+        validateCurrentStep(step, { validateRegimeTimeMinimum: true }),
     submitCalculate: () =>
         submitCalculate(enableManualMode, returnToClientStep),
 });
@@ -184,6 +222,10 @@ const validateFamilyInformationField = (
                             :entitlement-expiration-date-modalidad40="
                                 entitlementExpirationDateModalidad40
                             "
+                            :has-regime-time-error="showRegimeTimeError"
+                            :regime-time-error-message="
+                                REGIME_TIME_ERROR_MESSAGE
+                            "
                             :validate-regime-periods="validateRegimePeriodsStep"
                         />
                         <StepBeneficiaries
@@ -212,6 +254,18 @@ const validateFamilyInformationField = (
                 @next="goToNextStep"
             />
         </AppCard>
+
+        <AppModal
+            v-model:open="showRegimeTimeModal"
+            title="Tiempo de cotización insuficiente"
+            :description="REGIME_TIME_ERROR_MESSAGE"
+        >
+            <div class="flex justify-end">
+                <AppButton @click="showRegimeTimeModal = false">
+                    Entendido
+                </AppButton>
+            </div>
+        </AppModal>
     </div>
 </template>
 

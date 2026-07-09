@@ -148,11 +148,10 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         return Number.isFinite(total) ? total / 5 : 0;
     });
 
-    const sum_time_regime_periods = form.regime_periods.reduce(
-        (sum, period) => {
+    const sum_time_regime_periods = computed(() =>
+        form.regime_periods.reduce((sum, period) => {
             return sum + period.time;
-        },
-        0,
+        }, 0),
     );
 
     const contributed_weeks = computed(() => {

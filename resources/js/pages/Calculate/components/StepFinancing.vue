@@ -74,8 +74,11 @@ const costoPorcentual = (row: FinancingRegimeRow) =>
 const pagoMensual = (row: FinancingRegimeRow) =>
     salarioMensualAlta(row) * costoPorcentual(row);
 
-const pagoTotalPorPeriodo = (row: FinancingRegimeRow) =>
-    pagoMensual(row) * 9.767;
+const pagoTotalPorPeriodo = (row: FinancingRegimeRow) => {
+    const value = row.regimeType === 'modalidad_10' ? 9.767 : 5;
+
+    return pagoMensual(row) * value;
+};
 
 const pagoTotal = computed(() =>
     rows.reduce((total, row) => total + pagoTotalPorPeriodo(row), 0),
@@ -404,9 +407,7 @@ const totalCostoDelProyecto = computed(
         class="overflow-hidden border-emerald-400 bg-slate-950 shadow-[0_0_12px_rgba(52,211,153,0.28)]"
     >
         <div class="p-5">
-            <div
-                class="rounded-md bg-black px-5 py-6"
-            >
+            <div class="rounded-md bg-black px-5 py-6">
                 <span
                     class="ui-label text-xs font-semibold tracking-[0.24em] text-emerald-300 uppercase"
                 >
