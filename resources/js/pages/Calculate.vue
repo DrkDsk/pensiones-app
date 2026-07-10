@@ -5,6 +5,7 @@ import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppModal from '@/components/AppModal.vue';
 import type { Client } from '@/models/client';
+import StepProjection from '@/pages/Calculate/components/StepProjection.vue';
 import StepBeneficiaries from './Calculate/components/StepBeneficiaries.vue';
 import StepClient from './Calculate/components/StepClient.vue';
 import StepFinancing from './Calculate/components/StepFinancing.vue';
@@ -242,6 +243,10 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 4"
                             :form="form"
                             :monthly-pension="monthlyPension"
+                        />
+
+                        <StepProjection
+                            v-else-if="currentStep === 5"
                         />
                     </section>
                 </Transition>
