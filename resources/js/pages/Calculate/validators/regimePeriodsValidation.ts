@@ -7,7 +7,6 @@ import {
 } from '../constants/regimeTypes';
 import type {
     CalculateForm,
-    RegimePeriod,
     RegimePeriodErrors,
     StepErrors,
 } from '../types/calculate';
@@ -68,19 +67,6 @@ const isAfterDate = (value: string | null, comparisonValue: string | null) => {
     const comparisonDate = dateValue(comparisonValue);
 
     return date && comparisonDate ? date > comparisonDate : false;
-};
-
-const periodsOverlap = (first: RegimePeriod, second: RegimePeriod) => {
-    const firstStart = dateValue(first.contribution_start_date);
-    const firstEnd = dateValue(first.contribution_end_date);
-    const secondStart = dateValue(second.contribution_start_date);
-    const secondEnd = dateValue(second.contribution_end_date);
-
-    if (!firstStart || !firstEnd || !secondStart || !secondEnd) {
-        return false;
-    }
-
-    return firstStart <= secondEnd && secondStart <= firstEnd;
 };
 
 const resolveValidationContext = (
@@ -343,27 +329,6 @@ export const validateRegimePeriods = (
         }
 
         dynamicRegimeNameIndexes.set(normalizedRegimeName, index);
-    });
-
-    form.regime_periods.forEach((period, index) => {
-        form.regime_periods
-            .slice(index + 1)
-            .forEach((comparisonPeriod, offset) => {
-                /*if (periodsOverlap(period, comparisonPeriod)) {
-                    const comparisonIndex = index + offset + 1;
-
-                    fail(
-                        index,
-                        'contribution_end_date',
-                        'Este periodo se traslapa con otro periodo capturado.',
-                    );
-                    fail(
-                        comparisonIndex,
-                        'contribution_start_date',
-                        'Este periodo se traslapa con otro periodo capturado.',
-                    );
-                }*/
-            });
     });
 
     stepErrors.regime_periods = errors;

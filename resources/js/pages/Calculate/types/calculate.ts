@@ -36,6 +36,9 @@ export interface CalculateFormData {
     client: CalculateClientForm;
     family_information: CalculateFamilyInformationForm;
     regime_periods: RegimePeriod[];
+    basicAmountPercentage: string | number;
+    annualBasicAmountIncreasePercentage: string | number;
+    cesantiaEdadAvanzada: string | number;
 }
 
 export type CalculateForm = InertiaForm<CalculateFormData>;

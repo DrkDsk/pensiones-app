@@ -56,4 +56,7 @@ export const createCalculateFormDefaults = (
     },
     family_information: createFamilyInformationDefaults(selectedClient),
     regime_periods: createBaseRegimePeriods(),
+    basicAmountPercentage: '',
+    annualBasicAmountIncreasePercentage: '',
+    cesantiaEdadAvanzada: '',
 });

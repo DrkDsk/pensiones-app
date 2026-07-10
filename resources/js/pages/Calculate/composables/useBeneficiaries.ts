@@ -1,4 +1,4 @@
-import { computed, ref, toValue } from 'vue';
+import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import type { CalculateForm } from '../types/calculate';
 
@@ -26,26 +26,22 @@ export const useBeneficiaries = (
     yearsRecognized: MaybeRefOrGetter<number>,
     form: CalculateForm,
 ) => {
-    const basicAmountPercentage = ref<string | number>('');
-    const annualBasicAmountIncreasePercentage = ref<string | number>('');
-    const cesantiaEdadAvanzada = ref<string | number>('');
-
     const averageDailySalary = computed(
         () => toFiniteNumber(toValue(averageDailySalaryLast250Weeks)) ?? 0,
     );
 
     const basicAmountPercentageNumber = computed(() =>
-        toFiniteNumber(basicAmountPercentage.value),
+        toFiniteNumber(form.basicAmountPercentage),
     );
     const annualBasicAmountIncreasePercentageNumber = computed(() =>
-        toFiniteNumber(annualBasicAmountIncreasePercentage.value),
+        toFiniteNumber(form.annualBasicAmountIncreasePercentage),
     );
     const cesantiaEdadAvanzadaNumber = computed(() =>
-        toFiniteNumber(cesantiaEdadAvanzada.value),
+        toFiniteNumber(form.cesantiaEdadAvanzada),
     );
 
     const basicAmountPercentageError = computed(() => {
-        if (basicAmountPercentage.value === '') {
+        if (form.basicAmountPercentage === '') {
             return '';
         }
 
@@ -61,7 +57,7 @@ export const useBeneficiaries = (
     });
 
     const annualBasicAmountIncreasePercentageError = computed(() => {
-        if (annualBasicAmountIncreasePercentage.value === '') {
+        if (form.annualBasicAmountIncreasePercentage === '') {
             return '';
         }
 
@@ -77,7 +73,7 @@ export const useBeneficiaries = (
     });
 
     const cesantiaEdadAvanzadaError = computed(() => {
-        if (cesantiaEdadAvanzada.value === '') {
+        if (form.cesantiaEdadAvanzada === '') {
             return '';
         }
 
@@ -238,13 +234,11 @@ export const useBeneficiaries = (
     });
 
     return {
-        basicAmountPercentage,
         basicAmountPercentageError,
         basicAmountFactor,
         dailyAmount,
         annualBasicAmount,
         foxUpdateFactor,
-        annualBasicAmountIncreasePercentage,
         annualBasicAmountIncreasePercentageError,
         annualBasicAmountIncreaseFactor,
         dailyIncrease,
@@ -252,7 +246,6 @@ export const useBeneficiaries = (
         incrementoAnualCuantiaBasica,
         incrementoFoxUpdateFactor,
         cuantiaAnualPension,
-        cesantiaEdadAvanzada,
         cesantiaEdadAvanzadaError,
         cesantiaEdadAvanzadaPorcentaje,
         pensionPorEdadTrabajador,
