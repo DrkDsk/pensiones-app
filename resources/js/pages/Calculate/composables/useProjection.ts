@@ -56,7 +56,7 @@ export const useProjection = ({
 
     const firstPensionRetroactiveAndBonus = computed(
         () =>
-            monthlyPensionValue.value / 4 +
+            monthlyPensionValue.value * 4 +
             (monthlyPensionValue.value / 1.15 / 12) * 5,
     );
 
