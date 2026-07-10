@@ -3,6 +3,7 @@ import AppButton from '@/components/AppButton.vue';
 
 defineProps<{
     currentStep: number;
+    totalSteps: number;
     processing: boolean;
 }>();
 
@@ -29,7 +30,7 @@ const emit = defineEmits<{
             :disabled="processing"
             @click="emit('next')"
         >
-            {{ currentStep === 4 ? 'Finalizar' : 'Continuar' }}
+            {{ currentStep === totalSteps ? 'Finalizar' : 'Continuar' }}
         </AppButton>
     </div>
 </template>
