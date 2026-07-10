@@ -1,7 +1,9 @@
 import type { Client } from '@/models/client';
 import type {
-    CalculateFamilyInformationForm,
     CalculateFormData,
+    CalculateFamilyInformationForm,
+    FinancingData,
+    ProjectionData,
     RegimePeriod,
 } from '../types/calculate';
 import { BASE_REGIME_TYPES } from './regimeTypes';
@@ -12,9 +14,9 @@ export const createBaseRegimePeriods = (): RegimePeriod[] =>
         regime_name: regimeType.label,
         contribution_start_date: null,
         contribution_end_date: null,
-        uma_value_year : 0,
+        uma_value_year: 0,
         time: 0,
-        integrated_balance : 0,
+        integrated_balance: 0,
         is_fixed: true,
     }));
 
@@ -38,6 +40,22 @@ export const createFamilyInformationDefaults = (
     };
 };
 
+export const createFinancingDefaults = (): FinancingData => ({
+    modalidad10CostPercentage: '',
+    modalidad40CostPercentage: '',
+    pagoRetroactivo: 205167,
+    modalidad10: 16426.84,
+    pagoAyudaDeDesempleo: 93860.61,
+    seguroDeVida: 12759.35,
+    costoAdicional: 0,
+});
+
+export const createProjectionDefaults = (): ProjectionData => ({
+    monthlyPayment: 0,
+    retirement97Sar92: 0,
+    pensionCredit: 0,
+});
+
 export const createCalculateFormDefaults = (
     selectedClient: Client | null,
 ): CalculateFormData => ({
@@ -56,6 +74,8 @@ export const createCalculateFormDefaults = (
     },
     family_information: createFamilyInformationDefaults(selectedClient),
     regime_periods: createBaseRegimePeriods(),
+    financing: createFinancingDefaults(),
+    projection: createProjectionDefaults(),
     basicAmountPercentage: '',
     annualBasicAmountIncreasePercentage: '',
     cesantiaEdadAvanzada: '',

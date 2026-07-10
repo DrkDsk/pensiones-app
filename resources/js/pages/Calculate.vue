@@ -15,6 +15,7 @@ import StepRegimePeriods from './Calculate/components/StepRegimePeriods.vue';
 import { useCalculateForm } from './Calculate/composables/useCalculateForm';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
+import { useFinancing } from './Calculate/composables/useFinancing';
 import { calculateSteps } from './Calculate/constants/calculateSteps';
 import type {
     ClientValidationField,
@@ -57,6 +58,8 @@ const {
     clearClientFields,
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
+
+const { pagoTotal, totalCostoDelProyecto } = useFinancing(form, monthlyPension);
 
 const {
     clientSearch,
@@ -247,6 +250,10 @@ const validateFamilyInformationField = (
 
                         <StepProjection
                             v-else-if="currentStep === 5"
+                            :form="form"
+                            :monthly-pension="monthlyPension"
+                            :pago-total="pagoTotal"
+                            :total-costo-del-proyecto="totalCostoDelProyecto"
                         />
                     </section>
                 </Transition>
@@ -254,6 +261,7 @@ const validateFamilyInformationField = (
 
             <StepNavigation
                 :current-step="currentStep"
+                :total-steps="calculateSteps.length"
                 :processing="form.processing"
                 @previous="goToPreviousStep"
                 @next="goToNextStep"

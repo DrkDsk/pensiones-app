@@ -1,118 +1,44 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
-import type { CalculateForm, RegimePeriod } from '../types/calculate';
+import { formatCurrency } from '../composables/useBeneficiaries';
+import { toFiniteNumber, useFinancing } from '../composables/useFinancing';
+import type { CalculateForm, FinancingData } from '../types/calculate';
 
-type FinancingRegimeType = 'modalidad_10' | 'modalidad_40';
-
-type FinancingRegimeRow = {
-    regimeType: FinancingRegimeType;
-    label: string;
-    startDate: string;
-    endDate: string;
-    costPercentage: string | number;
-};
+type AppInputModelValue = string | number | undefined;
 
 const props = defineProps<{
     form: CalculateForm;
     monthlyPension: number;
 }>();
 
+const form = props.form;
 const currentYear = new Date().getFullYear();
 const umaLabel = `Valor UMA ${currentYear}`;
 
-const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-    }).format(Number.isFinite(value) ? value : 0);
+const {
+    rows,
+    updateCostPercentage,
+    updateRegimePeriodDate,
+    valorUma,
+    salarioDiarioTopado,
+    salarioMensualAlta,
+    pagoMensual,
+    pagoTotalPorPeriodo,
+    pagoTotal,
+    inversionTotal,
+    financiamiento,
+    intereses,
+    honorarios,
+    totalCostoDelProyecto,
+} = useFinancing(form, () => props.monthlyPension);
 
-const toFiniteNumber = (value: unknown) => {
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) ? numericValue : 0;
+const handleFinancingChange = (
+    field: keyof FinancingData,
+    value: AppInputModelValue,
+) => {
+    form.financing[field] = value ?? '';
 };
-
-const regimePeriodFor = (
-    regimeType: FinancingRegimeType,
-): RegimePeriod | undefined =>
-    props.form.regime_periods.find(
-        (period) => period.regime_type === regimeType,
-    );
-
-const rows = reactive<FinancingRegimeRow[]>([
-    {
-        regimeType: 'modalidad_10',
-        label: 'Modalidad 10',
-        startDate:
-            regimePeriodFor('modalidad_10')?.contribution_start_date ?? '',
-        endDate: regimePeriodFor('modalidad_10')?.contribution_end_date ?? '',
-        costPercentage: '',
-    },
-    {
-        regimeType: 'modalidad_40',
-        label: 'Modalidad 40',
-        startDate:
-            regimePeriodFor('modalidad_40')?.contribution_start_date ?? '',
-        endDate: regimePeriodFor('modalidad_40')?.contribution_end_date ?? '',
-        costPercentage: '',
-    },
-]);
-
-const valorUma = (row: FinancingRegimeRow) =>
-    toFiniteNumber(regimePeriodFor(row.regimeType)?.uma_value_year);
-
-const salarioDiarioTopado = (row: FinancingRegimeRow) => valorUma(row) * 25;
-
-const salarioMensualAlta = (row: FinancingRegimeRow) =>
-    salarioDiarioTopado(row) * 30.4;
-
-const costoPorcentual = (row: FinancingRegimeRow) =>
-    toFiniteNumber(row.costPercentage) / 100;
-
-const pagoMensual = (row: FinancingRegimeRow) =>
-    salarioMensualAlta(row) * costoPorcentual(row);
-
-const pagoTotalPorPeriodo = (row: FinancingRegimeRow) => {
-    const value = row.regimeType === 'modalidad_10' ? 9.767 : 5;
-
-    return pagoMensual(row) * value;
-};
-
-const pagoTotal = computed(() =>
-    rows.reduce((total, row) => total + pagoTotalPorPeriodo(row), 0),
-);
-
-const pagoRetroactivo = ref<string | number>(205167);
-const modalidad10 = ref<string | number>(16426.84);
-const pagoAyudaDeDesempleo = ref<string | number>(93860.61);
-const seguroDeVida = ref<string | number>(12759.35);
-const costoAdicional = ref<string | number>(0);
-
-const inversionTotal = computed(
-    () =>
-        toFiniteNumber(pagoRetroactivo.value) +
-        toFiniteNumber(modalidad10.value) +
-        toFiniteNumber(pagoAyudaDeDesempleo.value) +
-        toFiniteNumber(seguroDeVida.value),
-);
-
-const financiamiento = computed(() => inversionTotal.value);
-
-const intereses = computed(() => financiamiento.value * 0.4);
-
-const honorarios = computed(() =>
-    Number.isFinite(props.monthlyPension) ? props.monthlyPension : 0,
-);
-
-const totalCostoDelProyecto = computed(
-    () =>
-        financiamiento.value +
-        intereses.value +
-        honorarios.value +
-        toFiniteNumber(costoAdicional.value),
-);
 </script>
 
 <template>
@@ -190,12 +116,26 @@ const totalCostoDelProyecto = computed(
                         <td class="px-4 py-4">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <AppInput
-                                    v-model="row.startDate"
+                                    :model-value="row.startDate"
+                                    @update:model-value="
+                                        updateRegimePeriodDate(
+                                            row.regimeType,
+                                            'contribution_start_date',
+                                            $event,
+                                        )
+                                    "
                                     label="Fecha Inicial"
                                     type="date"
                                 />
                                 <AppInput
-                                    v-model="row.endDate"
+                                    :model-value="row.endDate"
+                                    @update:model-value="
+                                        updateRegimePeriodDate(
+                                            row.regimeType,
+                                            'contribution_end_date',
+                                            $event,
+                                        )
+                                    "
                                     label="Fecha Final"
                                     type="date"
                                 />
@@ -243,7 +183,13 @@ const totalCostoDelProyecto = computed(
                         </td>
                         <td class="px-4 py-4">
                             <AppInput
-                                v-model="row.costPercentage"
+                                :model-value="row.costPercentage"
+                                @update:model-value="
+                                    updateCostPercentage(
+                                        row.costPercentageField,
+                                        $event,
+                                    )
+                                "
                                 label="Costo Porcentual"
                                 type="number"
                                 min="0"
@@ -304,21 +250,35 @@ const totalCostoDelProyecto = computed(
             </div>
 
             <AppInput
-                v-model="pagoRetroactivo"
+                :model-value="props.form.financing.pagoRetroactivo"
+                @update:model-value="
+                    handleFinancingChange('pagoRetroactivo', $event)
+                "
                 label="Pago Retroactivo"
                 type="number"
                 min="0"
                 step="0.01"
-                :helper="formatCurrency(toFiniteNumber(pagoRetroactivo))"
+                :helper="
+                    formatCurrency(
+                        toFiniteNumber(props.form.financing.pagoRetroactivo),
+                    )
+                "
             />
 
             <AppInput
-                v-model="modalidad10"
+                :model-value="props.form.financing.modalidad10"
+                @update:model-value="
+                    handleFinancingChange('modalidad10', $event)
+                "
                 label="Modalidad 10"
                 type="number"
                 min="0"
                 step="0.01"
-                :helper="formatCurrency(toFiniteNumber(modalidad10))"
+                :helper="
+                    formatCurrency(
+                        toFiniteNumber(props.form.financing.modalidad10),
+                    )
+                "
             />
         </div>
     </AppCard>
@@ -334,21 +294,37 @@ const totalCostoDelProyecto = computed(
 
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <AppInput
-                v-model="pagoAyudaDeDesempleo"
+                :model-value="props.form.financing.pagoAyudaDeDesempleo"
+                @update:model-value="
+                    handleFinancingChange('pagoAyudaDeDesempleo', $event)
+                "
                 label="Pago Ayuda De Desempleo"
                 type="number"
                 min="0"
                 step="0.01"
-                :helper="formatCurrency(toFiniteNumber(pagoAyudaDeDesempleo))"
+                :helper="
+                    formatCurrency(
+                        toFiniteNumber(
+                            props.form.financing.pagoAyudaDeDesempleo,
+                        ),
+                    )
+                "
             />
 
             <AppInput
-                v-model="seguroDeVida"
+                :model-value="props.form.financing.seguroDeVida"
+                @update:model-value="
+                    handleFinancingChange('seguroDeVida', $event)
+                "
                 label="Seguro De Vida"
                 type="number"
                 min="0"
                 step="0.01"
-                :helper="formatCurrency(toFiniteNumber(seguroDeVida))"
+                :helper="
+                    formatCurrency(
+                        toFiniteNumber(props.form.financing.seguroDeVida),
+                    )
+                "
             />
 
             <div class="grid gap-2">
@@ -392,12 +368,19 @@ const totalCostoDelProyecto = computed(
             </div>
 
             <AppInput
-                v-model="costoAdicional"
+                :model-value="props.form.financing.costoAdicional"
+                @update:model-value="
+                    handleFinancingChange('costoAdicional', $event)
+                "
                 label="Costo Adicional"
                 type="number"
                 min="0"
                 step="0.01"
-                :helper="formatCurrency(toFiniteNumber(costoAdicional))"
+                :helper="
+                    formatCurrency(
+                        toFiniteNumber(props.form.financing.costoAdicional),
+                    )
+                "
             />
         </div>
     </AppCard>
