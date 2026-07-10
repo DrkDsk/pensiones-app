@@ -216,6 +216,10 @@ export const validateRegimePeriods = (
             }
         }
 
+        if (period.is_fixed && period.uma_value_year == 0) {
+            fail(index, 'uma_value_year', 'El valor de UMA es obligatorio.');
+        }
+
         if (!period.contribution_start_date) {
             fail(
                 index,

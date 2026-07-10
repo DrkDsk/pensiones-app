@@ -149,9 +149,13 @@ export const useCalculateForm = (selectedClient: Client | null) => {
     });
 
     const sum_time_regime_periods = computed(() =>
-        form.regime_periods.reduce((sum, period) => {
-            return sum + period.time;
-        }, 0),
+        Number(
+            form.regime_periods
+                .reduce((sum, period) => {
+                    return sum + period.time;
+                }, 0)
+                .toFixed(2),
+        ),
     );
 
     const contributed_weeks = computed(() => {
