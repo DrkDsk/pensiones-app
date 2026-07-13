@@ -26,16 +26,48 @@ export type RegimePeriod = {
     contribution_start_date: string | null;
     contribution_end_date: string | null;
     time: number;
-    uma_value_year : number | null;
+    uma_value_year: number | null;
     integrated_balance: number | null;
     is_fixed: boolean;
 };
+
+export interface modalidadPeriod {
+    contribution_start_date: string;
+    contribution_end_date: string;
+}
+
+export interface FinancingData {
+    modalidad10CostPercentage: string | number;
+    modalidad40CostPercentage: string | number;
+    pagoRetroactivo: string | number;
+    modalidad10: string | number;
+    pagoAyudaDeDesempleo: string | number;
+    seguroDeVida: string | number;
+    costoAdicional: string | number;
+    modalidad10Dates: modalidadPeriod;
+    modalidad40Dates: modalidadPeriod;
+}
+
+export interface ProjectionData {
+    monthlyPayment: string | number;
+    retirement97Sar92: string | number;
+    pensionCredit: string | number;
+}
+
+export interface BeneficieresData {
+    basicAmountPercentage: string | number;
+    annualBasicAmountIncreasePercentage: string | number;
+    cesantiaEdadAvanzada: string | number;
+}
 
 export interface CalculateFormData {
     client_id: number | null;
     client: CalculateClientForm;
     family_information: CalculateFamilyInformationForm;
     regime_periods: RegimePeriod[];
+    financing: FinancingData;
+    projection: ProjectionData;
+    beneficieres: BeneficieresData;
 }
 
 export type CalculateForm = InertiaForm<CalculateFormData>;

@@ -28,7 +28,7 @@ export const useCalculateSteps = ({
 
     const goToNextStep = () => {
         if (currentStep.value === steps.length) {
-            for (let step = 1; step < steps.length; step += 1) {
+            for (let step = 1; step <= steps.length; step += 1) {
                 if (!validateCurrentStep(step)) {
                     currentStep.value = step;
 

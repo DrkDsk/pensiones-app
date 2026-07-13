@@ -7,7 +7,9 @@ import {
     formatPercentage,
     useBeneficiaries,
 } from '../composables/useBeneficiaries';
-import type { CalculateForm } from '../types/calculate';
+import type { CalculateForm, CalculateFormData } from '../types/calculate';
+
+type AppInputModelValue = string | number | undefined;
 
 const props = defineProps<{
     averageDailySalaryLast250Weeks: number;
@@ -16,24 +18,23 @@ const props = defineProps<{
     form: CalculateForm;
 }>();
 
+const form = props.form;
+
 const emit = defineEmits<{
     'update:monthlyPension': [value: number];
 }>();
 
 const {
-    basicAmountPercentage,
     basicAmountPercentageError,
     dailyAmount,
     annualBasicAmount,
     foxUpdateFactor,
-    annualBasicAmountIncreasePercentage,
     annualBasicAmountIncreasePercentageError,
     dailyIncrease,
     previousAnnualIncrease,
     incrementoAnualCuantiaBasica,
     incrementoFoxUpdateFactor,
     cuantiaAnualPension,
-    cesantiaEdadAvanzada,
     cesantiaEdadAvanzadaError,
     pensionPorEdadTrabajador,
     ayudaAsignacionFamiliar,
@@ -46,8 +47,28 @@ const {
 } = useBeneficiaries(
     () => props.averageDailySalaryLast250Weeks,
     props.yearsRecognized,
-    props.form,
+    form,
 );
+
+const handleBasicAmountPercentageChange = (value: AppInputModelValue) => {
+    form.beneficieres.basicAmountPercentage =
+        value ??
+        ('' satisfies CalculateFormData['beneficieres']['basicAmountPercentage']);
+};
+
+const handleAnnualBasicAmountIncreasePercentageChange = (
+    value: AppInputModelValue,
+) => {
+    form.beneficieres.annualBasicAmountIncreasePercentage =
+        value ??
+        ('' satisfies CalculateFormData['beneficieres']['annualBasicAmountIncreasePercentage']);
+};
+
+const handleCesantiaEdadAvanzadaChange = (value: AppInputModelValue) => {
+    form.beneficieres.cesantiaEdadAvanzada =
+        value ??
+        ('' satisfies CalculateFormData['beneficieres']['cesantiaEdadAvanzada']);
+};
 
 const monthlyPension = computed(() => cuantiaTotalPension.value / 12);
 
@@ -84,7 +105,8 @@ watch(
 
             <div class="grid gap-2">
                 <AppInput
-                    v-model="basicAmountPercentage"
+                    :model-value="form.beneficieres.basicAmountPercentage"
+                    @update:model-value="handleBasicAmountPercentageChange"
                     label="Cuantía Básica (%)"
                     type="number"
                     min="0"
@@ -153,7 +175,12 @@ watch(
 
             <div class="grid gap-2">
                 <AppInput
-                    v-model="annualBasicAmountIncreasePercentage"
+                    :model-value="
+                        form.beneficieres.annualBasicAmountIncreasePercentage
+                    "
+                    @update:model-value="
+                        handleAnnualBasicAmountIncreasePercentageChange
+                    "
                     label="Incremento Cuantía Básica (%)"
                     type="number"
                     min="0"
@@ -278,7 +305,8 @@ watch(
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <div class="grid gap-2">
                 <AppInput
-                    v-model="cesantiaEdadAvanzada"
+                    :model-value="form.beneficieres.cesantiaEdadAvanzada"
+                    @update:model-value="handleCesantiaEdadAvanzadaChange"
                     label="Cesantía en Edad Avanzada (%)"
                     type="number"
                     min="0"

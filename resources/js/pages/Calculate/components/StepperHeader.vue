@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CalculateStep } from '../types/calculate';
 
-defineProps<{
+const props = defineProps<{
     steps: CalculateStep[];
     currentStep: number;
     progressWidth: string;
@@ -46,7 +46,7 @@ const emit = defineEmits<{
                     <p
                         class="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100"
                     >
-                        {{ currentStep }}/4
+                        {{ currentStep }}/{{ props.steps.length }}
                     </p>
                 </div>
             </div>
@@ -60,7 +60,7 @@ const emit = defineEmits<{
                     :style="{ width: progressWidth }"
                 />
 
-                <div class="relative grid gap-4 sm:grid-cols-4">
+                <div class="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <button
                         v-for="step in steps"
                         :key="step.id"

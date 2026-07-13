@@ -5,6 +5,7 @@ import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppModal from '@/components/AppModal.vue';
 import type { Client } from '@/models/client';
+import StepProjection from '@/pages/Calculate/components/StepProjection.vue';
 import StepBeneficiaries from './Calculate/components/StepBeneficiaries.vue';
 import StepClient from './Calculate/components/StepClient.vue';
 import StepFinancing from './Calculate/components/StepFinancing.vue';
@@ -14,6 +15,7 @@ import StepRegimePeriods from './Calculate/components/StepRegimePeriods.vue';
 import { useCalculateForm } from './Calculate/composables/useCalculateForm';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
+import { useFinancing } from './Calculate/composables/useFinancing';
 import { calculateSteps } from './Calculate/constants/calculateSteps';
 import type {
     ClientValidationField,
@@ -56,6 +58,8 @@ const {
     clearClientFields,
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
+
+const { pagoTotal, totalCostoDelProyecto } = useFinancing(form, monthlyPension);
 
 const {
     clientSearch,
@@ -243,12 +247,21 @@ const validateFamilyInformationField = (
                             :form="form"
                             :monthly-pension="monthlyPension"
                         />
+
+                        <StepProjection
+                            v-else-if="currentStep === 5"
+                            :form="form"
+                            :monthly-pension="monthlyPension"
+                            :pago-total="pagoTotal"
+                            :total-costo-del-proyecto="totalCostoDelProyecto"
+                        />
                     </section>
                 </Transition>
             </div>
 
             <StepNavigation
                 :current-step="currentStep"
+                :total-steps="calculateSteps.length"
                 :processing="form.processing"
                 @previous="goToPreviousStep"
                 @next="goToNextStep"
