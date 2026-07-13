@@ -37,6 +37,10 @@ const handleFinancingChange = (
     field: keyof FinancingData,
     value: AppInputModelValue,
 ) => {
+    if (field === 'modalidad10Dates' || field === 'modalidad40Dates') {
+        return ;
+    }
+
     form.financing[field] = value ?? '';
 };
 </script>

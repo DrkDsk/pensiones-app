@@ -31,6 +31,11 @@ export type RegimePeriod = {
     is_fixed: boolean;
 };
 
+export interface modalidadPeriod {
+    contribution_start_date: string;
+    contribution_end_date: string;
+}
+
 export interface FinancingData {
     modalidad10CostPercentage: string | number;
     modalidad40CostPercentage: string | number;
@@ -39,6 +44,8 @@ export interface FinancingData {
     pagoAyudaDeDesempleo: string | number;
     seguroDeVida: string | number;
     costoAdicional: string | number;
+    modalidad10Dates: modalidadPeriod;
+    modalidad40Dates: modalidadPeriod;
 }
 
 export interface ProjectionData {

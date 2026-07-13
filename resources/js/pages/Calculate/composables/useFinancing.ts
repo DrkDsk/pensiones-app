@@ -67,14 +67,11 @@ export const useFinancing = (
         field: 'contribution_start_date' | 'contribution_end_date',
         value: string | number | undefined,
     ) => {
-        const period = regimePeriodFor(regimeType);
-
-        if (!period) {
-            return;
+        if (regimeType === 'modalidad_10') {
+            form.financing.modalidad10Dates[field] = value === undefined ? '' : String(value);
+        } else if (regimeType === 'modalidad_40') {
+            form.financing.modalidad40Dates[field] = value === undefined ? '' : String(value);
         }
-
-        period[field] =
-            value === undefined || value === '' ? null : String(value);
     };
 
     const valorUma = (row: FinancingRegimeRow) =>

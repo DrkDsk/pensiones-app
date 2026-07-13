@@ -48,6 +48,14 @@ export const createFinancingDefaults = (): FinancingData => ({
     pagoAyudaDeDesempleo: 93860.61,
     seguroDeVida: 12759.35,
     costoAdicional: 0,
+    modalidad40Dates : {
+        contribution_end_date : '',
+        contribution_start_date : ''
+    },
+    modalidad10Dates : {
+        contribution_end_date : '',
+        contribution_start_date : ''
+    }
 });
 
 export const createProjectionDefaults = (): ProjectionData => ({
