@@ -31,17 +31,17 @@ export const useBeneficiaries = (
     );
 
     const basicAmountPercentageNumber = computed(() =>
-        toFiniteNumber(form.basicAmountPercentage),
+        toFiniteNumber(form.beneficieres.basicAmountPercentage),
     );
     const annualBasicAmountIncreasePercentageNumber = computed(() =>
-        toFiniteNumber(form.annualBasicAmountIncreasePercentage),
+        toFiniteNumber(form.beneficieres.annualBasicAmountIncreasePercentage),
     );
     const cesantiaEdadAvanzadaNumber = computed(() =>
-        toFiniteNumber(form.cesantiaEdadAvanzada),
+        toFiniteNumber(form.beneficieres.cesantiaEdadAvanzada),
     );
 
     const basicAmountPercentageError = computed(() => {
-        if (form.basicAmountPercentage === '') {
+        if (form.beneficieres.basicAmountPercentage === '') {
             return '';
         }
 
@@ -57,7 +57,7 @@ export const useBeneficiaries = (
     });
 
     const annualBasicAmountIncreasePercentageError = computed(() => {
-        if (form.annualBasicAmountIncreasePercentage === '') {
+        if (form.beneficieres.annualBasicAmountIncreasePercentage === '') {
             return '';
         }
 
@@ -73,7 +73,7 @@ export const useBeneficiaries = (
     });
 
     const cesantiaEdadAvanzadaError = computed(() => {
-        if (form.cesantiaEdadAvanzada === '') {
+        if (form.beneficieres.cesantiaEdadAvanzada === '') {
             return '';
         }
 

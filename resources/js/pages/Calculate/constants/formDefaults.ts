@@ -1,5 +1,6 @@
 import type { Client } from '@/models/client';
 import type {
+    BeneficieresData,
     CalculateFormData,
     CalculateFamilyInformationForm,
     FinancingData,
@@ -64,6 +65,12 @@ export const createProjectionDefaults = (): ProjectionData => ({
     pensionCredit: 0,
 });
 
+export const createBeneficieresDefaults = (): BeneficieresData => ({
+    basicAmountPercentage: '',
+    annualBasicAmountIncreasePercentage: '',
+    cesantiaEdadAvanzada: '',
+});
+
 export const createCalculateFormDefaults = (
     selectedClient: Client | null,
 ): CalculateFormData => ({
@@ -84,7 +91,5 @@ export const createCalculateFormDefaults = (
     regime_periods: createBaseRegimePeriods(),
     financing: createFinancingDefaults(),
     projection: createProjectionDefaults(),
-    basicAmountPercentage: '',
-    annualBasicAmountIncreasePercentage: '',
-    cesantiaEdadAvanzada: '',
+    beneficieres: createBeneficieresDefaults(),
 });

@@ -50,26 +50,24 @@ const {
     form,
 );
 
-const handleBasicAmountPercentageChange = (
-    value: AppInputModelValue,
-) => {
-    form.basicAmountPercentage =
-        value ?? ('' satisfies CalculateFormData['basicAmountPercentage']);
+const handleBasicAmountPercentageChange = (value: AppInputModelValue) => {
+    form.beneficieres.basicAmountPercentage =
+        value ??
+        ('' satisfies CalculateFormData['beneficieres']['basicAmountPercentage']);
 };
 
 const handleAnnualBasicAmountIncreasePercentageChange = (
     value: AppInputModelValue,
 ) => {
-    form.annualBasicAmountIncreasePercentage =
+    form.beneficieres.annualBasicAmountIncreasePercentage =
         value ??
-        ('' satisfies CalculateFormData['annualBasicAmountIncreasePercentage']);
+        ('' satisfies CalculateFormData['beneficieres']['annualBasicAmountIncreasePercentage']);
 };
 
-const handleCesantiaEdadAvanzadaChange = (
-    value: AppInputModelValue,
-) => {
-    form.cesantiaEdadAvanzada =
-        value ?? ('' satisfies CalculateFormData['cesantiaEdadAvanzada']);
+const handleCesantiaEdadAvanzadaChange = (value: AppInputModelValue) => {
+    form.beneficieres.cesantiaEdadAvanzada =
+        value ??
+        ('' satisfies CalculateFormData['beneficieres']['cesantiaEdadAvanzada']);
 };
 
 const monthlyPension = computed(() => cuantiaTotalPension.value / 12);
@@ -107,7 +105,7 @@ watch(
 
             <div class="grid gap-2">
                 <AppInput
-                    :model-value="form.basicAmountPercentage"
+                    :model-value="form.beneficieres.basicAmountPercentage"
                     @update:model-value="handleBasicAmountPercentageChange"
                     label="Cuantía Básica (%)"
                     type="number"
@@ -178,7 +176,7 @@ watch(
             <div class="grid gap-2">
                 <AppInput
                     :model-value="
-                        form.annualBasicAmountIncreasePercentage
+                        form.beneficieres.annualBasicAmountIncreasePercentage
                     "
                     @update:model-value="
                         handleAnnualBasicAmountIncreasePercentageChange
@@ -307,7 +305,7 @@ watch(
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <div class="grid gap-2">
                 <AppInput
-                    :model-value="form.cesantiaEdadAvanzada"
+                    :model-value="form.beneficieres.cesantiaEdadAvanzada"
                     @update:model-value="handleCesantiaEdadAvanzadaChange"
                     label="Cesantía en Edad Avanzada (%)"
                     type="number"

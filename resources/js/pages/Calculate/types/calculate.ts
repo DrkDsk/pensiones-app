@@ -54,6 +54,12 @@ export interface ProjectionData {
     pensionCredit: string | number;
 }
 
+export interface BeneficieresData {
+    basicAmountPercentage: string | number;
+    annualBasicAmountIncreasePercentage: string | number;
+    cesantiaEdadAvanzada: string | number;
+}
+
 export interface CalculateFormData {
     client_id: number | null;
     client: CalculateClientForm;
@@ -61,9 +67,7 @@ export interface CalculateFormData {
     regime_periods: RegimePeriod[];
     financing: FinancingData;
     projection: ProjectionData;
-    basicAmountPercentage: string | number;
-    annualBasicAmountIncreasePercentage: string | number;
-    cesantiaEdadAvanzada: string | number;
+    beneficieres: BeneficieresData;
 }
 
 export type CalculateForm = InertiaForm<CalculateFormData>;

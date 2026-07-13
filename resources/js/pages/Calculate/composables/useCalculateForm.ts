@@ -258,7 +258,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         enableManualMode: () => void,
         returnToClientStep: () => void,
     ) => {
-        form.post(calculate.store().url, {
+        /*form.post(calculate.store().url, {
             preserveScroll: true,
             onError: (errors) => {
                 const normalizedErrors = Object.fromEntries(
@@ -274,7 +274,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
                 applyServerErrors(normalizedErrors, enableManualMode);
                 returnToClientStep();
             },
-        });
+        });*/
     };
 
     return {
