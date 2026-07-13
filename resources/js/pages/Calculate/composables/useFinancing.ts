@@ -36,20 +36,16 @@ export const useFinancing = (
         {
             regimeType: 'modalidad_10',
             label: 'Modalidad 10',
-            startDate:
-                regimePeriodFor('modalidad_10')?.contribution_start_date ?? '',
-            endDate:
-                regimePeriodFor('modalidad_10')?.contribution_end_date ?? '',
+            startDate: form.financing.modalidad10Dates.contribution_start_date ?? '',
+            endDate: form.financing.modalidad10Dates.contribution_end_date ?? '',
             costPercentage: form.financing.modalidad10CostPercentage,
             costPercentageField: 'modalidad10CostPercentage',
         },
         {
             regimeType: 'modalidad_40',
             label: 'Modalidad 40',
-            startDate:
-                regimePeriodFor('modalidad_40')?.contribution_start_date ?? '',
-            endDate:
-                regimePeriodFor('modalidad_40')?.contribution_end_date ?? '',
+            startDate: form.financing.modalidad40Dates.contribution_start_date ?? '',
+            endDate: form.financing.modalidad40Dates.contribution_end_date ?? '',
             costPercentage: form.financing.modalidad40CostPercentage,
             costPercentageField: 'modalidad40CostPercentage',
         },
