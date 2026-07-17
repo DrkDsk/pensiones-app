@@ -40,7 +40,7 @@ const showRegimeTimeModal = ref(false);
 const showRegimeTimeError = ref(false);
 const REGIME_TIME_MINIMUM = 5;
 const REGIME_TIME_ERROR_MESSAGE =
-    'No es posible avanzar al siguiente paso, debido a que el tiempo de cotización no es mayor a 5';
+    'No es posible avanzar al siguiente paso, debido a que el tiempo de cotización no es igual a 5';
 
 const {
     form,
@@ -106,7 +106,7 @@ const validateCurrentStep = (
         return stepIsValid;
     }
 
-    if (sum_time_regime_periods.value >= REGIME_TIME_MINIMUM) {
+    if (sum_time_regime_periods.value == REGIME_TIME_MINIMUM) {
         showRegimeTimeError.value = false;
 
         return stepIsValid;
