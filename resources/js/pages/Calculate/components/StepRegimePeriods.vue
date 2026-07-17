@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { GripVertical, Plus, Trash2 } from '@lucide/vue';
+import Sortable from 'sortablejs';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppInput from '@/components/AppInput.vue';
@@ -8,6 +9,7 @@ import { useRegimePeriods } from '../composables/useRegimePeriods';
 import { MAX_ADDITIONAL_REGIME_PERIODS } from '../constants/regimeTypes';
 import type {
     CalculateForm,
+    RegimePeriod,
     RegimePeriodField,
     StepErrors,
 } from '../types/calculate';
@@ -27,10 +29,13 @@ const props = defineProps<{
     validateRegimePeriods: () => boolean;
 }>();
 
+const form = props.form;
 const { addRegimePeriod, removeRegimePeriod, updateRegimePeriodField } =
-    useRegimePeriods(props.form);
+    useRegimePeriods(form);
 
 const maxRowsMessage = ref('');
+const periodsTableBody = ref<HTMLElement | null>(null);
+let sortable: Sortable | null = null;
 
 const additionalPeriodsCount = computed(
     () => props.form.regime_periods.filter((period) => !period.is_fixed).length,
@@ -67,6 +72,50 @@ const formatCurrency = (value: number) =>
 
 const periodError = (index: number, field: RegimePeriodField) =>
     props.stepErrors.regime_periods[index]?.[field] ?? '';
+
+const isFixedRegime = (period: RegimePeriod): boolean => {
+    return (
+        period.regime_type === 'modalidad_10' ||
+        period.regime_type === 'modalidad_40'
+    );
+};
+
+const restoreDraggedRowDom = (event: Sortable.SortableEvent) => {
+    if (event.oldIndex === undefined) {
+        return;
+    }
+
+    event.item.remove();
+    event.from.insertBefore(
+        event.item,
+        event.from.children.item(event.oldIndex),
+    );
+};
+
+const moveDynamicRegimePeriod = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) {
+        return;
+    }
+
+    const dynamicPeriods = form.regime_periods.filter(
+        (period) => !isFixedRegime(period),
+    );
+    const fixedPeriods = form.regime_periods.filter(isFixedRegime);
+    const [movedPeriod] = dynamicPeriods.splice(fromIndex, 1);
+
+    if (!movedPeriod) {
+        return;
+    }
+
+    dynamicPeriods.splice(toIndex, 0, movedPeriod);
+    form.regime_periods.splice(
+        0,
+        form.regime_periods.length,
+        ...dynamicPeriods,
+        ...fixedPeriods,
+    );
+    props.validateRegimePeriods();
+};
 
 const handleAddRegimePeriod = () => {
     maxRowsMessage.value = '';
@@ -115,6 +164,40 @@ const updateContributionDate = (
     updateRegimePeriodField(index, field, value ? String(value) : null);
     props.validateRegimePeriods();
 };
+
+onMounted(() => {
+    if (!periodsTableBody.value) {
+        return;
+    }
+
+    sortable = Sortable.create(periodsTableBody.value, {
+        animation: 150,
+        draggable: '.regime-draggable-row',
+        handle: '.regime-drag-handle',
+        ghostClass: 'opacity-60',
+        chosenClass: 'ring-1',
+        dragClass: 'shadow-sm',
+        onEnd(event) {
+            if (
+                event.oldDraggableIndex === undefined ||
+                event.newDraggableIndex === undefined
+            ) {
+                return;
+            }
+
+            restoreDraggedRowDom(event);
+            moveDynamicRegimePeriod(
+                event.oldDraggableIndex,
+                event.newDraggableIndex,
+            );
+        },
+    });
+});
+
+onBeforeUnmount(() => {
+    sortable?.destroy();
+    sortable = null;
+});
 </script>
 
 <template>
@@ -146,6 +229,9 @@ const updateContributionDate = (
             >
                 <thead class="bg-slate-50 dark:bg-slate-950/60">
                     <tr>
+                        <th class="w-10 px-2 py-3">
+                            <span class="sr-only">Ordenar</span>
+                        </th>
                         <th
                             class="w-[28%] px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
                         >
@@ -181,13 +267,29 @@ const updateContributionDate = (
                 </thead>
 
                 <tbody
+                    ref="periodsTableBody"
                     class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
                 >
                     <tr
                         v-for="(period, index) in form.regime_periods"
                         :key="period.id ?? `${period.regime_type}-${index}`"
+                        :data-period-id="period.id"
                         class="align-top"
+                        :class="
+                            !isFixedRegime(period) ? 'regime-draggable-row' : ''
+                        "
                     >
+                        <td class="px-2 py-10">
+                            <button
+                                v-if="!isFixedRegime(period)"
+                                type="button"
+                                title="Reordenar periodo"
+                                class="regime-drag-handle inline-flex size-8 cursor-grab items-center justify-center rounded-md text-slate-300 transition hover:bg-slate-50 hover:text-slate-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:cursor-grabbing dark:hover:bg-slate-900 dark:hover:text-slate-400"
+                            >
+                                <GripVertical class="size-4" />
+                                <span class="sr-only">Reordenar periodo</span>
+                            </button>
+                        </td>
                         <td class="min-w-56 px-4 py-4">
                             <AppInput
                                 v-if="!period.is_fixed"
