@@ -83,7 +83,34 @@ const calculateAgeInYears = (birthdate: string | null): number => {
         age -= 1;
     }
 
-    return Math.max(age, 0);
+    let lastBirthday = new Date(
+        today.getFullYear(),
+        dateParts.month - 1,
+        dateParts.day,
+    );
+
+    if (today < lastBirthday) {
+        lastBirthday = new Date(
+            today.getFullYear() - 1,
+            dateParts.month -1,
+            dateParts.day,
+        );
+    }
+
+    const nextBirthday = new Date(
+        lastBirthday.getFullYear() + 1,
+        dateParts.month - 1,
+        dateParts.day,
+    );
+
+    const elapsedSinceBirthday =
+        today.getTime() - lastBirthday.getTime();
+
+    const birthdayPeriod = nextBirthday.getTime() - lastBirthday.getTime();
+
+    const decimalPart = elapsedSinceBirthday / birthdayPeriod;
+
+    return age + decimalPart;
 };
 
 export const createStepErrors = () =>
