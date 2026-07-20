@@ -14,7 +14,7 @@ class CesantiaController extends Controller
             'age' => 'required',
         ]);
 
-        $age = $request->input('age');
+        $age = round($request->input('age'), 2);
 
         return response()->json([
             'message' => 'Cesantia obtenida correctamente',
