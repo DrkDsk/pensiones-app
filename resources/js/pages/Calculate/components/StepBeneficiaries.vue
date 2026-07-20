@@ -16,6 +16,7 @@ const props = defineProps<{
     contributedWeeks: number;
     yearsRecognized: number;
     form: CalculateForm;
+    age: number;
 }>();
 
 const form = props.form;
