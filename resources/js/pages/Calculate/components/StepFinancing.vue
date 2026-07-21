@@ -121,226 +121,262 @@ const handleUmaMultiplierSelect = (multiplier: number) => {
                 <tbody
                     class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
                 >
-                    <tr
-                        v-for="row in rows"
-                        :key="row.regimeType"
-                        class="align-top"
-                    >
-                        <td
-                            class="px-4 py-4 font-semibold text-slate-800 dark:text-slate-100"
-                        >
-                            {{ row.label }}
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-3 sm:grid-cols-2">
-                                <AppInput
-                                    :model-value="row.startDate"
-                                    @update:model-value="
-                                        updateRegimePeriodDate(
-                                            row.regimeType,
-                                            'contribution_start_date',
-                                            $event,
-                                        )
-                                    "
-                                    label="Fecha Inicial"
-                                    type="date"
-                                />
-                                <AppInput
-                                    :model-value="row.endDate"
-                                    @update:model-value="
-                                        updateRegimePeriodDate(
-                                            row.regimeType,
-                                            'contribution_end_date',
-                                            $event,
-                                        )
-                                    "
-                                    label="Fecha Final"
-                                    type="date"
-                                />
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    {{ umaLabel }}
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{ formatCurrency(valorUma(row)) }}
+                    <template v-for="row in rows" :key="row.regimeType">
+                        <tr class="align-top">
+                            <td
+                                class="px-4 py-4 font-semibold text-slate-800 dark:text-slate-100"
+                            >
+                                {{ row.label }}
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <AppInput
+                                        :model-value="row.startDate"
+                                        @update:model-value="
+                                            updateRegimePeriodDate(
+                                                row.regimeType,
+                                                'contribution_start_date',
+                                                $event,
+                                            )
+                                        "
+                                        label="Fecha Inicial"
+                                        type="date"
+                                    />
+                                    <AppInput
+                                        :model-value="row.endDate"
+                                        @update:model-value="
+                                            updateRegimePeriodDate(
+                                                row.regimeType,
+                                                'contribution_end_date',
+                                                $event,
+                                            )
+                                        "
+                                        label="Fecha Final"
+                                        type="date"
+                                    />
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    Salario Diario Topado A
-                                    {{ selectedUmaMultiplier(row) }} UMAS
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{
-                                        formatCurrency(salarioDiarioTopado(row))
-                                    }}
-                                </div>
-                                <button
-                                    v-if="row.regimeType === 'modalidad_40'"
-                                    type="button"
-                                    class="w-max text-xs font-medium text-slate-600 underline underline-offset-4 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-                                    @click="showUmaValues = !showUmaValues"
-                                >
-                                    {{
-                                        showUmaValues
-                                            ? 'Ocultar valores por UMA'
-                                            : 'Ver valores por UMA'
-                                    }}
-                                </button>
-                                <div
-                                    v-if="
-                                        row.regimeType === 'modalidad_40' &&
-                                        showUmaValues
-                                    "
-                                    class="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800"
-                                >
-                                    <table
-                                        class="min-w-full divide-y divide-slate-100 text-left text-xs dark:divide-slate-800"
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        {{ umaLabel }}
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                                     >
-                                        <thead
-                                            class="bg-slate-50 text-slate-500 dark:bg-slate-900 dark:text-slate-400"
-                                        >
-                                            <tr>
-                                                <th
-                                                    class="px-3 py-2 font-semibold"
-                                                >
-                                                    UMAS
-                                                </th>
-                                                <th
-                                                    class="px-3 py-2 font-semibold"
-                                                >
-                                                    Operación
-                                                </th>
-                                                <th
-                                                    class="px-3 py-2 font-semibold"
-                                                >
-                                                    Resultado
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody
-                                            class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
-                                        >
-                                            <tr
-                                                v-for="multiplier in umaMultipliers"
-                                                :key="multiplier"
-                                                class="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-900"
-                                                :class="
-                                                    selectedUmaMultiplier(
-                                                        row,
-                                                    ) === multiplier
-                                                        ? 'bg-slate-100 ring-1 ring-slate-300 ring-inset dark:bg-slate-900 dark:ring-slate-700'
-                                                        : ''
-                                                "
-                                                @click="
-                                                    handleUmaMultiplierSelect(
-                                                        multiplier,
-                                                    )
-                                                "
+                                        {{ formatCurrency(valorUma(row)) }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Salario Diario Topado A
+                                        {{ selectedUmaMultiplier(row) }} UMAS
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatCurrency(
+                                                salarioDiarioTopado(row),
+                                            )
+                                        }}
+                                    </div>
+                                    <button
+                                        v-if="row.regimeType === 'modalidad_40'"
+                                        type="button"
+                                        class="w-max text-xs font-medium text-slate-600 underline underline-offset-4 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+                                        @click="showUmaValues = !showUmaValues"
+                                    >
+                                        {{
+                                            showUmaValues
+                                                ? 'Ocultar valores por UMA'
+                                                : 'Ver valores por UMA'
+                                        }}
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Salario Mensual Alta
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatCurrency(
+                                                salarioMensualAlta(row),
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <AppInput
+                                    :model-value="row.costPercentage"
+                                    @update:model-value="
+                                        updateCostPercentage(
+                                            row.costPercentageField,
+                                            $event,
+                                        )
+                                    "
+                                    label="Costo Porcentual"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="40"
+                                    helper="Captura 40 para 40%."
+                                />
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Pago Mensual
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{ formatCurrency(pagoMensual(row)) }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Pago Total Por Periodo
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatCurrency(
+                                                pagoTotalPorPeriodo(row),
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr
+                            v-if="
+                                row.regimeType === 'modalidad_40' &&
+                                showUmaValues
+                            "
+                        >
+                            <td colspan="8" class="p-0">
+                                <div
+                                    class="border-t border-slate-200 bg-slate-50/80 px-4 py-5 dark:border-slate-800 dark:bg-slate-900/40"
+                                >
+                                    <div
+                                        class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                                    >
+                                        <div class="mb-4">
+                                            <h4
+                                                class="text-sm font-semibold text-slate-900 dark:text-slate-100"
                                             >
-                                                <td
-                                                    class="px-3 py-2 font-medium text-slate-700 dark:text-slate-200"
+                                                Valores por UMA
+                                            </h4>
+                                            <p
+                                                class="mt-1 text-sm text-slate-500 dark:text-slate-400"
+                                            >
+                                                Selecciona el valor UMA que se
+                                                utilizará para los cálculos de
+                                                esta fila.
+                                            </p>
+                                        </div>
+
+                                        <div
+                                            class="overflow-x-auto rounded-md border border-slate-200 dark:border-slate-800"
+                                        >
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 text-left text-xs dark:divide-slate-800"
+                                            >
+                                                <thead
+                                                    class="bg-slate-50 text-slate-500 dark:bg-slate-900 dark:text-slate-400"
                                                 >
-                                                    {{ multiplier }}
-                                                    {{
-                                                        multiplier === 1
-                                                            ? 'UMA'
-                                                            : 'UMAS'
-                                                    }}
-                                                </td>
-                                                <td
-                                                    class="px-3 py-2 font-mono text-slate-500 dark:text-slate-400"
+                                                    <tr>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            UMAS
+                                                        </th>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            Operación
+                                                        </th>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            Resultado
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
                                                 >
-                                                    {{
-                                                        formatCurrency(
-                                                            valorUma(row),
-                                                        )
-                                                    }}
-                                                    × {{ multiplier }}
-                                                </td>
-                                                <td
-                                                    class="px-3 py-2 font-mono text-slate-700 dark:text-slate-200"
-                                                >
-                                                    {{
-                                                        formatCurrency(
-                                                            valorUma(row) *
+                                                    <tr
+                                                        v-for="multiplier in umaMultipliers"
+                                                        :key="multiplier"
+                                                        class="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-900"
+                                                        :class="
+                                                            selectedUmaMultiplier(
+                                                                row,
+                                                            ) === multiplier
+                                                                ? 'bg-slate-100 ring-1 ring-slate-300 ring-inset dark:bg-slate-900 dark:ring-slate-700'
+                                                                : ''
+                                                        "
+                                                        @click="
+                                                            handleUmaMultiplierSelect(
                                                                 multiplier,
-                                                        )
-                                                    }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                                            )
+                                                        "
+                                                    >
+                                                        <td
+                                                            class="px-3 py-2 font-medium text-slate-700 dark:text-slate-200"
+                                                        >
+                                                            {{ multiplier }}
+                                                            {{
+                                                                multiplier === 1
+                                                                    ? 'UMA'
+                                                                    : 'UMAS'
+                                                            }}
+                                                        </td>
+                                                        <td
+                                                            class="px-3 py-2 font-mono text-slate-500 dark:text-slate-400"
+                                                        >
+                                                            {{
+                                                                formatCurrency(
+                                                                    valorUma(
+                                                                        row,
+                                                                    ),
+                                                                )
+                                                            }}
+                                                            × {{ multiplier }}
+                                                        </td>
+                                                        <td
+                                                            class="px-3 py-2 font-mono text-slate-700 dark:text-slate-200"
+                                                        >
+                                                            {{
+                                                                formatCurrency(
+                                                                    valorUma(
+                                                                        row,
+                                                                    ) *
+                                                                        multiplier,
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    Salario Mensual Alta
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{
-                                        formatCurrency(salarioMensualAlta(row))
-                                    }}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <AppInput
-                                :model-value="row.costPercentage"
-                                @update:model-value="
-                                    updateCostPercentage(
-                                        row.costPercentageField,
-                                        $event,
-                                    )
-                                "
-                                label="Costo Porcentual"
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="40"
-                                helper="Captura 40 para 40%."
-                            />
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    Pago Mensual
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{ formatCurrency(pagoMensual(row)) }}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    Pago Total Por Periodo
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{
-                                        formatCurrency(pagoTotalPorPeriodo(row))
-                                    }}
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
