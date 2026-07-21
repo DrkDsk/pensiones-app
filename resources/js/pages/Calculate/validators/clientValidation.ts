@@ -272,13 +272,13 @@ export const validateFamilyInformationField = (
             ? 'hijos menores o estudiando'
             : 'padres';
 
-    stepErrors[field] = !value
+    stepErrors[field] = value === null || value === undefined
         ? options.requireRequiredFields && field !== 'parents_count'
             ? `El numero de ${fieldLabel} es obligatorio.`
             : ''
         : isNonNegativeInteger(value)
           ? ''
-          : `El numero de ${fieldLabel} debe ser un entero mayor o igual a 0.`;
+          : `El numero de ${fieldLabel} debe ser un entero`;
 
     return !stepErrors[field];
 };
