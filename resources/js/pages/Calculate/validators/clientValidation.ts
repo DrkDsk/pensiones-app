@@ -273,7 +273,7 @@ export const validateFamilyInformationField = (
             : 'padres';
 
     stepErrors[field] = !value
-        ? options.requireRequiredFields
+        ? options.requireRequiredFields && field !== 'parents_count'
             ? `El numero de ${fieldLabel} es obligatorio.`
             : ''
         : isNonNegativeInteger(value)
