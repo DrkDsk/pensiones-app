@@ -238,7 +238,11 @@ export const useRegimePeriods = (form: CalculateForm) => {
             return;
         }
 
+        const [year, month] = nextStartDate.split('-').map(Number);
+        const lastDay = new Date(year, month, 0);
+
         modalidad10.contribution_start_date = nextStartDate;
+        modalidad10.contribution_end_date = lastDay.toISOString().slice(0, 10);
         recalculatePeriodTime(modalidad10);
     };
 
