@@ -3,7 +3,12 @@ import { computed, reactive } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
 import { createCalculateFormDefaults } from '../constants/formDefaults';
-import type { CalculateFormData, ClientStepField, StepErrors } from '../types/calculate';
+
+import type {
+    CalculateFormData,
+    ClientStepField,
+    StepErrors,
+} from '../types/calculate';
 
 const toFiniteNumber = (value: unknown): number | null => {
     const numericValue = Number(value);
@@ -64,7 +69,10 @@ const addDays = (dateString: string | null, days: number): string => {
     return `${day}/${month}/${year}`;
 };
 
-export const calculateAgeInYears = (birthdate: string | null, baseDate : Date = new Date()): number => {
+export const calculateAgeInYears = (
+    birthdate: string | null,
+    baseDate: Date = new Date(),
+): number => {
     const dateParts = parseDateParts(birthdate);
 
     if (!dateParts) {
@@ -149,7 +157,6 @@ function searchValueAproxForYearReduced(value: number) {
 }
 
 export const useCalculateForm = (selectedClient: Client | null) => {
-
     const form = useForm<CalculateFormData>(
         createCalculateFormDefaults(selectedClient),
     );
@@ -191,7 +198,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         }
 
         return Number((1293 + modalidad40.time * 52 + 4).toFixed(0));
-    })
+    });
 
     const years_recognized = computed(() => {
         const weeksAfter500 = contributed_weeks.value - 500;
@@ -203,7 +210,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         const yearsReduced = searchValueAproxForYearReduced(weeksReduced);
 
         return yearsReduced + yearsCompletedAfter500;
-    })
+    });
 
     const ageInYears = computed(() => {
         return calculateAgeInYears(form.client.birthdate);
@@ -240,6 +247,19 @@ export const useCalculateForm = (selectedClient: Client | null) => {
 
             stepErrors[field as ClientStepField] = '';
         });
+    };
+
+    ///ELIMINAR SOLO PARA MOCK Y DEV
+    /// fillCalculateForm, resetCalculateForm
+
+    const fillCalculateForm = (data: CalculateFormData): void => {
+        Object.assign(form, structuredClone(data));
+        form.clearErrors();
+        clearStepErrors();
+    };
+
+    const resetCalculateForm = (): void => {
+        fillCalculateForm(createCalculateFormDefaults(selectedClient));
     };
 
     const clearClientFields = () => {
@@ -300,6 +320,9 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         });
     };
 
+    ///ELIMINAR SOLO PARA MOCK Y DEV
+    /// fillCalculateForm, resetCalculateForm
+
     return {
         form,
         average_daily_salary_last_250_weeks,
@@ -313,6 +336,8 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         stepErrors,
         clearStepError,
         clearStepErrors,
+        fillCalculateForm,
+        resetCalculateForm,
         clearClientFields,
         applyServerErrors,
         submitCalculate,
