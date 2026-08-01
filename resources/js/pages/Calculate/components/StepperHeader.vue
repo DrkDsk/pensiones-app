@@ -1,15 +1,44 @@
 <script setup lang="ts">
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar usePage y computed
+
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import type { CalculateStep } from '../types/calculate';
 
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar props.developmentModeEnabled
 const props = defineProps<{
     steps: CalculateStep[];
     currentStep: number;
     progressWidth: string;
+    developmentModeEnabled: boolean;
 }>();
 
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar toggleDevelopmentMode
 const emit = defineEmits<{
     goToStep: [step: number];
+    toggleDevelopmentMode: [enabled: boolean];
 }>();
+
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar page, isDebugModeAvailable, toggleDevelopmentMode
+
+const page = usePage();
+const isDebugModeAvailable = computed(() => page.props.debug === true);
+
+const toggleDevelopmentMode = (): void => {
+    if (!isDebugModeAvailable.value) {
+        return;
+    }
+
+    emit('toggleDevelopmentMode', !props.developmentModeEnabled);
+};
 </script>
 
 <template>
@@ -17,7 +46,9 @@ const emit = defineEmits<{
         class="border-b border-slate-200 px-6 py-5 sm:px-8 dark:border-slate-800"
     >
         <div class="flex flex-col gap-5">
-            <div class="flex items-start justify-between gap-4">
+            <div
+                class="flex flex-col items-start justify-between gap-4 sm:flex-row"
+            >
                 <div>
                     <p
                         class="text-primary-600 dark:text-primary-300 text-xs font-semibold tracking-[0.24em] uppercase"
@@ -35,19 +66,70 @@ const emit = defineEmits<{
                     </p>
                 </div>
 
-                <div
-                    class="hidden min-w-36 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 text-right sm:block dark:border-slate-800 dark:bg-slate-950/60"
-                >
-                    <p
-                        class="text-xs tracking-[0.2em] text-slate-400 uppercase dark:text-slate-500"
+                <div class="w-full space-y-3 sm:w-auto">
+                    <div
+                        v-if="isDebugModeAvailable"
+                        class="flex items-center justify-between gap-5 rounded-sm border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 sm:min-w-80 dark:border-slate-700 dark:bg-slate-950/60"
                     >
-                        Progreso
-                    </p>
-                    <p
-                        class="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100"
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <p
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                                >
+                                    Modo de desarrollo
+                                </p>
+                                <span
+                                    class="rounded-sm border border-slate-300 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:border-slate-700 dark:text-slate-400"
+                                >
+                                    DEV
+                                </span>
+                            </div>
+                            <p
+                                class="mt-0.5 text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                Precargar datos y avanzar al paso 3
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            role="switch"
+                            :aria-checked="developmentModeEnabled"
+                            aria-label="Alternar modo de desarrollo"
+                            class="focus-visible:ring-primary-500 relative h-6 w-11 shrink-0 rounded-full border transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none dark:focus-visible:ring-offset-slate-950"
+                            :class="
+                                developmentModeEnabled
+                                    ? 'border-primary-600 bg-primary-500'
+                                    : 'border-slate-300 bg-slate-200 dark:border-slate-700 dark:bg-slate-800'
+                            "
+                            @click="toggleDevelopmentMode"
+                        >
+                            <span
+                                aria-hidden="true"
+                                class="absolute top-0.5 left-0.5 h-4.5 w-4.5 rounded-full bg-white shadow-sm transition-transform"
+                                :class="
+                                    developmentModeEnabled
+                                        ? 'translate-x-5'
+                                        : 'translate-x-0'
+                                "
+                            />
+                        </button>
+                    </div>
+
+                    <div
+                        class="hidden min-w-36 rounded-sm border border-slate-200 bg-slate-50 px-4 py-3 text-right sm:block dark:border-slate-800 dark:bg-slate-950/60"
                     >
-                        {{ currentStep }}/{{ props.steps.length }}
-                    </p>
+                        <p
+                            class="text-xs tracking-[0.2em] text-slate-400 uppercase dark:text-slate-500"
+                        >
+                            Progreso
+                        </p>
+                        <p
+                            class="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100"
+                        >
+                            {{ currentStep }}/{{ props.steps.length }}
+                        </p>
+                    </div>
                 </div>
             </div>
 
