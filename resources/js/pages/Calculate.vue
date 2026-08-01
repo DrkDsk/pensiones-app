@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+///ELIMINAR USEPAGE (MOCK)
+import { Head, usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
@@ -16,6 +19,7 @@ import { useCalculateForm } from './Calculate/composables/useCalculateForm';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
 import { useFinancing } from './Calculate/composables/useFinancing';
+import { calculateDevelopmentMock } from './Calculate/constants/calculateDevelopmentMock';
 import { calculateSteps } from './Calculate/constants/calculateSteps';
 import type {
     ClientValidationField,
@@ -35,6 +39,11 @@ const props = defineProps<{
     };
 }>();
 
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar page y developmentModeEnabled
+const page = usePage();
+const developmentModeEnabled = ref(false);
 const monthlyPension = ref(0);
 const showRegimeTimeModal = ref(false);
 const showRegimeTimeError = ref(false);
@@ -42,6 +51,9 @@ const REGIME_TIME_MINIMUM = 5;
 const REGIME_TIME_ERROR_MESSAGE =
     'No es posible avanzar al siguiente paso, debido a que el tiempo de cotización no es igual a 5';
 
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar fillCalculateForm y resetCalculateForm
 const {
     form,
     average_daily_salary_last_250_weeks,
@@ -55,6 +67,8 @@ const {
     stepErrors,
     clearStepError,
     clearStepErrors,
+    fillCalculateForm,
+    resetCalculateForm,
     clearClientFields,
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
@@ -146,6 +160,41 @@ const {
         submitCalculate(enableManualMode, returnToClientStep),
 });
 
+///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+///ELIMINAR DESPUES
+/// eliminar resetCalculateUiState, handleDevelopmentModeToggle
+
+const resetCalculateUiState = (): void => {
+    clientSearch.value = props.filters?.search ?? '';
+    selectedClient.value = props.selectedClient;
+    showClientDropdown.value = false;
+    manualCustomerMode.value = false;
+    monthlyPension.value = 0;
+    showRegimeTimeError.value = false;
+    showRegimeTimeModal.value = false;
+};
+
+const handleDevelopmentModeToggle = (enabled: boolean): void => {
+    if (page.props.debug !== true) {
+        return;
+    }
+
+    developmentModeEnabled.value = enabled;
+    resetCalculateUiState();
+
+    if (enabled) {
+        fillCalculateForm(calculateDevelopmentMock);
+        clientSearch.value = `${calculateDevelopmentMock.client.name} ${calculateDevelopmentMock.client.last_name}`;
+        selectedClient.value = null;
+        currentStep.value = 3;
+
+        return;
+    }
+
+    resetCalculateForm();
+    currentStep.value = 1;
+};
+
 const validateClientField = (
     field: ClientValidationField,
     options: { requireRequiredFields?: boolean } = {},
@@ -160,13 +209,21 @@ const validateFamilyInformationField = (
 <template>
     <Head title="Cálculo de Pensión" />
 
+    <!--
+        ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
+        ELIMINAR DESPUES
+        eliminar :development-mode-enabled="developmentModeEnabled", @toggle-development-mode="handleDevelopmentModeToggle"
+    -->
+
     <div class="mx-auto w-full p-4">
         <AppCard class="overflow-hidden">
             <StepperHeader
                 :steps="calculateSteps"
                 :current-step="currentStep"
                 :progress-width="progressWidth"
+                :development-mode-enabled="developmentModeEnabled"
                 @go-to-step="goToStep"
+                @toggle-development-mode="handleDevelopmentModeToggle"
             />
 
             <div class="px-6 py-6 sm:px-8">
