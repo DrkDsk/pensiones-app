@@ -17,7 +17,7 @@ type DateParts = {
     day: number;
 };
 
-const parseDateParts = (value: string | null): DateParts | null => {
+export const parseDateParts = (value: string | null): DateParts | null => {
     if (!value) {
         return null;
     }
@@ -64,17 +64,16 @@ const addDays = (dateString: string | null, days: number): string => {
     return `${day}/${month}/${year}`;
 };
 
-const calculateAgeInYears = (birthdate: string | null): number => {
+export const calculateAgeInYears = (birthdate: string | null, baseDate : Date = new Date()): number => {
     const dateParts = parseDateParts(birthdate);
 
     if (!dateParts) {
         return 0;
     }
 
-    const today = new Date();
-    let age = today.getFullYear() - dateParts.year;
-    const currentMonth = today.getMonth() + 1;
-    const currentDay = today.getDate();
+    let age = baseDate.getFullYear() - dateParts.year;
+    const currentMonth = baseDate.getMonth() + 1;
+    const currentDay = baseDate.getDate();
 
     if (
         currentMonth < dateParts.month ||
@@ -84,15 +83,15 @@ const calculateAgeInYears = (birthdate: string | null): number => {
     }
 
     let lastBirthday = new Date(
-        today.getFullYear(),
+        baseDate.getFullYear(),
         dateParts.month - 1,
         dateParts.day,
     );
 
-    if (today < lastBirthday) {
+    if (baseDate < lastBirthday) {
         lastBirthday = new Date(
-            today.getFullYear() - 1,
-            dateParts.month -1,
+            baseDate.getFullYear() - 1,
+            dateParts.month - 1,
             dateParts.day,
         );
     }
@@ -103,11 +102,8 @@ const calculateAgeInYears = (birthdate: string | null): number => {
         dateParts.day,
     );
 
-    const elapsedSinceBirthday =
-        today.getTime() - lastBirthday.getTime();
-
+    const elapsedSinceBirthday = baseDate.getTime() - lastBirthday.getTime();
     const birthdayPeriod = nextBirthday.getTime() - lastBirthday.getTime();
-
     const decimalPart = elapsedSinceBirthday / birthdayPeriod;
 
     return age + decimalPart;

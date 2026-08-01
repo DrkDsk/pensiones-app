@@ -7,6 +7,10 @@ import {
     formatPercentage,
     useBeneficiaries,
 } from '../composables/useBeneficiaries';
+import {
+    calculateAgeInYears,
+    parseDateParts,
+} from '../composables/useCalculateForm';
 import { useCesantiaService } from '../services/cesantiaService';
 import type { CalculateForm, CalculateFormData } from '../types/calculate';
 
@@ -86,7 +90,32 @@ const handleCesantiaEdadAvanzadaChange = (value: AppInputModelValue) => {
 };
 
 const loadCesantiaEdadAvanzada = async () => {
-    const age = Number(props.age);
+    const modalidad10 = form.regime_periods.find(
+        (period) => period.regime_type === 'modalidad_10',
+    );
+
+    if (!modalidad10) {
+        return;
+    }
+
+    const modalidad10ContributionEndDateParts = parseDateParts(
+        modalidad10.contribution_end_date,
+    );
+
+    if (!modalidad10ContributionEndDateParts) {
+        return;
+    }
+
+    const modalidad10ContributionEndDate = new Date(
+        modalidad10ContributionEndDateParts.year,
+        modalidad10ContributionEndDateParts.month - 1,
+        modalidad10ContributionEndDateParts.day,
+    );
+
+    const age = calculateAgeInYears(
+        form.data().client.birthdate,
+        modalidad10ContributionEndDate,
+    );
 
     if (
         !Number.isFinite(age) ||
@@ -106,7 +135,6 @@ const loadCesantiaEdadAvanzada = async () => {
 
         if (
             !Number.isFinite(percentage) ||
-            Number(props.age) !== age ||
             !isCesantiaEdadAvanzadaEmpty() ||
             hasUserEditedCesantia.value
         ) {
