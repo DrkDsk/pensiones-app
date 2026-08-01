@@ -5,6 +5,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppInput from '@/components/AppInput.vue';
+import { useFinancing } from '../composables/useFinancing';
 import { useRegimePeriods } from '../composables/useRegimePeriods';
 import { MAX_ADDITIONAL_REGIME_PERIODS } from '../constants/regimeTypes';
 import type {
@@ -32,8 +33,15 @@ const props = defineProps<{
 const form = props.form;
 const { addRegimePeriod, removeRegimePeriod, updateRegimePeriodField } =
     useRegimePeriods(form);
+const { umaMultipliers, valorUma } = useFinancing(form, 0);
 
 const maxRowsMessage = ref('');
+const showUmaValues = ref<
+    Partial<Record<RegimePeriod['regime_type'], boolean>>
+>({
+    modalidad_10: false,
+    modalidad_40: false,
+});
 const periodsTableBody = ref<HTMLElement | null>(null);
 let sortable: Sortable | null = null;
 
@@ -78,6 +86,43 @@ const isFixedRegime = (period: RegimePeriod): boolean => {
         period.regime_type === 'modalidad_10' ||
         period.regime_type === 'modalidad_40'
     );
+};
+
+const hasValidUma = (period: RegimePeriod) => valorUma(period) > 0;
+
+const selectedUmaMultiplier = (period: RegimePeriod): number | null => {
+    const umaValue = valorUma(period);
+    const integratedBalance = Number(period.integrated_balance);
+
+    if (umaValue <= 0 || !Number.isFinite(integratedBalance)) {
+        return null;
+    }
+
+    const multiplier = Math.round(integratedBalance / umaValue);
+    const matchesIntegratedBalance =
+        Math.abs(integratedBalance - umaValue * multiplier) < 0.005;
+
+    return matchesIntegratedBalance && umaMultipliers.includes(multiplier)
+        ? multiplier
+        : null;
+};
+
+const handleUmaMultiplierSelect = (
+    period: RegimePeriod,
+    index: number,
+    multiplier: number,
+) => {
+    if (!isFixedRegime(period) || !hasValidUma(period)) {
+        return;
+    }
+
+    updateRegimePeriodField(
+        index,
+        'integrated_balance',
+        valorUma(period) * multiplier,
+    );
+    showUmaValues.value[period.regime_type] = false;
+    props.validateRegimePeriods();
 };
 
 const restoreDraggedRowDom = (event: Sortable.SortableEvent) => {
@@ -270,205 +315,371 @@ onBeforeUnmount(() => {
                     ref="periodsTableBody"
                     class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
                 >
-                    <tr
+                    <template
                         v-for="(period, index) in form.regime_periods"
                         :key="period.id ?? `${period.regime_type}-${index}`"
-                        :data-period-id="period.id"
-                        class="align-top"
-                        :class="
-                            !isFixedRegime(period) ? 'regime-draggable-row' : ''
-                        "
                     >
-                        <td class="px-2 py-10">
-                            <button
-                                v-if="!isFixedRegime(period)"
-                                type="button"
-                                title="Reordenar periodo"
-                                class="regime-drag-handle inline-flex size-8 cursor-grab items-center justify-center rounded-md text-slate-300 transition hover:bg-slate-50 hover:text-slate-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:cursor-grabbing dark:hover:bg-slate-900 dark:hover:text-slate-400"
-                            >
-                                <GripVertical class="size-4" />
-                                <span class="sr-only">Reordenar periodo</span>
-                            </button>
-                        </td>
-                        <td class="min-w-56 px-4 py-4">
-                            <AppInput
-                                v-if="!period.is_fixed"
-                                :model-value="period.regime_name"
-                                label="Patrón"
-                                placeholder="Ej. Patrón anterior"
-                                maxlength="100"
-                                :error="periodError(index, 'regime_name')"
-                                required
-                                @update:model-value="
-                                    updateRegimeName(index, $event)
-                                "
-                                @blur="validateRegimePeriods"
-                            />
+                        <tr
+                            :data-period-id="period.id"
+                            class="align-top"
+                            :class="
+                                !isFixedRegime(period)
+                                    ? 'regime-draggable-row'
+                                    : ''
+                            "
+                        >
+                            <td class="px-2 py-10">
+                                <button
+                                    v-if="!isFixedRegime(period)"
+                                    type="button"
+                                    title="Reordenar periodo"
+                                    class="regime-drag-handle inline-flex size-8 cursor-grab items-center justify-center rounded-md text-slate-300 transition hover:bg-slate-50 hover:text-slate-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:cursor-grabbing dark:hover:bg-slate-900 dark:hover:text-slate-400"
+                                >
+                                    <GripVertical class="size-4" />
+                                    <span class="sr-only"
+                                        >Reordenar periodo</span
+                                    >
+                                </button>
+                            </td>
+                            <td class="min-w-56 px-4 py-4">
+                                <AppInput
+                                    v-if="!period.is_fixed"
+                                    :model-value="period.regime_name"
+                                    label="Patrón"
+                                    placeholder="Ej. Patrón anterior"
+                                    maxlength="100"
+                                    :error="periodError(index, 'regime_name')"
+                                    required
+                                    @update:model-value="
+                                        updateRegimeName(index, $event)
+                                    "
+                                    @blur="validateRegimePeriods"
+                                />
 
-                            <AppInput
-                                v-else
-                                :model-value="period.regime_name"
-                                label="Patrón"
-                                disabled
-                                :error="periodError(index, 'regime_type')"
-                            />
-                        </td>
+                                <AppInput
+                                    v-else
+                                    :model-value="period.regime_name"
+                                    label="Patrón"
+                                    disabled
+                                    :error="periodError(index, 'regime_type')"
+                                />
+                            </td>
 
-                        <td class="min-w-md px-4 py-4">
-                            <div class="grid gap-3 sm:grid-cols-2">
+                            <td class="min-w-md px-4 py-4">
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <AppInput
+                                        v-if="!period.is_fixed"
+                                        :model-value="
+                                            period.contribution_start_date ?? ''
+                                        "
+                                        label="Fecha inicio"
+                                        type="date"
+                                        :error="
+                                            periodError(
+                                                index,
+                                                'contribution_start_date',
+                                            )
+                                        "
+                                        required
+                                        @update:model-value="
+                                            updateContributionDate(
+                                                index,
+                                                'contribution_start_date',
+                                                $event,
+                                            )
+                                        "
+                                        @blur="validateRegimePeriods"
+                                    />
+
+                                    <div class="grid gap-2" v-else>
+                                        <span
+                                            class="ui-label text-sm font-medium"
+                                        >
+                                            Fecha inicio
+                                        </span>
+                                        <div
+                                            class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                        >
+                                            {{
+                                                formatDate(
+                                                    period.contribution_start_date,
+                                                )
+                                            }}
+                                        </div>
+                                    </div>
+
+                                    <AppInput
+                                        v-if="
+                                            period.regime_type !==
+                                            'modalidad_10'
+                                        "
+                                        :model-value="
+                                            period.contribution_end_date ?? ''
+                                        "
+                                        label="Fecha fin"
+                                        type="date"
+                                        :error="
+                                            periodError(
+                                                index,
+                                                'contribution_end_date',
+                                            )
+                                        "
+                                        required
+                                        @update:model-value="
+                                            updateContributionDate(
+                                                index,
+                                                'contribution_end_date',
+                                                $event,
+                                            )
+                                        "
+                                        @blur="validateRegimePeriods"
+                                    />
+
+                                    <div class="grid gap-2" v-else>
+                                        <span
+                                            class="ui-label text-sm font-medium"
+                                        >
+                                            Fecha fin
+                                        </span>
+                                        <div
+                                            class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                        >
+                                            {{
+                                                formatDate(
+                                                    period.contribution_end_date,
+                                                )
+                                            }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-4">
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Calculado
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{ formatTime(period.time) }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="min-w-56 px-4 py-4">
+                                <div v-if="period.is_fixed" class="grid gap-2">
+                                    <AppInput
+                                        :model-value="
+                                            period.uma_value_year ?? 0
+                                        "
+                                        label="Valor"
+                                        placeholder="0"
+                                        maxlength="100"
+                                        :error="
+                                            periodError(index, 'uma_value_year')
+                                        "
+                                        required
+                                        @update:model-value="
+                                            updateUMA(index, $event)
+                                        "
+                                        @blur="validateRegimePeriods"
+                                    />
+                                    <button
+                                        type="button"
+                                        class="w-max text-xs font-medium text-slate-600 underline underline-offset-4 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+                                        @click="
+                                            showUmaValues[period.regime_type] =
+                                                !showUmaValues[
+                                                    period.regime_type
+                                                ]
+                                        "
+                                    >
+                                        {{
+                                            showUmaValues[period.regime_type]
+                                                ? 'Ocultar valores por UMA'
+                                                : 'Ver valores por UMA'
+                                        }}
+                                    </button>
+                                </div>
+                            </td>
+
+                            <td class="min-w-56 px-4 py-4">
+                                <div class="grid gap-2" v-if="period.is_fixed">
+                                    <span class="ui-label text-sm font-medium">
+                                        Salario Integrado
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{
+                                            formatIntegratedBalance(
+                                                period.integrated_balance ?? 0,
+                                            )
+                                        }}
+                                    </div>
+                                </div>
+
                                 <AppInput
                                     v-if="!period.is_fixed"
                                     :model-value="
-                                        period.contribution_start_date ?? ''
+                                        period.integrated_balance ?? 0
                                     "
-                                    label="Fecha inicio"
-                                    type="date"
+                                    label="Salario Integrado"
+                                    placeholder="0"
+                                    maxlength="100"
                                     :error="
-                                        periodError(
-                                            index,
-                                            'contribution_start_date',
-                                        )
+                                        periodError(index, 'integrated_balance')
                                     "
                                     required
                                     @update:model-value="
-                                        updateContributionDate(
-                                            index,
-                                            'contribution_start_date',
-                                            $event,
-                                        )
+                                        updateIntegratedBalance(index, $event)
                                     "
                                     @blur="validateRegimePeriods"
                                 />
+                            </td>
 
-                                <div class="grid gap-2" v-else>
-                                    <span class="ui-label text-sm font-medium">
-                                        Fecha inicio
-                                    </span>
-                                    <div
-                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                            <td class="px-4 py-10 text-right">
+                                <button
+                                    v-if="!period.is_fixed"
+                                    type="button"
+                                    title="Eliminar periodo"
+                                    class="inline-flex size-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-rose-950/30 dark:hover:text-rose-300"
+                                    @click="handleRemoveRegimePeriod(index)"
+                                >
+                                    <Trash2 class="size-4" />
+                                    <span class="sr-only"
+                                        >Eliminar periodo</span
                                     >
-                                        {{
-                                            formatDate(
-                                                period.contribution_start_date,
-                                            )
-                                        }}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr
+                            v-if="
+                                isFixedRegime(period) &&
+                                showUmaValues[period.regime_type]
+                            "
+                        >
+                            <td colspan="7" class="p-0">
+                                <div
+                                    class="border-t border-slate-200 bg-slate-50/80 px-4 py-5 dark:border-slate-800 dark:bg-slate-900/40"
+                                >
+                                    <div
+                                        class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                                    >
+                                        <div class="mb-4">
+                                            <h4
+                                                class="text-sm font-semibold text-slate-900 dark:text-slate-100"
+                                            >
+                                                Valores por UMA
+                                            </h4>
+                                            <p
+                                                class="mt-1 text-sm text-slate-500 dark:text-slate-400"
+                                            >
+                                                Selecciona el valor UMA que se
+                                                utilizará para los cálculos de
+                                                esta fila.
+                                            </p>
+                                        </div>
+
+                                        <div
+                                            class="overflow-x-auto rounded-md border border-slate-200 dark:border-slate-800"
+                                        >
+                                            <table
+                                                class="min-w-full divide-y divide-slate-100 text-left text-xs dark:divide-slate-800"
+                                            >
+                                                <thead
+                                                    class="bg-slate-50 text-slate-500 dark:bg-slate-900 dark:text-slate-400"
+                                                >
+                                                    <tr>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            UMAS
+                                                        </th>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            Operación
+                                                        </th>
+                                                        <th
+                                                            class="px-3 py-2 font-semibold"
+                                                        >
+                                                            Resultado
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
+                                                >
+                                                    <tr
+                                                        v-for="multiplier in umaMultipliers"
+                                                        :key="multiplier"
+                                                        :aria-disabled="
+                                                            !hasValidUma(period)
+                                                        "
+                                                        class="transition"
+                                                        :class="[
+                                                            hasValidUma(period)
+                                                                ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900'
+                                                                : 'cursor-not-allowed opacity-50',
+                                                            selectedUmaMultiplier(
+                                                                period,
+                                                            ) === multiplier
+                                                                ? 'bg-slate-100 ring-1 ring-slate-300 ring-inset dark:bg-slate-900 dark:ring-slate-700'
+                                                                : '',
+                                                        ]"
+                                                        @click="
+                                                            handleUmaMultiplierSelect(
+                                                                period,
+                                                                index,
+                                                                multiplier,
+                                                            )
+                                                        "
+                                                    >
+                                                        <td
+                                                            class="px-3 py-2 font-medium text-slate-700 dark:text-slate-200"
+                                                        >
+                                                            {{ multiplier }}
+                                                            {{
+                                                                multiplier === 1
+                                                                    ? 'UMA'
+                                                                    : 'UMAS'
+                                                            }}
+                                                        </td>
+                                                        <td
+                                                            class="px-3 py-2 font-mono text-slate-500 dark:text-slate-400"
+                                                        >
+                                                            {{
+                                                                formatCurrency(
+                                                                    valorUma(
+                                                                        period,
+                                                                    ),
+                                                                )
+                                                            }}
+                                                            × {{ multiplier }}
+                                                        </td>
+                                                        <td
+                                                            class="px-3 py-2 font-mono text-slate-700 dark:text-slate-200"
+                                                        >
+                                                            {{
+                                                                formatCurrency(
+                                                                    valorUma(
+                                                                        period,
+                                                                    ) *
+                                                                        multiplier,
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <AppInput
-                                    v-if="period.regime_type !== 'modalidad_10'"
-                                    :model-value="
-                                        period.contribution_end_date ?? ''
-                                    "
-                                    label="Fecha fin"
-                                    type="date"
-                                    :error="
-                                        periodError(
-                                            index,
-                                            'contribution_end_date',
-                                        )
-                                    "
-                                    required
-                                    @update:model-value="
-                                        updateContributionDate(
-                                            index,
-                                            'contribution_end_date',
-                                            $event,
-                                        )
-                                    "
-                                    @blur="validateRegimePeriods"
-                                />
-
-                                <div class="grid gap-2" v-else>
-                                    <span class="ui-label text-sm font-medium">
-                                        Fecha fin
-                                    </span>
-                                    <div
-                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                    >
-                                        {{
-                                            formatDate(
-                                                period.contribution_end_date,
-                                            )
-                                        }}
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="px-4 py-4">
-                            <div class="grid gap-2">
-                                <span class="ui-label text-sm font-medium">
-                                    Calculado
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{ formatTime(period.time) }}
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="min-w-56 px-4 py-4">
-                            <AppInput
-                                v-if="period.is_fixed"
-                                :model-value="period.uma_value_year ?? 0"
-                                label="Valor"
-                                placeholder="0"
-                                maxlength="100"
-                                :error="periodError(index, 'uma_value_year')"
-                                required
-                                @update:model-value="updateUMA(index, $event)"
-                                @blur="validateRegimePeriods"
-                            />
-                        </td>
-
-                        <td class="min-w-56 px-4 py-4">
-                            <div class="grid gap-2" v-if="period.is_fixed">
-                                <span class="ui-label text-sm font-medium">
-                                    Salario Integrado
-                                </span>
-                                <div
-                                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-                                >
-                                    {{
-                                        formatIntegratedBalance(
-                                            period.integrated_balance ?? 0,
-                                        )
-                                    }}
-                                </div>
-                            </div>
-
-                            <AppInput
-                                v-if="!period.is_fixed"
-                                :model-value="period.integrated_balance ?? 0"
-                                label="Salario Integrado"
-                                placeholder="0"
-                                maxlength="100"
-                                :error="
-                                    periodError(index, 'integrated_balance')
-                                "
-                                required
-                                @update:model-value="
-                                    updateIntegratedBalance(index, $event)
-                                "
-                                @blur="validateRegimePeriods"
-                            />
-                        </td>
-
-                        <td class="px-4 py-10 text-right">
-                            <button
-                                v-if="!period.is_fixed"
-                                type="button"
-                                title="Eliminar periodo"
-                                class="inline-flex size-9 items-center justify-center rounded-md text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-rose-950/30 dark:hover:text-rose-300"
-                                @click="handleRemoveRegimePeriod(index)"
-                            >
-                                <Trash2 class="size-4" />
-                                <span class="sr-only">Eliminar periodo</span>
-                            </button>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
