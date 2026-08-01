@@ -235,6 +235,7 @@ const validateFamilyInformationField = (
                         <StepBeneficiaries
                             v-else-if="currentStep === 3"
                             :form="form"
+                            :age="ageInYears"
                             :average-daily-salary-last250-weeks="
                                 average_daily_salary_last_250_weeks
                             "

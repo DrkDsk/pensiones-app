@@ -179,7 +179,7 @@ export const validateRegimePeriods = (
                 fail(
                     index,
                     'regime_name',
-                    'El nombre del regimen es obligatorio.',
+                    'El nombre del patrón es obligatorio.',
                 );
             } else if (regimeName.length < 3) {
                 fail(

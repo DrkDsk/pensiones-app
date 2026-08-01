@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import {
@@ -7,6 +7,11 @@ import {
     formatPercentage,
     useBeneficiaries,
 } from '../composables/useBeneficiaries';
+import {
+    calculateAgeInYears,
+    parseDateParts,
+} from '../composables/useCalculateForm';
+import { useCesantiaService } from '../services/cesantiaService';
 import type { CalculateForm, CalculateFormData } from '../types/calculate';
 
 type AppInputModelValue = string | number | undefined;
@@ -16,9 +21,13 @@ const props = defineProps<{
     contributedWeeks: number;
     yearsRecognized: number;
     form: CalculateForm;
+    age: number;
 }>();
 
 const form = props.form;
+const isLoadingCesantia = ref(false);
+const hasUserEditedCesantia = ref(false);
+const { getCesantiaByAge } = useCesantiaService();
 
 const emit = defineEmits<{
     'update:monthlyPension': [value: number];
@@ -64,13 +73,94 @@ const handleAnnualBasicAmountIncreasePercentageChange = (
         ('' satisfies CalculateFormData['beneficieres']['annualBasicAmountIncreasePercentage']);
 };
 
-const handleCesantiaEdadAvanzadaChange = (value: AppInputModelValue) => {
+const isCesantiaEdadAvanzadaEmpty = (): boolean =>
+    form.beneficieres.cesantiaEdadAvanzada === null ||
+    form.beneficieres.cesantiaEdadAvanzada === undefined ||
+    form.beneficieres.cesantiaEdadAvanzada === '';
+
+const updateCesantiaEdadAvanzada = (value: AppInputModelValue) => {
     form.beneficieres.cesantiaEdadAvanzada =
         value ??
         ('' satisfies CalculateFormData['beneficieres']['cesantiaEdadAvanzada']);
 };
 
+const handleCesantiaEdadAvanzadaChange = (value: AppInputModelValue) => {
+    hasUserEditedCesantia.value = true;
+    updateCesantiaEdadAvanzada(value);
+};
+
+const loadCesantiaEdadAvanzada = async () => {
+    const modalidad10 = form.regime_periods.find(
+        (period) => period.regime_type === 'modalidad_10',
+    );
+
+    if (!modalidad10) {
+        return;
+    }
+
+    const modalidad10ContributionEndDateParts = parseDateParts(
+        modalidad10.contribution_end_date,
+    );
+
+    if (!modalidad10ContributionEndDateParts) {
+        return;
+    }
+
+    const modalidad10ContributionEndDate = new Date(
+        modalidad10ContributionEndDateParts.year,
+        modalidad10ContributionEndDateParts.month - 1,
+        modalidad10ContributionEndDateParts.day,
+    );
+
+    const age = calculateAgeInYears(
+        form.data().client.birthdate,
+        modalidad10ContributionEndDate,
+    );
+
+    if (
+        !Number.isFinite(age) ||
+        age <= 0 ||
+        !isCesantiaEdadAvanzadaEmpty() ||
+        hasUserEditedCesantia.value ||
+        isLoadingCesantia.value
+    ) {
+        return;
+    }
+
+    isLoadingCesantia.value = true;
+
+    try {
+        const response = await getCesantiaByAge(age);
+        const percentage = Number(response.data);
+
+        if (
+            !Number.isFinite(percentage) ||
+            !isCesantiaEdadAvanzadaEmpty() ||
+            hasUserEditedCesantia.value
+        ) {
+            return;
+        }
+
+        updateCesantiaEdadAvanzada(percentage);
+    } catch {
+        return;
+    } finally {
+        isLoadingCesantia.value = false;
+    }
+};
+
 const monthlyPension = computed(() => cuantiaTotalPension.value / 12);
+
+onMounted(() => {
+    void loadCesantiaEdadAvanzada();
+});
+
+watch(
+    () => props.age,
+    () => {
+        void loadCesantiaEdadAvanzada();
+    },
+);
 
 watch(
     monthlyPension,
