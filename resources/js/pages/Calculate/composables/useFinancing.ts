@@ -100,6 +100,7 @@ export const useFinancing = (
             costPercentage: MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT,
             costPercentageField: 'modalidad10CostPercentage',
         };
+
         const modalidad40Rows = modalidad40AnnualPeriods.value.map(
             (period): FinancingRegimeRow => {
                 const annualValues = form.financing.modalidad40AnnualValues[
