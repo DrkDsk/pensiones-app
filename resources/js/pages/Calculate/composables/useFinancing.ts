@@ -11,6 +11,7 @@ type FinancingCostPercentageField =
 const DEFAULT_UMA_MULTIPLIER = 25;
 const MIN_UMA_MULTIPLIER = 1;
 const MAX_UMA_MULTIPLIER = 25;
+const MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT = 21;
 
 export type FinancingRegimeRow = {
     regimeType: FinancingRegimeType;
@@ -41,28 +42,37 @@ export const useFinancing = (
     ): RegimePeriod | undefined =>
         form.regime_periods.find((period) => period.regime_type === regimeType);
 
-    const rows = computed<FinancingRegimeRow[]>(() => [
-        {
-            regimeType: 'modalidad_10',
-            label: 'Modalidad 10',
-            startDate:
-                form.financing.modalidad10Dates.contribution_start_date ?? '',
-            endDate:
-                form.financing.modalidad10Dates.contribution_end_date ?? '',
-            costPercentage: form.financing.modalidad10CostPercentage,
-            costPercentageField: 'modalidad10CostPercentage',
-        },
-        {
-            regimeType: 'modalidad_40',
-            label: 'Modalidad 40',
-            startDate:
-                form.financing.modalidad40Dates.contribution_start_date ?? '',
-            endDate:
-                form.financing.modalidad40Dates.contribution_end_date ?? '',
-            costPercentage: form.financing.modalidad40CostPercentage,
-            costPercentageField: 'modalidad40CostPercentage',
-        },
-    ]);
+    const rows = computed<FinancingRegimeRow[]>(() => {
+        const modalidad10 = form.regime_periods.find(
+            (value) => value.regime_type == 'modalidad_10',
+        );
+        const modalidad10ContributionStartDate =
+            modalidad10?.contribution_start_date ?? '';
+        const modalidad10ContributionEndDate =
+            modalidad10?.contribution_end_date ?? '';
+
+        return [
+            {
+                regimeType: 'modalidad_10',
+                label: 'Modalidad 10',
+                startDate: modalidad10ContributionStartDate,
+                endDate: modalidad10ContributionEndDate,
+                costPercentage: MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT,
+                costPercentageField: 'modalidad10CostPercentage',
+            },
+            {
+                regimeType: 'modalidad_40',
+                label: 'Modalidad 40',
+                startDate:
+                    form.financing.modalidad40Dates.contribution_start_date ??
+                    '',
+                endDate:
+                    form.financing.modalidad40Dates.contribution_end_date ?? '',
+                costPercentage: form.financing.modalidad40CostPercentage,
+                costPercentageField: 'modalidad40CostPercentage',
+            },
+        ];
+    });
 
     const updateCostPercentage = (
         field: FinancingCostPercentageField,
@@ -120,7 +130,7 @@ export const useFinancing = (
         salarioMensualAlta(row) * costoPorcentual(row);
 
     const pagoTotalPorPeriodo = (row: FinancingRegimeRow) => {
-        const value = row.regimeType === 'modalidad_10' ? 9.767 : 5;
+        const value = row.regimeType === 'modalidad_10' ? 1 : 5;
 
         return pagoMensual(row) * value;
     };
