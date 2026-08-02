@@ -41,6 +41,11 @@ export interface Modalidad40AnnualFinancingValues {
     costPercentage: string | number;
 }
 
+export interface PercentageCostModality40Response {
+    message: string;
+    data: Record<string, number>;
+}
+
 export interface FinancingData {
     modalidad10CostPercentage: string | number;
     modalidad40CostPercentage: string | number;
