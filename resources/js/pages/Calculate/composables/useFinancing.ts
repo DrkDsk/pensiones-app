@@ -1,5 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue';
-import { computed, toValue, watch } from 'vue';
+import { computed, ref, toValue, watch } from 'vue';
+import { toast } from 'vue-sonner';
+import { usePercentageCostModality40Service } from '../services/percentageCostModality40Service';
 import type { CalculateForm, RegimePeriod } from '../types/calculate';
 import { splitPeriodByYear } from './splitPeriodByYear';
 import { calculateRegimeTime } from './useRegimePeriods';
@@ -37,6 +39,13 @@ export const useFinancing = (
     form: CalculateForm,
     monthlyPension: MaybeRefOrGetter<number>,
 ) => {
+    const { getPercentageCostsByYears } = usePercentageCostModality40Service();
+    const isLoadingPercentageCosts = ref(false);
+    let loadedPercentageCostYears = '';
+    let pendingPercentageCostYears = '';
+    let percentageCostsWatchInitialized = false;
+    let percentageCostRequestSequence = 0;
+
     const umaMultipliers = Array.from(
         { length: MAX_UMA_MULTIPLIER },
         (_, index) => index + 1,
@@ -125,6 +134,102 @@ export const useFinancing = (
 
         return [modality10Row, ...modality40Rows];
     });
+
+    const modality40Years = computed(() => [
+        ...new Set(
+            rows.value
+                .filter((row) => row.regimeType === 'modalidad_40')
+                .map((row) => row.year)
+                .filter(
+                    (year) =>
+                        Number.isInteger(year) && year >= 1900 && year <= 2100,
+                ),
+        ),
+    ]);
+
+    const loadModality40PercentageCosts = async (years: number[]) => {
+        const yearsKey = [...years]
+            .sort((left, right) => left - right)
+            .join(',');
+
+        if (
+            !yearsKey ||
+            yearsKey === loadedPercentageCostYears ||
+            yearsKey === pendingPercentageCostYears
+        ) {
+            return;
+        }
+
+        const requestSequence = ++percentageCostRequestSequence;
+        pendingPercentageCostYears = yearsKey;
+        isLoadingPercentageCosts.value = true;
+
+        try {
+            const { data: percentages } =
+                await getPercentageCostsByYears(years);
+
+            if (requestSequence !== percentageCostRequestSequence) {
+                return;
+            }
+
+            const missingYears: number[] = [];
+
+            rows.value.forEach((row) => {
+                if (row.regimeType !== 'modalidad_40') {
+                    return;
+                }
+
+                const percentage = percentages[String(row.year)];
+
+                if (!Number.isFinite(percentage)) {
+                    missingYears.push(row.year);
+
+                    return;
+                }
+
+                form.financing.modalidad40AnnualValues[
+                    String(row.year)
+                ].costPercentage = percentage;
+            });
+
+            loadedPercentageCostYears = yearsKey;
+
+            if (missingYears.length > 0) {
+                toast.error(
+                    `No se encontraron costos porcentuales para: ${[
+                        ...new Set(missingYears),
+                    ].join(', ')}.`,
+                );
+            }
+        } catch {
+            if (requestSequence === percentageCostRequestSequence) {
+                toast.error(
+                    'No fue posible cargar los costos porcentuales de Modalidad 40.',
+                );
+            }
+        } finally {
+            if (requestSequence === percentageCostRequestSequence) {
+                pendingPercentageCostYears = '';
+                isLoadingPercentageCosts.value = false;
+            }
+        }
+    };
+
+    const initializeModality40PercentageCosts = () => {
+        if (percentageCostsWatchInitialized) {
+            return;
+        }
+
+        percentageCostsWatchInitialized = true;
+
+        watch(
+            () => modality40Years.value.join(','),
+            () => {
+                void loadModality40PercentageCosts(modality40Years.value);
+            },
+            { immediate: true },
+        );
+    };
 
     const updateCostPercentage = (
         row: FinancingRegimeRow,
@@ -234,6 +339,8 @@ export const useFinancing = (
 
     return {
         rows,
+        isLoadingPercentageCosts,
+        initializeModality40PercentageCosts,
         updateCostPercentage,
         updateUmaValue,
         updateRegimePeriodDate,
