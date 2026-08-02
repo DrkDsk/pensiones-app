@@ -132,6 +132,9 @@ const handleFinancingChange = (
                                         "
                                         label="Fecha Inicial"
                                         type="date"
+                                        :disabled="
+                                            row.regimeType === 'modalidad_10'
+                                        "
                                     />
                                     <AppInput
                                         :model-value="row.endDate"
@@ -144,6 +147,9 @@ const handleFinancingChange = (
                                         "
                                         label="Fecha Final"
                                         type="date"
+                                        :disabled="
+                                            row.regimeType === 'modalidad_10'
+                                        "
                                     />
                                 </div>
                             </td>
@@ -192,7 +198,7 @@ const handleFinancingChange = (
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-4 py-4">
+                            <td class="flex flex-row px-4 py-4">
                                 <AppInput
                                     :model-value="row.costPercentage"
                                     @update:model-value="
@@ -203,10 +209,14 @@ const handleFinancingChange = (
                                     "
                                     label="Costo Porcentual"
                                     type="number"
+                                    :disabled="
+                                        row.regimeType === 'modalidad_10'
+                                    "
                                     min="0"
                                     step="0.01"
                                     placeholder="40"
-                                    helper="Captura 40 para 40%."
+                                    helper="%"
+                                    helperOrientation="horizontal"
                                 />
                             </td>
                             <td class="px-4 py-4">
