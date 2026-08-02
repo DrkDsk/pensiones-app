@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Settings } from '@lucide/vue';
+import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import { formatContributionDate } from '../composables/splitPeriodByYear';
@@ -19,6 +21,8 @@ const umaLabel = `Valor UMA ${currentYear}`;
 
 const {
     rows,
+    isLoadingPercentageCosts,
+    initializeModality40PercentageCosts,
     updateCostPercentage,
     updateUmaValue,
     updateRegimePeriodDate,
@@ -35,6 +39,8 @@ const {
     honorarios,
     totalCostoDelProyecto,
 } = useFinancing(form, () => props.monthlyPension);
+
+initializeModality40PercentageCosts();
 
 const handleFinancingChange = (
     field: keyof FinancingData,
@@ -97,7 +103,21 @@ const handleFinancingChange = (
                         <th
                             class="min-w-48 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
                         >
-                            Costo Porcentual
+                            <span class="flex items-center gap-1">
+                                <span>Costo Porcentual</span>
+                                <span title="Administrar costos porcentuales">
+                                    <!-- TODO: habilitar la navegación con Inertia cuando exista la ruta de administración. -->
+                                    <AppButton
+                                        variant="ghost"
+                                        size="sm"
+                                        class="size-8 px-0"
+                                        disabled
+                                        aria-label="Administrar costos porcentuales"
+                                    >
+                                        <Settings class="size-4" />
+                                    </AppButton>
+                                </span>
+                            </span>
                         </th>
                         <th
                             class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
@@ -252,11 +272,22 @@ const handleFinancingChange = (
                                     label="Costo Porcentual"
                                     type="number"
                                     :disabled="
-                                        row.regimeType === 'modalidad_10'
+                                        row.regimeType === 'modalidad_10' ||
+                                        row.regimeType === 'modalidad_40'
                                     "
                                     min="0"
-                                    step="0.01"
-                                    placeholder="40"
+                                    :step="
+                                        row.regimeType === 'modalidad_40'
+                                            ? 0.001
+                                            : 0.01
+                                    "
+                                    :placeholder="
+                                        row.regimeType === 'modalidad_10'
+                                            ? '40'
+                                            : isLoadingPercentageCosts
+                                              ? 'Cargando...'
+                                              : 'Sin porcentaje'
+                                    "
                                     helper="%"
                                     helperOrientation="horizontal"
                                 />
