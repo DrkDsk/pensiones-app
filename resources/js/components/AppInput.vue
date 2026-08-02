@@ -5,14 +5,20 @@ import { cn } from '@/lib/utils';
 
 defineOptions({ inheritAttrs: false });
 
-const props = defineProps<{
-    label?: string;
-    helper?: string;
-    error?: string;
-    disabled?: boolean;
-    required?: boolean;
-    class?: HTMLAttributes['class'];
-}>();
+const props = withDefaults(
+    defineProps<{
+        label?: string;
+        helper?: string;
+        error?: string;
+        disabled?: boolean;
+        required?: boolean;
+        class?: HTMLAttributes['class'];
+        helperOrientation?: 'vertical' | 'horizontal';
+    }>(),
+    {
+        helperOrientation: 'vertical',
+    },
+);
 
 const model = defineModel<string | number>();
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -37,29 +43,40 @@ const inputClass = () =>
             {{ props.label
             }}<span v-if="props.required" class="text-red-500"> *</span>
         </span>
-        <input
-            v-if="model !== undefined"
-            ref="inputRef"
-            v-bind="$attrs"
-            v-model="model"
-            :disabled="props.disabled"
-            :required="props.required"
-            :aria-invalid="Boolean(props.error)"
-            :class="inputClass()"
-        />
-        <input
-            v-else
-            ref="inputRef"
-            v-bind="$attrs"
-            :disabled="props.disabled"
-            :required="props.required"
-            :aria-invalid="Boolean(props.error)"
-            :class="inputClass()"
-        />
+        <span class="flex flex-row items-center gap-2">
+            <input
+                v-if="model !== undefined"
+                ref="inputRef"
+                v-bind="$attrs"
+                v-model="model"
+                :disabled="props.disabled"
+                :required="props.required"
+                :aria-invalid="Boolean(props.error)"
+                :class="inputClass()"
+            />
+            <input
+                v-else
+                ref="inputRef"
+                v-bind="$attrs"
+                :disabled="props.disabled"
+                :required="props.required"
+                :aria-invalid="Boolean(props.error)"
+                :class="inputClass()"
+            />
+            <span
+                v-if="props.helper && helperOrientation == 'horizontal'"
+                class="text-sm text-text-secondary"
+            >
+                {{ props.helper }}
+            </span>
+        </span>
         <span v-if="props.error" class="text-xs text-red-600 dark:text-red-300">
             {{ props.error }}
         </span>
-        <span v-else-if="props.helper" class="text-sm text-text-secondary">
+        <span
+            v-if="props.helper && helperOrientation == 'vertical'"
+            class="text-sm text-text-secondary"
+        >
             {{ props.helper }}
         </span>
     </label>
