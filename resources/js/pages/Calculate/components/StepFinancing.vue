@@ -18,6 +18,7 @@ const umaLabel = `Valor UMA ${currentYear}`;
 
 const {
     rows,
+    modalidad10Value,
     updateCostPercentage,
     updateRegimePeriodDate,
     selectedUmaMultiplier,
@@ -26,7 +27,7 @@ const {
     salarioMensualAlta,
     pagoMensual,
     pagoTotalPorPeriodo,
-    pagoTotal,
+    pagoTotalModalidad40,
     inversionTotal,
     financiamiento,
     intereses,
@@ -265,11 +266,23 @@ const handleFinancingChange = (
 
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <div class="grid gap-2">
-                <span class="ui-label text-sm font-medium"> Pago Total </span>
+                <span class="ui-label text-sm font-medium">
+                    Pago Total Modalidad 40
+                </span>
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{ formatCurrency(pagoTotal) }}
+                    {{ formatCurrency(pagoTotalModalidad40) }}
+                </div>
+            </div>
+
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium"> Modalidad 10 </span>
+
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(modalidad10Value) }}
                 </div>
             </div>
 
@@ -285,22 +298,6 @@ const handleFinancingChange = (
                 :helper="
                     formatCurrency(
                         toFiniteNumber(props.form.financing.pagoRetroactivo),
-                    )
-                "
-            />
-
-            <AppInput
-                :model-value="props.form.financing.modalidad10"
-                @update:model-value="
-                    handleFinancingChange('modalidad10', $event)
-                "
-                label="Modalidad 10"
-                type="number"
-                min="0"
-                step="0.01"
-                :helper="
-                    formatCurrency(
-                        toFiniteNumber(props.form.financing.modalidad10),
                     )
                 "
             />
@@ -396,7 +393,7 @@ const handleFinancingChange = (
                 @update:model-value="
                     handleFinancingChange('costoAdicional', $event)
                 "
-                label="Costo Adicional"
+                label="Aportación Cliente"
                 type="number"
                 min="0"
                 step="0.01"
