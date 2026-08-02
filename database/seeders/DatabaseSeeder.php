@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             CesantiaSeeder::class,
+            PercentageCostForModality40Seeder::class,
         ]);
     }
 }
