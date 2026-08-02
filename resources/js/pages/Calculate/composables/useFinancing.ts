@@ -1,5 +1,5 @@
-import { computed, toValue, watch } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
+import { computed, toValue, watch } from 'vue';
 import type { CalculateForm, RegimePeriod } from '../types/calculate';
 import { splitPeriodByYear } from './splitPeriodByYear';
 import { calculateRegimeTime } from './useRegimePeriods';
@@ -47,7 +47,7 @@ export const useFinancing = (
     ): RegimePeriod | undefined =>
         form.regime_periods.find((period) => period.regime_type === regimeType);
 
-    const modalidad40AnnualPeriods = computed(() => {
+    const modality40AnnualPeriods = computed(() => {
         const period = regimePeriodFor('modalidad_40');
 
         return splitPeriodByYear(
@@ -57,10 +57,11 @@ export const useFinancing = (
     });
 
     watch(
-        modalidad40AnnualPeriods,
+        modality40AnnualPeriods,
         (periods) => {
             const currentValues = form.financing.modalidad40AnnualValues ?? {};
-            const synchronizedValues = Object.fromEntries(
+
+            form.financing.modalidad40AnnualValues = Object.fromEntries(
                 periods.map(({ year }) => {
                     const yearKey = String(year);
 
@@ -74,34 +75,32 @@ export const useFinancing = (
                     ];
                 }),
             );
-
-            form.financing.modalidad40AnnualValues = synchronizedValues;
         },
         { immediate: true },
     );
 
     const rows = computed<FinancingRegimeRow[]>(() => {
-        const modalidad10 = form.regime_periods.find(
+        const modality10 = form.regime_periods.find(
             (value) => value.regime_type == 'modalidad_10',
         );
-        const modalidad10ContributionStartDate =
-            modalidad10?.contribution_start_date ?? '';
-        const modalidad10ContributionEndDate =
-            modalidad10?.contribution_end_date ?? '';
+        const modality10ContributionStartDate =
+            modality10?.contribution_start_date ?? '';
+        const modality10ContributionEndDate =
+            modality10?.contribution_end_date ?? '';
 
-        const modalidad10Row: FinancingRegimeRow = {
+        const modality10Row: FinancingRegimeRow = {
             key: 'modalidad_10',
             regimeType: 'modalidad_10',
             label: 'Modalidad 10',
             year: new Date().getFullYear(),
-            startDate: modalidad10ContributionStartDate,
-            endDate: modalidad10ContributionEndDate,
-            umaValue: modalidad10?.uma_value_year ?? 0,
+            startDate: modality10ContributionStartDate,
+            endDate: modality10ContributionEndDate,
+            umaValue: modality10?.uma_value_year ?? 0,
             costPercentage: MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT,
             costPercentageField: 'modalidad10CostPercentage',
         };
 
-        const modalidad40Rows = modalidad40AnnualPeriods.value.map(
+        const modality40Rows = modality40AnnualPeriods.value.map(
             (period): FinancingRegimeRow => {
                 const annualValues = form.financing.modalidad40AnnualValues[
                     String(period.year)
@@ -124,7 +123,7 @@ export const useFinancing = (
             },
         );
 
-        return [modalidad10Row, ...modalidad40Rows];
+        return [modality10Row, ...modality40Rows];
     });
 
     const updateCostPercentage = (
