@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
+import { formatContributionDate } from '../composables/splitPeriodByYear';
 import { formatCurrency } from '../composables/useBeneficiaries';
 import { toFiniteNumber, useFinancing } from '../composables/useFinancing';
 import type { CalculateForm, FinancingData } from '../types/calculate';
@@ -19,6 +20,7 @@ const umaLabel = `Valor UMA ${currentYear}`;
 const {
     rows,
     updateCostPercentage,
+    updateUmaValue,
     updateRegimePeriodDate,
     selectedUmaMultiplier,
     valorUma,
@@ -41,7 +43,8 @@ const handleFinancingChange = (
     if (
         field === 'modalidad10Dates' ||
         field === 'modalidad40Dates' ||
-        field === 'modalidad40UmaMultiplier'
+        field === 'modalidad40UmaMultiplier' ||
+        field === 'modalidad40AnnualValues'
     ) {
         return;
     }
@@ -79,7 +82,7 @@ const handleFinancingChange = (
                         <th
                             class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
                         >
-                            {{ umaLabel }}
+                            Valor UMA
                         </th>
                         <th
                             class="min-w-56 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
@@ -112,7 +115,7 @@ const handleFinancingChange = (
                 <tbody
                     class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
                 >
-                    <template v-for="row in rows" :key="row.regimeType">
+                    <template v-for="row in rows" :key="row.key">
                         <tr class="align-top">
                             <td
                                 class="px-4 py-4 font-semibold text-slate-800 dark:text-slate-100"
@@ -122,6 +125,7 @@ const handleFinancingChange = (
                             <td class="px-4 py-4">
                                 <div class="grid gap-3 sm:grid-cols-2">
                                     <AppInput
+                                        v-if="row.regimeType === 'modalidad_10'"
                                         :model-value="row.startDate"
                                         @update:model-value="
                                             updateRegimePeriodDate(
@@ -132,11 +136,26 @@ const handleFinancingChange = (
                                         "
                                         label="Fecha Inicial"
                                         type="date"
-                                        :disabled="
-                                            row.regimeType === 'modalidad_10'
-                                        "
+                                        disabled
                                     />
+                                    <div v-else class="grid gap-2">
+                                        <span
+                                            class="ui-label text-sm font-medium"
+                                        >
+                                            Fecha Inicial
+                                        </span>
+                                        <span
+                                            class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                        >
+                                            {{
+                                                formatContributionDate(
+                                                    row.startDate,
+                                                )
+                                            }}
+                                        </span>
+                                    </div>
                                     <AppInput
+                                        v-if="row.regimeType === 'modalidad_10'"
                                         :model-value="row.endDate"
                                         @update:model-value="
                                             updateRegimePeriodDate(
@@ -147,14 +166,40 @@ const handleFinancingChange = (
                                         "
                                         label="Fecha Final"
                                         type="date"
-                                        :disabled="
-                                            row.regimeType === 'modalidad_10'
-                                        "
+                                        disabled
                                     />
+                                    <div v-else class="grid gap-2">
+                                        <span
+                                            class="ui-label text-sm font-medium"
+                                        >
+                                            Fecha Final
+                                        </span>
+                                        <span
+                                            class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                        >
+                                            {{
+                                                formatContributionDate(
+                                                    row.endDate,
+                                                )
+                                            }}
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-4 py-4">
-                                <div class="grid gap-2">
+                                <AppInput
+                                    v-if="row.regimeType === 'modalidad_40'"
+                                    :model-value="row.umaValue"
+                                    @update:model-value="
+                                        updateUmaValue(row, $event)
+                                    "
+                                    :label="`Valor UMA ${row.year}`"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0"
+                                />
+                                <div v-else class="grid gap-2">
                                     <span class="ui-label text-sm font-medium">
                                         {{ umaLabel }}
                                     </span>
@@ -202,10 +247,7 @@ const handleFinancingChange = (
                                 <AppInput
                                     :model-value="row.costPercentage"
                                     @update:model-value="
-                                        updateCostPercentage(
-                                            row.costPercentageField,
-                                            $event,
-                                        )
+                                        updateCostPercentage(row, $event)
                                     "
                                     label="Costo Porcentual"
                                     type="number"
