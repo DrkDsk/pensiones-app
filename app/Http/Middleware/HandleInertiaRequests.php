@@ -35,9 +35,12 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        /// Eliminar 'debug' => (bool) config('app.debug'),
+        /// Solo para mock
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'debug' => (bool) config('app.debug'),
             'auth' => [
                 'user' => $request->user(),
             ],

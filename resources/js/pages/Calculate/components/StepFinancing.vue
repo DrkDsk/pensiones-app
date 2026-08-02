@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import { formatCurrency } from '../composables/useBeneficiaries';
@@ -16,15 +15,12 @@ const props = defineProps<{
 const form = props.form;
 const currentYear = new Date().getFullYear();
 const umaLabel = `Valor UMA ${currentYear}`;
-const showUmaValues = ref(false);
 
 const {
     rows,
     updateCostPercentage,
     updateRegimePeriodDate,
-    umaMultipliers,
     selectedUmaMultiplier,
-    updateModalidad40UmaMultiplier,
     valorUma,
     salarioDiarioTopado,
     salarioMensualAlta,
@@ -51,11 +47,6 @@ const handleFinancingChange = (
     }
 
     form.financing[field] = value ?? '';
-};
-
-const handleUmaMultiplierSelect = (multiplier: number) => {
-    updateModalidad40UmaMultiplier(multiplier);
-    showUmaValues.value = false;
 };
 </script>
 
@@ -189,18 +180,6 @@ const handleUmaMultiplierSelect = (multiplier: number) => {
                                             )
                                         }}
                                     </div>
-                                    <button
-                                        v-if="row.regimeType === 'modalidad_40'"
-                                        type="button"
-                                        class="w-max text-xs font-medium text-slate-600 underline underline-offset-4 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-                                        @click="showUmaValues = !showUmaValues"
-                                    >
-                                        {{
-                                            showUmaValues
-                                                ? 'Ocultar valores por UMA'
-                                                : 'Ver valores por UMA'
-                                        }}
-                                    </button>
                                 </div>
                             </td>
                             <td class="px-4 py-4">
@@ -265,123 +244,6 @@ const handleUmaMultiplierSelect = (multiplier: number) => {
                                                 pagoTotalPorPeriodo(row),
                                             )
                                         }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr
-                            v-if="
-                                row.regimeType === 'modalidad_40' &&
-                                showUmaValues
-                            "
-                        >
-                            <td colspan="8" class="p-0">
-                                <div
-                                    class="border-t border-slate-200 bg-slate-50/80 px-4 py-5 dark:border-slate-800 dark:bg-slate-900/40"
-                                >
-                                    <div
-                                        class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950"
-                                    >
-                                        <div class="mb-4">
-                                            <h4
-                                                class="text-sm font-semibold text-slate-900 dark:text-slate-100"
-                                            >
-                                                Valores por UMA
-                                            </h4>
-                                            <p
-                                                class="mt-1 text-sm text-slate-500 dark:text-slate-400"
-                                            >
-                                                Selecciona el valor UMA que se
-                                                utilizará para los cálculos de
-                                                esta fila.
-                                            </p>
-                                        </div>
-
-                                        <div
-                                            class="overflow-x-auto rounded-md border border-slate-200 dark:border-slate-800"
-                                        >
-                                            <table
-                                                class="min-w-full divide-y divide-slate-100 text-left text-xs dark:divide-slate-800"
-                                            >
-                                                <thead
-                                                    class="bg-slate-50 text-slate-500 dark:bg-slate-900 dark:text-slate-400"
-                                                >
-                                                    <tr>
-                                                        <th
-                                                            class="px-3 py-2 font-semibold"
-                                                        >
-                                                            UMAS
-                                                        </th>
-                                                        <th
-                                                            class="px-3 py-2 font-semibold"
-                                                        >
-                                                            Operación
-                                                        </th>
-                                                        <th
-                                                            class="px-3 py-2 font-semibold"
-                                                        >
-                                                            Resultado
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody
-                                                    class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
-                                                >
-                                                    <tr
-                                                        v-for="multiplier in umaMultipliers"
-                                                        :key="multiplier"
-                                                        class="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-900"
-                                                        :class="
-                                                            selectedUmaMultiplier(
-                                                                row,
-                                                            ) === multiplier
-                                                                ? 'bg-slate-100 ring-1 ring-slate-300 ring-inset dark:bg-slate-900 dark:ring-slate-700'
-                                                                : ''
-                                                        "
-                                                        @click="
-                                                            handleUmaMultiplierSelect(
-                                                                multiplier,
-                                                            )
-                                                        "
-                                                    >
-                                                        <td
-                                                            class="px-3 py-2 font-medium text-slate-700 dark:text-slate-200"
-                                                        >
-                                                            {{ multiplier }}
-                                                            {{
-                                                                multiplier === 1
-                                                                    ? 'UMA'
-                                                                    : 'UMAS'
-                                                            }}
-                                                        </td>
-                                                        <td
-                                                            class="px-3 py-2 font-mono text-slate-500 dark:text-slate-400"
-                                                        >
-                                                            {{
-                                                                formatCurrency(
-                                                                    valorUma(
-                                                                        row,
-                                                                    ),
-                                                                )
-                                                            }}
-                                                            × {{ multiplier }}
-                                                        </td>
-                                                        <td
-                                                            class="px-3 py-2 font-mono text-slate-700 dark:text-slate-200"
-                                                        >
-                                                            {{
-                                                                formatCurrency(
-                                                                    valorUma(
-                                                                        row,
-                                                                    ) *
-                                                                        multiplier,
-                                                                )
-                                                            }}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
                                     </div>
                                 </div>
                             </td>

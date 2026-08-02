@@ -95,8 +95,12 @@ export const useFinancing = (
         }
     };
 
-    const valorUma = (row: FinancingRegimeRow) =>
-        toFiniteNumber(regimePeriodFor(row.regimeType)?.uma_value_year);
+    const valorUma = (row: FinancingRegimeRow | RegimePeriod) =>
+        toFiniteNumber(
+            'uma_value_year' in row
+                ? row.uma_value_year
+                : regimePeriodFor(row.regimeType)?.uma_value_year,
+        );
 
     const selectedUmaMultiplier = (row: FinancingRegimeRow) => {
         if (row.regimeType !== 'modalidad_40') {
@@ -111,10 +115,6 @@ export const useFinancing = (
             multiplier <= MAX_UMA_MULTIPLIER
             ? multiplier
             : DEFAULT_UMA_MULTIPLIER;
-    };
-
-    const updateModalidad40UmaMultiplier = (multiplier: number) => {
-        form.financing.modalidad40UmaMultiplier = multiplier;
     };
 
     const salarioDiarioTopado = (row: FinancingRegimeRow) =>
@@ -167,7 +167,6 @@ export const useFinancing = (
         updateRegimePeriodDate,
         umaMultipliers,
         selectedUmaMultiplier,
-        updateModalidad40UmaMultiplier,
         valorUma,
         salarioDiarioTopado,
         salarioMensualAlta,
