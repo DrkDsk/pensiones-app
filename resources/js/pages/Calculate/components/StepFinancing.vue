@@ -25,7 +25,6 @@ const {
     initializeModality40PercentageCosts,
     modalidad10Value,
     updateCostPercentage,
-    updateUmaValue,
     updateRegimePeriodDate,
     selectedUmaMultiplier,
     valorUma,
@@ -211,11 +210,9 @@ const handleFinancingChange = (
                                 <AppInput
                                     v-if="row.regimeType === 'modalidad_40'"
                                     :model-value="row.umaValue"
-                                    @update:model-value="
-                                        updateUmaValue(row, $event)
-                                    "
                                     :label="`Valor UMA ${row.year}`"
                                     type="number"
+                                    disabled
                                     min="0"
                                     step="0.01"
                                     placeholder="0"
