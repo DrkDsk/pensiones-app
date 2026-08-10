@@ -107,6 +107,7 @@ export const useFinancing = (
         const modality10 = form.regime_periods.find(
             (value) => value.regime_type == 'modalidad_10',
         );
+        const modality40 = regimePeriodFor('modalidad_40');
         const modality10ContributionStartDate =
             modality10?.contribution_start_date ?? '';
         const modality10ContributionEndDate =
@@ -141,7 +142,7 @@ export const useFinancing = (
                     year: period.year,
                     startDate: period.startDate,
                     endDate: period.endDate,
-                    umaValue: annualValues.umaValue,
+                    umaValue: modality40?.uma_value_year ?? 0,
                     costPercentage: annualValues.costPercentage,
                     costPercentageField: 'modalidad40CostPercentage',
                 };
@@ -262,18 +263,6 @@ export const useFinancing = (
         form.financing[row.costPercentageField] = value ?? '';
     };
 
-    const updateUmaValue = (
-        row: FinancingRegimeRow,
-        value: string | number | undefined,
-    ) => {
-        if (row.regimeType !== 'modalidad_40') {
-            return;
-        }
-
-        form.financing.modalidad40AnnualValues[String(row.year)].umaValue =
-            value ?? '';
-    };
-
     const updateRegimePeriodDate = (
         regimeType: FinancingRegimeType,
         field: 'contribution_start_date' | 'contribution_end_date',
@@ -361,7 +350,6 @@ export const useFinancing = (
         initializeModality40PercentageCosts,
         modalidad10Value,
         updateCostPercentage,
-        updateUmaValue,
         updateRegimePeriodDate,
         umaMultipliers,
         selectedUmaMultiplier,
