@@ -36,10 +36,21 @@ export interface modalidadPeriod {
     contribution_end_date: string;
 }
 
+export interface Modalidad40AnnualFinancingValues {
+    umaValue: string | number;
+    costPercentage: string | number;
+}
+
+export interface PercentageCostModality40Response {
+    message: string;
+    data: Record<string, number>;
+}
+
 export interface FinancingData {
     modalidad10CostPercentage: string | number;
     modalidad40CostPercentage: string | number;
     modalidad40UmaMultiplier: number;
+    modalidad40AnnualValues: Record<string, Modalidad40AnnualFinancingValues>;
     pagoRetroactivo: string | number;
     modalidad10: string | number;
     pagoAyudaDeDesempleo: string | number;

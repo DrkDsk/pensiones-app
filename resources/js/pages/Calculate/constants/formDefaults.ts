@@ -45,6 +45,7 @@ export const createFinancingDefaults = (): FinancingData => ({
     modalidad10CostPercentage: '',
     modalidad40CostPercentage: '',
     modalidad40UmaMultiplier: 25,
+    modalidad40AnnualValues: {},
     pagoRetroactivo: 205167,
     modalidad10: 16426.84,
     pagoAyudaDeDesempleo: 93860.61,
