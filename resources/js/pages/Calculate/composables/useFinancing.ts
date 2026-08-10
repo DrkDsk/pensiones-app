@@ -37,6 +37,20 @@ export const useFinancing = (
         (_, index) => index + 1,
     );
 
+    const modalidad10Value = computed(() => {
+        const modalidad10Row = rows.value.find(
+            (value) => value.regimeType === 'modalidad_10',
+        );
+
+        if (!modalidad10Row) {
+            return 0;
+        }
+
+        const pagoMensualValue = pagoMensual(modalidad10Row);
+
+        return Number.parseFloat(pagoMensualValue.toFixed(2));
+    });
+
     const regimePeriodFor = (
         regimeType: FinancingRegimeType,
     ): RegimePeriod | undefined =>
@@ -135,7 +149,7 @@ export const useFinancing = (
         return pagoMensual(row) * value;
     };
 
-    const pagoTotal = computed(() =>
+    const pagoTotalModalidad40 = computed(() =>
         rows.value.reduce((total, row) => total + pagoTotalPorPeriodo(row), 0),
     );
 
@@ -163,6 +177,7 @@ export const useFinancing = (
 
     return {
         rows,
+        modalidad10Value,
         updateCostPercentage,
         updateRegimePeriodDate,
         umaMultipliers,
@@ -172,7 +187,7 @@ export const useFinancing = (
         salarioMensualAlta,
         pagoMensual,
         pagoTotalPorPeriodo,
-        pagoTotal,
+        pagoTotalModalidad40,
         inversionTotal,
         financiamiento,
         intereses,
