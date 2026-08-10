@@ -94,7 +94,7 @@ const handleFinancingChange = (
                         <th
                             class="min-w-56 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
                         >
-                            Salario Diario Topado
+                            Salario Diario
                         </th>
                         <th
                             class="min-w-52 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
@@ -234,8 +234,19 @@ const handleFinancingChange = (
                             <td class="px-4 py-4">
                                 <div class="grid gap-2">
                                     <span class="ui-label text-sm font-medium">
-                                        Salario Diario Topado A
-                                        {{ selectedUmaMultiplier(row) }} UMAS
+                                        <template
+                                            v-if="
+                                                row.regimeType ===
+                                                'modalidad_10'
+                                            "
+                                        >
+                                            Salario Integrado
+                                        </template>
+                                        <template v-else>
+                                            Salario Diario A
+                                            {{ selectedUmaMultiplier(row) }}
+                                            UMAS
+                                        </template>
                                     </span>
                                     <div
                                         class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
