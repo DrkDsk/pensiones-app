@@ -25,6 +25,7 @@ export type FinancingRegimeRow = {
     startDate: string;
     endDate: string;
     umaValue: string | number;
+    integratedBalance?: string | number;
     costPercentage: string | number;
     costPercentageField: FinancingCostPercentageField;
 };
@@ -119,6 +120,7 @@ export const useFinancing = (
             startDate: modality10ContributionStartDate,
             endDate: modality10ContributionEndDate,
             umaValue: modality10?.uma_value_year ?? 0,
+            integratedBalance: modality10?.integrated_balance ?? 0,
             costPercentage: MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT,
             costPercentageField: 'modalidad10CostPercentage',
         };
@@ -305,7 +307,9 @@ export const useFinancing = (
     };
 
     const salarioDiarioTopado = (row: FinancingRegimeRow) =>
-        valorUma(row) * selectedUmaMultiplier(row);
+        row.regimeType === 'modalidad_10'
+            ? toFiniteNumber(row.integratedBalance)
+            : valorUma(row) * selectedUmaMultiplier(row);
 
     const salarioMensualAlta = (row: FinancingRegimeRow) =>
         salarioDiarioTopado(row) * 30.4;
