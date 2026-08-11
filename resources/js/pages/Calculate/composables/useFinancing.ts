@@ -315,7 +315,7 @@ export const useFinancing = (
                 ? 1
                 : calculateRegimeTime(row.startDate, row.endDate);
 
-        return pagoMensual(row) * value;
+        return pagoMensual(row) * (value * 12);
     };
 
     const pagoTotalModalidad40 = computed(() =>
