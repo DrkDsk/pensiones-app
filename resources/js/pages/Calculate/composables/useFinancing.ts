@@ -330,7 +330,13 @@ export const useFinancing = (
             toFiniteNumber(form.financing.seguroDeVida),
     );
 
-    const financiamiento = computed(() => inversionTotal.value);
+    const aportacionCliente = computed(() =>
+        toFiniteNumber(form.financing.costoAdicional),
+    );
+
+    const financiamiento = computed(
+        () => inversionTotal.value - aportacionCliente.value,
+    );
 
     const intereses = computed(() => financiamiento.value * 0.4);
 
