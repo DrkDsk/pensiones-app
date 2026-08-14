@@ -318,17 +318,25 @@ export const useFinancing = (
         return pagoMensual(row) * (value * 12);
     };
 
-    const pagoTotalModalidad40 = computed(() =>
-        rows.value.reduce((total, row) => total + pagoTotalPorPeriodo(row), 0),
-    );
+    const pagoTotalModalidad40 = computed(() => {
+        const modalidad40Row = rows.value.filter(
+            (value) => value.regimeType === 'modalidad_40',
+        );
 
-    const inversionTotal = computed(
-        () =>
+        return modalidad40Row.reduce(
+            (total, row) => total + pagoTotalPorPeriodo(row),
+            0,
+        );
+    });
+
+    const inversionTotal = computed(() => {
+        return (
             toFiniteNumber(form.financing.pagoRetroactivo) +
-            toFiniteNumber(form.financing.modalidad10) +
+            toFiniteNumber(modalidad10Value.value) +
             toFiniteNumber(form.financing.pagoAyudaDeDesempleo) +
-            toFiniteNumber(form.financing.seguroDeVida),
-    );
+            toFiniteNumber(form.financing.seguroDeVida)
+        );
+    });
 
     const aportacionCliente = computed(() =>
         toFiniteNumber(form.financing.costoAdicional),
