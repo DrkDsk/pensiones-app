@@ -272,6 +272,9 @@ const handleFinancingChange = (
                                     </div>
                                 </div>
                             </td>
+                            <!--                            TODO   REVISAR Y ELIMINAR @update:model-value="
+                                        updateCostPercentage(row, $event)
+                                    "-->
                             <td class="flex flex-row px-4 py-4">
                                 <AppInput
                                     :model-value="row.costPercentage"
@@ -280,16 +283,8 @@ const handleFinancingChange = (
                                     "
                                     label="Costo Porcentual"
                                     type="number"
-                                    :disabled="
-                                        row.regimeType === 'modalidad_10' ||
-                                        row.regimeType === 'modalidad_40'
-                                    "
+                                    :disabled="true"
                                     min="0"
-                                    :step="
-                                        row.regimeType === 'modalidad_40'
-                                            ? 0.001
-                                            : 0.01
-                                    "
                                     :placeholder="
                                         row.regimeType === 'modalidad_10'
                                             ? '40'
