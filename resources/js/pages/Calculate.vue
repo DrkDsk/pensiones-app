@@ -73,7 +73,7 @@ const {
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
 
-const { pagoTotal, totalCostoDelProyecto } = useFinancing(form, monthlyPension);
+const { totalCostoDelProyecto } = useFinancing(form, monthlyPension);
 
 const {
     clientSearch,
@@ -310,7 +310,7 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 5"
                             :form="form"
                             :monthly-pension="monthlyPension"
-                            :pago-total="pagoTotal"
+                            :pago-total="0"
                             :total-costo-del-proyecto="totalCostoDelProyecto"
                         />
                     </section>
@@ -322,7 +322,7 @@ const validateFamilyInformationField = (
                 :total-steps="calculateSteps.length"
                 :processing="form.processing"
                 @previous="goToPreviousStep"
-                @next="goToNextStep"
+                @next="goToNextStep(form)"
             />
         </AppCard>
 
