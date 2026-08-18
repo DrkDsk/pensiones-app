@@ -80,29 +80,6 @@ export const useFinancing = (
         );
     });
 
-    watch(
-        modality40AnnualPeriods,
-        (periods) => {
-            const currentValues = form.financing.modalidad40AnnualValues ?? {};
-
-            form.financing.modalidad40AnnualValues = Object.fromEntries(
-                periods.map(({ year }) => {
-                    const yearKey = String(year);
-
-                    return [
-                        yearKey,
-                        currentValues[yearKey] ?? {
-                            umaValue: '',
-                            costPercentage:
-                                form.financing.modalidad40CostPercentage,
-                        },
-                    ];
-                }),
-            );
-        },
-        { immediate: true },
-    );
-
     const rows = computed<FinancingRegimeRow[]>(() => {
         const modality10 = form.regime_periods.find(
             (value) => value.regime_type == 'modalidad_10',
@@ -128,12 +105,12 @@ export const useFinancing = (
 
         const modality40Rows = modality40AnnualPeriods.value.map(
             (period): FinancingRegimeRow => {
-                const annualValues = form.financing.modalidad40AnnualValues[
+                /*const annualValues = form.financing.modalidad40AnnualValues[
                     String(period.year)
                 ] ?? {
                     umaValue: '',
                     costPercentage: form.financing.modalidad40CostPercentage,
-                };
+                };*/
 
                 return {
                     key: `modalidad_40-${period.year}-${period.startDate}-${period.endDate}`,
@@ -143,7 +120,7 @@ export const useFinancing = (
                     startDate: period.startDate,
                     endDate: period.endDate,
                     umaValue: modality40?.uma_value_year ?? 0,
-                    costPercentage: annualValues.costPercentage,
+                    costPercentage: 0,
                     costPercentageField: 'modalidad40CostPercentage',
                 };
             },
@@ -204,9 +181,11 @@ export const useFinancing = (
                     return;
                 }
 
-                form.financing.modalidad40AnnualValues[
+                row.costPercentage = percentage;
+
+                /*form.financing.modalidad40AnnualValues[
                     String(row.year)
-                ].costPercentage = percentage;
+                ].costPercentage = percentage;*/
             });
 
             loadedPercentageCostYears = yearsKey;
@@ -246,35 +225,6 @@ export const useFinancing = (
             },
             { immediate: true },
         );
-    };
-
-    const updateCostPercentage = (
-        row: FinancingRegimeRow,
-        value: string | number | undefined,
-    ) => {
-        if (row.regimeType === 'modalidad_40') {
-            form.financing.modalidad40AnnualValues[
-                String(row.year)
-            ].costPercentage = value ?? '';
-
-            return;
-        }
-
-        form.financing[row.costPercentageField] = value ?? '';
-    };
-
-    const updateRegimePeriodDate = (
-        regimeType: FinancingRegimeType,
-        field: 'contribution_start_date' | 'contribution_end_date',
-        value: string | number | undefined,
-    ) => {
-        if (regimeType === 'modalidad_10') {
-            form.financing.modalidad10Dates[field] =
-                value === undefined ? '' : String(value);
-        } else if (regimeType === 'modalidad_40') {
-            form.financing.modalidad40Dates[field] =
-                value === undefined ? '' : String(value);
-        }
     };
 
     const valorUma = (row: FinancingRegimeRow | RegimePeriod) =>
@@ -363,8 +313,6 @@ export const useFinancing = (
         isLoadingPercentageCosts,
         initializeModality40PercentageCosts,
         modalidad10Value,
-        updateCostPercentage,
-        updateRegimePeriodDate,
         umaMultipliers,
         selectedUmaMultiplier,
         valorUma,
