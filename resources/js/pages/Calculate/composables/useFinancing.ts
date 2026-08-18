@@ -25,6 +25,7 @@ export type FinancingRegimeRow = {
     startDate: string;
     endDate: string;
     umaValue: string | number;
+    integratedBalance?: string | number;
     costPercentage: string | number;
     costPercentageField: FinancingCostPercentageField;
 };
@@ -79,33 +80,11 @@ export const useFinancing = (
         );
     });
 
-    watch(
-        modality40AnnualPeriods,
-        (periods) => {
-            const currentValues = form.financing.modalidad40AnnualValues ?? {};
-
-            form.financing.modalidad40AnnualValues = Object.fromEntries(
-                periods.map(({ year }) => {
-                    const yearKey = String(year);
-
-                    return [
-                        yearKey,
-                        currentValues[yearKey] ?? {
-                            umaValue: '',
-                            costPercentage:
-                                form.financing.modalidad40CostPercentage,
-                        },
-                    ];
-                }),
-            );
-        },
-        { immediate: true },
-    );
-
     const rows = computed<FinancingRegimeRow[]>(() => {
         const modality10 = form.regime_periods.find(
             (value) => value.regime_type == 'modalidad_10',
         );
+        const modality40 = regimePeriodFor('modalidad_40');
         const modality10ContributionStartDate =
             modality10?.contribution_start_date ?? '';
         const modality10ContributionEndDate =
@@ -119,18 +98,19 @@ export const useFinancing = (
             startDate: modality10ContributionStartDate,
             endDate: modality10ContributionEndDate,
             umaValue: modality10?.uma_value_year ?? 0,
+            integratedBalance: modality10?.integrated_balance ?? 0,
             costPercentage: MODALIDAD_10_COSTO_PORCENTUAL_DEFAULT,
             costPercentageField: 'modalidad10CostPercentage',
         };
 
         const modality40Rows = modality40AnnualPeriods.value.map(
             (period): FinancingRegimeRow => {
-                const annualValues = form.financing.modalidad40AnnualValues[
+                /*const annualValues = form.financing.modalidad40AnnualValues[
                     String(period.year)
                 ] ?? {
                     umaValue: '',
                     costPercentage: form.financing.modalidad40CostPercentage,
-                };
+                };*/
 
                 return {
                     key: `modalidad_40-${period.year}-${period.startDate}-${period.endDate}`,
@@ -139,8 +119,8 @@ export const useFinancing = (
                     year: period.year,
                     startDate: period.startDate,
                     endDate: period.endDate,
-                    umaValue: annualValues.umaValue,
-                    costPercentage: annualValues.costPercentage,
+                    umaValue: modality40?.uma_value_year ?? 0,
+                    costPercentage: 0,
                     costPercentageField: 'modalidad40CostPercentage',
                 };
             },
@@ -201,9 +181,11 @@ export const useFinancing = (
                     return;
                 }
 
-                form.financing.modalidad40AnnualValues[
+                row.costPercentage = percentage;
+
+                /*form.financing.modalidad40AnnualValues[
                     String(row.year)
-                ].costPercentage = percentage;
+                ].costPercentage = percentage;*/
             });
 
             loadedPercentageCostYears = yearsKey;
@@ -245,47 +227,6 @@ export const useFinancing = (
         );
     };
 
-    const updateCostPercentage = (
-        row: FinancingRegimeRow,
-        value: string | number | undefined,
-    ) => {
-        if (row.regimeType === 'modalidad_40') {
-            form.financing.modalidad40AnnualValues[
-                String(row.year)
-            ].costPercentage = value ?? '';
-
-            return;
-        }
-
-        form.financing[row.costPercentageField] = value ?? '';
-    };
-
-    const updateUmaValue = (
-        row: FinancingRegimeRow,
-        value: string | number | undefined,
-    ) => {
-        if (row.regimeType !== 'modalidad_40') {
-            return;
-        }
-
-        form.financing.modalidad40AnnualValues[String(row.year)].umaValue =
-            value ?? '';
-    };
-
-    const updateRegimePeriodDate = (
-        regimeType: FinancingRegimeType,
-        field: 'contribution_start_date' | 'contribution_end_date',
-        value: string | number | undefined,
-    ) => {
-        if (regimeType === 'modalidad_10') {
-            form.financing.modalidad10Dates[field] =
-                value === undefined ? '' : String(value);
-        } else if (regimeType === 'modalidad_40') {
-            form.financing.modalidad40Dates[field] =
-                value === undefined ? '' : String(value);
-        }
-    };
-
     const valorUma = (row: FinancingRegimeRow | RegimePeriod) =>
         toFiniteNumber('umaValue' in row ? row.umaValue : row.uma_value_year);
 
@@ -305,7 +246,9 @@ export const useFinancing = (
     };
 
     const salarioDiarioTopado = (row: FinancingRegimeRow) =>
-        valorUma(row) * selectedUmaMultiplier(row);
+        row.regimeType === 'modalidad_10'
+            ? toFiniteNumber(row.integratedBalance)
+            : valorUma(row) * selectedUmaMultiplier(row);
 
     const salarioMensualAlta = (row: FinancingRegimeRow) =>
         salarioDiarioTopado(row) * 30.4;
@@ -322,22 +265,36 @@ export const useFinancing = (
                 ? 1
                 : calculateRegimeTime(row.startDate, row.endDate);
 
-        return pagoMensual(row) * value;
+        return pagoMensual(row) * (value * 12);
     };
 
-    const pagoTotalModalidad40 = computed(() =>
-        rows.value.reduce((total, row) => total + pagoTotalPorPeriodo(row), 0),
-    );
+    const pagoTotalModalidad40 = computed(() => {
+        const modalidad40Row = rows.value.filter(
+            (value) => value.regimeType === 'modalidad_40',
+        );
 
-    const inversionTotal = computed(
-        () =>
+        return modalidad40Row.reduce(
+            (total, row) => total + pagoTotalPorPeriodo(row),
+            0,
+        );
+    });
+
+    const inversionTotal = computed(() => {
+        return (
             toFiniteNumber(form.financing.pagoRetroactivo) +
-            toFiniteNumber(form.financing.modalidad10) +
+            toFiniteNumber(modalidad10Value.value) +
             toFiniteNumber(form.financing.pagoAyudaDeDesempleo) +
-            toFiniteNumber(form.financing.seguroDeVida),
+            toFiniteNumber(form.financing.seguroDeVida)
+        );
+    });
+
+    const aportacionCliente = computed(() =>
+        toFiniteNumber(form.financing.costoAdicional),
     );
 
-    const financiamiento = computed(() => inversionTotal.value);
+    const financiamiento = computed(
+        () => inversionTotal.value - aportacionCliente.value,
+    );
 
     const intereses = computed(() => financiamiento.value * 0.4);
 
@@ -356,9 +313,6 @@ export const useFinancing = (
         isLoadingPercentageCosts,
         initializeModality40PercentageCosts,
         modalidad10Value,
-        updateCostPercentage,
-        updateUmaValue,
-        updateRegimePeriodDate,
         umaMultipliers,
         selectedUmaMultiplier,
         valorUma,

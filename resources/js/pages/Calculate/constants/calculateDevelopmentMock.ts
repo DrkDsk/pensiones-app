@@ -93,9 +93,7 @@ export const calculateDevelopmentMock = {
         modalidad10CostPercentage: '',
         modalidad40CostPercentage: '',
         modalidad40UmaMultiplier: 25,
-        modalidad40AnnualValues: {},
         pagoRetroactivo: 205167,
-        modalidad10: 16426.84,
         pagoAyudaDeDesempleo: 93860.61,
         seguroDeVida: 12759.35,
         costoAdicional: 0,
@@ -107,6 +105,7 @@ export const calculateDevelopmentMock = {
             contribution_end_date: '',
             contribution_start_date: '',
         },
+        modalidad10: '',
     },
     projection: {
         monthlyPayment: 0,
