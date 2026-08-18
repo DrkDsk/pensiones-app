@@ -16,7 +16,7 @@ const props = withDefaults(
         helperOrientation?: 'vertical' | 'horizontal';
     }>(),
     {
-        helperOrientation: 'vertical',
+        helperOrientation: 'horizontal',
     },
 );
 
@@ -40,8 +40,14 @@ const inputClass = () =>
 <template>
     <label class="grid gap-2">
         <span v-if="props.label" class="ui-label text-sm font-medium">
-            {{ props.label
-            }}<span v-if="props.required" class="text-red-500"> *</span>
+            {{ props.label }}
+            <span
+                v-if="props.helper && helperOrientation == 'horizontal'"
+                class="text-sm text-text-secondary"
+            >
+                {{ props.helper }}
+            </span>
+            <span v-if="props.required" class="text-red-500"> *</span>
         </span>
         <span class="flex flex-row items-center gap-2">
             <input
@@ -63,12 +69,6 @@ const inputClass = () =>
                 :aria-invalid="Boolean(props.error)"
                 :class="inputClass()"
             />
-            <span
-                v-if="props.helper && helperOrientation == 'horizontal'"
-                class="text-sm text-text-secondary"
-            >
-                {{ props.helper }}
-            </span>
         </span>
         <span v-if="props.error" class="text-xs text-red-600 dark:text-red-300">
             {{ props.error }}
