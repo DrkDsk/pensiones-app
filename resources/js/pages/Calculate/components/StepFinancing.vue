@@ -24,8 +24,6 @@ const {
     isLoadingPercentageCosts,
     initializeModality40PercentageCosts,
     modalidad10Value,
-    updateCostPercentage,
-    updateRegimePeriodDate,
     selectedUmaMultiplier,
     valorUma,
     salarioDiarioTopado,
@@ -49,8 +47,7 @@ const handleFinancingChange = (
     if (
         field === 'modalidad10Dates' ||
         field === 'modalidad40Dates' ||
-        field === 'modalidad40UmaMultiplier' ||
-        field === 'modalidad40AnnualValues'
+        field === 'modalidad40UmaMultiplier'
     ) {
         return;
     }
@@ -144,21 +141,7 @@ const handleFinancingChange = (
                             </td>
                             <td class="px-4 py-4">
                                 <div class="grid gap-3 sm:grid-cols-2">
-                                    <AppInput
-                                        v-if="row.regimeType === 'modalidad_10'"
-                                        :model-value="row.startDate"
-                                        @update:model-value="
-                                            updateRegimePeriodDate(
-                                                row.regimeType,
-                                                'contribution_start_date',
-                                                $event,
-                                            )
-                                        "
-                                        label="Fecha Inicial"
-                                        type="date"
-                                        disabled
-                                    />
-                                    <div v-else class="grid gap-2">
+                                    <div class="grid gap-2">
                                         <span
                                             class="ui-label text-sm font-medium"
                                         >
@@ -174,21 +157,7 @@ const handleFinancingChange = (
                                             }}
                                         </span>
                                     </div>
-                                    <AppInput
-                                        v-if="row.regimeType === 'modalidad_10'"
-                                        :model-value="row.endDate"
-                                        @update:model-value="
-                                            updateRegimePeriodDate(
-                                                row.regimeType,
-                                                'contribution_end_date',
-                                                $event,
-                                            )
-                                        "
-                                        label="Fecha Final"
-                                        type="date"
-                                        disabled
-                                    />
-                                    <div v-else class="grid gap-2">
+                                    <div class="grid gap-2">
                                         <span
                                             class="ui-label text-sm font-medium"
                                         >
@@ -207,17 +176,7 @@ const handleFinancingChange = (
                                 </div>
                             </td>
                             <td class="px-4 py-4">
-                                <AppInput
-                                    v-if="row.regimeType === 'modalidad_40'"
-                                    :model-value="row.umaValue"
-                                    :label="`Valor UMA ${row.year}`"
-                                    type="number"
-                                    disabled
-                                    min="0"
-                                    step="0.01"
-                                    placeholder="0"
-                                />
-                                <div v-else class="grid gap-2">
+                                <div class="grid gap-2">
                                     <span class="ui-label text-sm font-medium">
                                         {{ umaLabel }}
                                     </span>
@@ -264,11 +223,16 @@ const handleFinancingChange = (
                                     <div
                                         class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                                     >
-                                        {{
-                                            formatCurrency(
-                                                salarioMensualAlta(row),
-                                            )
-                                        }}
+                                        <span v-if="isLoadingPercentageCosts">
+                                            Cargando...
+                                        </span>
+                                        <span v-else>
+                                            {{
+                                                formatCurrency(
+                                                    salarioMensualAlta(row),
+                                                )
+                                            }}
+                                        </span>
                                     </div>
                                 </div>
                             </td>
@@ -276,25 +240,16 @@ const handleFinancingChange = (
                                         updateCostPercentage(row, $event)
                                     "-->
                             <td class="flex flex-row px-4 py-4">
-                                <AppInput
-                                    :model-value="row.costPercentage"
-                                    @update:model-value="
-                                        updateCostPercentage(row, $event)
-                                    "
-                                    label="Costo Porcentual"
-                                    type="number"
-                                    :disabled="true"
-                                    min="0"
-                                    :placeholder="
-                                        row.regimeType === 'modalidad_10'
-                                            ? '40'
-                                            : isLoadingPercentageCosts
-                                              ? 'Cargando...'
-                                              : 'Sin porcentaje'
-                                    "
-                                    helper="%"
-                                    helperOrientation="horizontal"
-                                />
+                                <div class="grid gap-2">
+                                    <span class="ui-label text-sm font-medium">
+                                        Costo Porcentual
+                                    </span>
+                                    <div
+                                        class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                                    >
+                                        {{ row.costPercentage }}%
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-4 py-4">
                                 <div class="grid gap-2">
@@ -370,6 +325,7 @@ const handleFinancingChange = (
                 label="Pago Retroactivo"
                 type="number"
                 min="0"
+                helper-orientation="horizontal"
                 step="0.01"
                 :helper="
                     formatCurrency(
