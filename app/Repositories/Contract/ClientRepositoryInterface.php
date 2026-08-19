@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface ClientRepositoryInterface extends BaseRepositoryInterface
 {
+    public function findWithFamilyInformation(int $clientId): ?Client;
+
     /**
      * @return Collection<int, Client>
      */
