@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/vue3';
 import { computed, reactive } from 'vue';
 import type { Client } from '@/models/client';
-import calculate from '@/routes/calculate';
+import clients from '@/routes/clients';
 import { createCalculateFormDefaults } from '../constants/formDefaults';
 
 import type {
@@ -301,23 +301,21 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         enableManualMode: () => void,
         returnToClientStep: () => void,
     ) => {
-        form.get(calculate.store().url, {
-            preserveScroll: true,
-            onError: (errors) => {
-                const normalizedErrors = Object.fromEntries(
-                    Object.entries(errors).map(([field, message]) => {
-                        const normalizedField = field
-                            .replace('client.', '')
-                            .replace('family_information.', '');
+        if (form.client_id === null) {
+            applyServerErrors(
+                {
+                    client_id: [
+                        'Selecciona un cliente registrado para generar la propuesta.',
+                    ],
+                },
+                enableManualMode,
+            );
+            returnToClientStep();
 
-                        return [normalizedField, [message]];
-                    }),
-                );
+            return;
+        }
 
-                applyServerErrors(normalizedErrors, enableManualMode);
-                returnToClientStep();
-            },
-        });
+        window.location.assign(clients.pensionProposal.pdf(form.client_id).url);
     };
 
     ///ELIMINAR SOLO PARA MOCK Y DEV
