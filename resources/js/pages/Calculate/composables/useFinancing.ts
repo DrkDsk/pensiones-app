@@ -42,6 +42,7 @@ export const useFinancing = (
 ) => {
     const { getPercentageCostsByYears } = usePercentageCostModality40Service();
     const isLoadingPercentageCosts = ref(false);
+    const modality40PercentageCosts = ref<Record<number, number>>({});
     let loadedPercentageCostYears = '';
     let pendingPercentageCostYears = '';
     let percentageCostsWatchInitialized = false;
@@ -105,13 +106,6 @@ export const useFinancing = (
 
         const modality40Rows = modality40AnnualPeriods.value.map(
             (period): FinancingRegimeRow => {
-                /*const annualValues = form.financing.modalidad40AnnualValues[
-                    String(period.year)
-                ] ?? {
-                    umaValue: '',
-                    costPercentage: form.financing.modalidad40CostPercentage,
-                };*/
-
                 return {
                     key: `modalidad_40-${period.year}-${period.startDate}-${period.endDate}`,
                     regimeType: 'modalidad_40',
@@ -120,7 +114,8 @@ export const useFinancing = (
                     startDate: period.startDate,
                     endDate: period.endDate,
                     umaValue: modality40?.uma_value_year ?? 0,
-                    costPercentage: 0,
+                    costPercentage:
+                        modality40PercentageCosts.value[period.year] ?? 0,
                     costPercentageField: 'modalidad40CostPercentage',
                 };
             },
@@ -167,27 +162,21 @@ export const useFinancing = (
             }
 
             const missingYears: number[] = [];
+            const nextPercentageCosts: Record<number, number> = {};
 
-            rows.value.forEach((row) => {
-                if (row.regimeType !== 'modalidad_40') {
-                    return;
-                }
-
-                const percentage = percentages[String(row.year)];
+            years.forEach((year) => {
+                const percentage = percentages[String(year)];
 
                 if (!Number.isFinite(percentage)) {
-                    missingYears.push(row.year);
+                    missingYears.push(year);
 
                     return;
                 }
 
-                row.costPercentage = percentage;
-
-                /*form.financing.modalidad40AnnualValues[
-                    String(row.year)
-                ].costPercentage = percentage;*/
+                nextPercentageCosts[year] = percentage;
             });
 
+            modality40PercentageCosts.value = nextPercentageCosts;
             loadedPercentageCostYears = yearsKey;
 
             if (missingYears.length > 0) {
