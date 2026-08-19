@@ -13,6 +13,13 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
         parent::__construct($model);
     }
 
+    public function findWithFamilyInformation(int $clientId): ?Client
+    {
+        return Client::query()
+            ->with('familyInformation')
+            ->find($clientId);
+    }
+
     /**
      * @return Collection<int, Client>
      */
