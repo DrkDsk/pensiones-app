@@ -28,6 +28,8 @@ export const useCalculateSteps = ({
     };
 
     const goToNextStep = (form: InertiaForm<CalculateFormData>) => {
+        console.log(form.data());
+
         if (currentStep.value === steps.length) {
             for (let step = 1; step <= steps.length; step += 1) {
                 if (!validateCurrentStep(step)) {
