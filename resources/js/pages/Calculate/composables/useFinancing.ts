@@ -269,11 +269,11 @@ export const useFinancing = (
     };
 
     const pagoTotalModalidad40 = computed(() => {
-        const modalidad40Row = rows.value.filter(
+        const modalidad40Rows = rows.value.filter(
             (value) => value.regimeType === 'modalidad_40',
         );
 
-        return modalidad40Row.reduce(
+        return modalidad40Rows.reduce(
             (total, row) => total + pagoTotalPorPeriodo(row),
             0,
         );
