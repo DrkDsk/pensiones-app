@@ -249,10 +249,11 @@ export const useFinancing = (
         salarioMensualAlta(row) * costoPorcentual(row);
 
     const pagoTotalPorPeriodo = (row: FinancingRegimeRow) => {
-        const value =
-            row.regimeType === 'modalidad_10'
-                ? 1
-                : calculateRegimeTime(row.startDate, row.endDate);
+        if (row.regimeType === 'modalidad_10') {
+            return pagoMensual(row);
+        }
+
+        const value = calculateRegimeTime(row.startDate, row.endDate);
 
         return pagoMensual(row) * (value * 12);
     };
