@@ -421,9 +421,9 @@ const handleFinancingChange = (
             </div>
 
             <AppInput
-                :model-value="props.form.financing.costoAdicional"
+                :model-value="props.form.financing.aportacionCliente"
                 @update:model-value="
-                    handleFinancingChange('costoAdicional', $event)
+                    handleFinancingChange('aportacionCliente', $event)
                 "
                 label="Aportación Cliente"
                 type="number"
@@ -431,7 +431,7 @@ const handleFinancingChange = (
                 step="0.01"
                 :helper="
                     formatCurrency(
-                        toFiniteNumber(props.form.financing.costoAdicional),
+                        toFiniteNumber(props.form.financing.aportacionCliente),
                     )
                 "
             />

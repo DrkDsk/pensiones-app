@@ -5,27 +5,15 @@ namespace App\UseCases\PensionProposal;
 use App\Helpers\AgeFormatter;
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
-use App\Repositories\Contract\ClientRepositoryInterface;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-readonly class GetClientInformationUseCase
+class GetClientInformationUseCase
 {
-    public function __construct(
-        private ClientRepositoryInterface $clients,
-    ) {}
-
     /**
      * @return array<string, mixed>
      */
-    public function execute(int $clientId, CarbonImmutable $asOf): array
+    public function execute(Client $client, CarbonImmutable $asOf): array
     {
-        $client = $this->clients->findWithFamilyInformation($clientId);
-
-        if (! $client instanceof Client) {
-            throw (new ModelNotFoundException)->setModel(Client::class, [$clientId]);
-        }
-
         $familyInformation = $client->familyInformation;
         $childrenCount = $familyInformation?->minor_or_student_children_count;
 

@@ -1,6 +1,5 @@
-import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import type { CalculateFormData, CalculateStep } from '../types/calculate';
+import type { CalculateStep } from '../types/calculate';
 
 export const useCalculateSteps = ({
     steps,
@@ -27,7 +26,7 @@ export const useCalculateSteps = ({
         currentStep.value = Math.max(currentStep.value - 1, 1);
     };
 
-    const goToNextStep = (form: InertiaForm<CalculateFormData>) => {
+    const goToNextStep = () => {
         if (currentStep.value === steps.length) {
             for (let step = 1; step <= steps.length; step += 1) {
                 if (!validateCurrentStep(step)) {

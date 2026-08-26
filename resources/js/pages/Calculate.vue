@@ -19,6 +19,7 @@ import { useCalculateForm } from './Calculate/composables/useCalculateForm';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
 import { useFinancing } from './Calculate/composables/useFinancing';
+import { useProjection } from './Calculate/composables/useProjection';
 import { calculateDevelopmentMock } from './Calculate/constants/calculateDevelopmentMock';
 import { calculateSteps } from './Calculate/constants/calculateSteps';
 import type {
@@ -65,6 +66,7 @@ const {
     entitlementRetentionYears,
     years_recognized,
     stepErrors,
+    isGeneratingProposal,
     clearStepError,
     clearStepErrors,
     fillCalculateForm,
@@ -73,7 +75,22 @@ const {
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
 
-const { totalCostoDelProyecto } = useFinancing(form, monthlyPension);
+const {
+    modalidad10Value,
+    pagoTotalModalidad40,
+    financiamiento,
+    totalCostoDelProyecto,
+} = useFinancing(form, monthlyPension);
+
+const { firstPensionRetroactiveAndBonus, modality40RecoveredAmount } =
+    useProjection({
+        monthlyPension,
+        monthlyPayment: () => form.projection.monthlyPayment,
+        retirement97Sar92: () => form.projection.retirement97Sar92,
+        pensionCredit: () => form.projection.pensionCredit,
+        pagoTotal: pagoTotalModalidad40,
+        totalCostoDelProyecto,
+    });
 
 const {
     clientSearch,
@@ -156,8 +173,17 @@ const {
     steps: calculateSteps,
     validateCurrentStep: (step) =>
         validateCurrentStep(step, { validateRegimeTimeMinimum: true }),
-    submitCalculate: () =>
-        submitCalculate(enableManualMode, returnToClientStep),
+    submitCalculate: () => {
+        form.monthly_pension = monthlyPension.value;
+        form.contributed_weeks = contributed_weeks.value;
+        form.average_daily_salary = average_daily_salary_last_250_weeks.value;
+        form.modality_10_value = modalidad10Value.value;
+        form.total_financing = financiamiento.value;
+        form.pension_retroactive = firstPensionRetroactiveAndBonus.value;
+        form.modality_40_recovered_amount = modality40RecoveredAmount.value;
+
+        void submitCalculate(enableManualMode, returnToClientStep);
+    },
 });
 
 ///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
@@ -310,7 +336,7 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 5"
                             :form="form"
                             :monthly-pension="monthlyPension"
-                            :pago-total="0"
+                            :pago-total="pagoTotalModalidad40"
                             :total-costo-del-proyecto="totalCostoDelProyecto"
                         />
                     </section>
@@ -320,9 +346,9 @@ const validateFamilyInformationField = (
             <StepNavigation
                 :current-step="currentStep"
                 :total-steps="calculateSteps.length"
-                :processing="form.processing"
+                :processing="form.processing || isGeneratingProposal"
                 @previous="goToPreviousStep"
-                @next="goToNextStep(form)"
+                @next="goToNextStep"
             />
         </AppCard>
 

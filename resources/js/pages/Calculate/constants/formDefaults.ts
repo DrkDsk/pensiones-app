@@ -46,9 +46,10 @@ export const createFinancingDefaults = (): FinancingData => ({
     modalidad40CostPercentage: '',
     modalidad40UmaMultiplier: 25,
     pagoRetroactivo: 205167,
+    modalidad10: 0,
     pagoAyudaDeDesempleo: 93860.61,
     seguroDeVida: 12759.35,
-    costoAdicional: 0,
+    aportacionCliente: 0,
     modalidad40Dates: {
         contribution_end_date: '',
         contribution_start_date: '',
@@ -92,4 +93,11 @@ export const createCalculateFormDefaults = (
     financing: createFinancingDefaults(),
     projection: createProjectionDefaults(),
     beneficieres: createBeneficieresDefaults(),
+    monthly_pension: 0,
+    contributed_weeks: 0,
+    average_daily_salary: 0,
+    modality_10_value: 0,
+    total_financing: 0,
+    pension_retroactive: 0,
+    modality_40_recovered_amount: 0,
 });

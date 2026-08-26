@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/vue3';
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import { toast } from 'vue-sonner';
 import type { Client } from '@/models/client';
 import clients from '@/routes/clients';
 import { createCalculateFormDefaults } from '../constants/formDefaults';
@@ -162,6 +163,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
     );
 
     const stepErrors = createStepErrors();
+    const isGeneratingProposal = ref(false);
 
     const average_daily_salary_last_250_weeks = computed(() => {
         const total = form.regime_periods.reduce((sum, period) => {
@@ -297,10 +299,10 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         }
     };
 
-    const submitCalculate = (
+    const submitCalculate = async (
         enableManualMode: () => void,
         returnToClientStep: () => void,
-    ) => {
+    ): Promise<void> => {
         if (form.client_id === null) {
             applyServerErrors(
                 {
@@ -315,7 +317,53 @@ export const useCalculateForm = (selectedClient: Client | null) => {
             return;
         }
 
-        window.location.assign(clients.pensionProposal.pdf(form.client_id).url);
+        isGeneratingProposal.value = true;
+
+        try {
+            const response = await fetch(
+                clients.pensionProposal.pdf(form.client_id).url,
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/pdf, application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(form.data()),
+                },
+            );
+
+            if (!response.ok) {
+                const error = (await response.json()) as {
+                    message?: string;
+                };
+
+                throw new Error(
+                    error.message ?? 'No fue posible generar la propuesta.',
+                );
+            }
+
+            const blobUrl = URL.createObjectURL(await response.blob());
+            const download = document.createElement('a');
+            const disposition = response.headers.get('Content-Disposition');
+            const filename =
+                disposition?.match(/filename="?([^";]+)"?/i)?.[1] ??
+                'propuesta-pension.pdf';
+
+            download.href = blobUrl;
+            download.download = filename;
+            document.body.appendChild(download);
+            download.click();
+            download.remove();
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'No fue posible generar la propuesta.',
+            );
+        } finally {
+            isGeneratingProposal.value = false;
+        }
     };
 
     ///ELIMINAR SOLO PARA MOCK Y DEV
@@ -332,6 +380,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         entitlementRetentionYears,
         years_recognized,
         stepErrors,
+        isGeneratingProposal,
         clearStepError,
         clearStepErrors,
         fillCalculateForm,
