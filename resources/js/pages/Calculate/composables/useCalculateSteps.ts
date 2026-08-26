@@ -1,6 +1,5 @@
-import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import type { CalculateFormData, CalculateStep } from '../types/calculate';
+import type { CalculateStep } from '../types/calculate';
 
 export const useCalculateSteps = ({
     steps,
