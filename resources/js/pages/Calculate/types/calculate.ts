@@ -54,7 +54,7 @@ export interface FinancingData {
     modalidad10: string | number;
     pagoAyudaDeDesempleo: string | number;
     seguroDeVida: string | number;
-    costoAdicional: string | number;
+    aportacionCliente: string | number;
     modalidad10Dates: modalidadPeriod;
     modalidad40Dates: modalidadPeriod;
 }
@@ -79,6 +79,13 @@ export interface CalculateFormData {
     financing: FinancingData;
     projection: ProjectionData;
     beneficieres: BeneficieresData;
+    monthly_pension: number;
+    contributed_weeks: number;
+    average_daily_salary: number;
+    modality_10_value: number;
+    total_financing: number;
+    pension_retroactive: number;
+    modality_40_recovered_amount: number;
 }
 
 export type CalculateForm = InertiaForm<CalculateFormData>;

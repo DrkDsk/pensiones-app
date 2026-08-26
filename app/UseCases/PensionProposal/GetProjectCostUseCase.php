@@ -7,21 +7,17 @@ class GetProjectCostUseCase
     /**
      * @return array<string, float>
      */
-    public function execute(float $monthlyPension): array
-    {
-        // Inputs temporales hasta que el cálculo de financiamiento sea persistido.
-        $retroactiveModality40 = 246204.82;
-        $modality10 = 16426.84;
-        $unemploymentAssistance = 93860.61;
-        $lifeInsurance = 12759.35;
-        $clientContribution = 0.00;
+    public function execute(
+        float $monthlyPension,
+        float $retroactiveModality40,
+        float $modality10,
+        float $unemploymentAssistance,
+        float $lifeInsurance,
+        float $clientContribution,
+        float $totalFinancing,
+    ): array {
         $financingRate = 0.40;
 
-        $totalFinancing = $retroactiveModality40
-            + $modality10
-            + $unemploymentAssistance
-            + $lifeInsurance
-            + $clientContribution;
         $financingCost = $totalFinancing * $financingRate;
         $fees = $monthlyPension;
 
@@ -35,7 +31,7 @@ class GetProjectCostUseCase
             'financing_rate' => $financingRate,
             'financing_cost' => $financingCost,
             'fees' => $fees,
-            'total_project_cost' => $totalFinancing + $financingCost + $fees,
+            'total_project_cost' => $totalFinancing + $financingCost + $fees + $clientContribution,
         ];
     }
 }

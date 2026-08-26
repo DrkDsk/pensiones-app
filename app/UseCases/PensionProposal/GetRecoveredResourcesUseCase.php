@@ -7,14 +7,14 @@ class GetRecoveredResourcesUseCase
     /**
      * @return array<string, float>
      */
-    public function execute(): array
-    {
-        // Valores temporales hasta que los recursos recuperados sean persistidos.
-        $pensionRetroactive = 156411.83;
-        $modality40Return = 40058.08;
-        $aforeAndInfonavit = 552903.42;
-
+    public function execute(
+        float $monthlyPension,
+        float $pensionRetroactive,
+        float $modality40Return,
+        float $aforeAndInfonavit,
+    ): array {
         return [
+            'fees' => $monthlyPension,
             'pension_retroactive' => $pensionRetroactive,
             'modality_40_return' => $modality40Return,
             'afore_and_infonavit' => $aforeAndInfonavit,

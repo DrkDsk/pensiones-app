@@ -12,6 +12,6 @@ Route::get('/user', static function (Request $request) {
 
 Route::post('cesantia', [CesantiaController::class, 'index']);
 Route::get('percentage-cost-modality-40', [PercentageCostModality40Controller::class, 'index']);
-Route::get('clients/{clientId}/pension-proposal/pdf', PensionProposalController::class)
+Route::post('clients/{clientId}/pension-proposal/pdf', PensionProposalController::class)
     ->whereNumber('clientId')
     ->name('clients.pension-proposal.pdf');

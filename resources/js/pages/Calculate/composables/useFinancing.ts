@@ -289,7 +289,7 @@ export const useFinancing = (
     });
 
     const aportacionCliente = computed(() =>
-        toFiniteNumber(form.financing.costoAdicional),
+        toFiniteNumber(form.financing.aportacionCliente),
     );
 
     const financiamiento = computed(
@@ -305,7 +305,7 @@ export const useFinancing = (
             financiamiento.value +
             intereses.value +
             honorarios.value +
-            toFiniteNumber(form.financing.costoAdicional),
+            toFiniteNumber(form.financing.aportacionCliente),
     );
 
     return {

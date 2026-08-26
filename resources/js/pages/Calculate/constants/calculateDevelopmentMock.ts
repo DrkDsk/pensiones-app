@@ -96,7 +96,7 @@ export const calculateDevelopmentMock = {
         pagoRetroactivo: 205167,
         pagoAyudaDeDesempleo: 93860.61,
         seguroDeVida: 12759.35,
-        costoAdicional: 0,
+        aportacionCliente: 0,
         modalidad40Dates: {
             contribution_end_date: '',
             contribution_start_date: '',
@@ -117,4 +117,11 @@ export const calculateDevelopmentMock = {
         annualBasicAmountIncreasePercentage: 2.45,
         cesantiaEdadAvanzada: 85,
     },
+    monthly_pension: 0,
+    contributed_weeks: 0,
+    average_daily_salary: 0,
+    modality_10_value: 0,
+    total_financing: 0,
+    pension_retroactive: 0,
+    modality_40_recovered_amount: 0,
 } satisfies CalculateFormData;
