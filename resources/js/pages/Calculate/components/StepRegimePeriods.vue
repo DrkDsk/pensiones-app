@@ -54,7 +54,7 @@ const canAddRegimePeriod = computed(
 );
 
 const formatTime = (value: number) =>
-    Number.isFinite(value) && value > 0 ? value.toFixed(2) : '0.00';
+    Number.isFinite(value) && value > 0 ? value.toFixed(3) : '0.000';
 
 const formatDate = (dateString: string | null) => {
     if (!dateString) {
