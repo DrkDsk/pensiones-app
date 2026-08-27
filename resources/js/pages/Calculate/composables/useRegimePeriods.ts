@@ -82,7 +82,11 @@ export const calculateDays360 = (
 export const calculateRegimeTime = (
     startDate: string | null,
     endDate: string | null,
-): number => Math.max(calculateDays360(startDate, endDate) / 360, 0);
+): number => {
+    return parseFloat(
+        Math.max(calculateDays360(startDate, endDate) / 360, 0).toFixed(3),
+    );
+};
 
 export const calculateIntegratedBalance = (umaValueYear: number): number =>
     umaValueYear * 25;
@@ -197,7 +201,9 @@ export const useRegimePeriods = (form: CalculateForm) => {
             return;
         }
 
-        const nextStartDate = addOneDay(lastDynamicPeriod.contribution_end_date);
+        const nextStartDate = addOneDay(
+            lastDynamicPeriod.contribution_end_date,
+        );
 
         if (!nextStartDate) {
             return;
