@@ -54,7 +54,7 @@ readonly class GeneratePensionProposalAction
         );
         $projectCost = $this->getProjectCost->execute(
             monthlyPension: $monthlyPension,
-            retroactiveModality40: (float) $financing['pagoRetroactivo'],
+            retroactiveModality40: (float) $calculation['retroactive_modality_40'],
             modality10: (float) $calculation['modality_10_value'],
             unemploymentAssistance: (float) $financing['pagoAyudaDeDesempleo'],
             lifeInsurance: (float) $financing['seguroDeVida'],

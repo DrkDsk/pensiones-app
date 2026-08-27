@@ -269,9 +269,19 @@ export const useFinancing = (
         );
     });
 
+    const percentageModalidad40 = computed(
+        () => toFiniteNumber(regimePeriodFor('modalidad_40')?.time) * 13.5,
+    );
+
+    const pagoRetroactivo = computed(
+        () =>
+            toFiniteNumber(pagoTotalModalidad40.value) *
+            (percentageModalidad40.value / 100),
+    );
+
     const inversionTotal = computed(() => {
         return (
-            toFiniteNumber(form.financing.pagoRetroactivo) +
+            pagoRetroactivo.value +
             toFiniteNumber(modalidad10Value.value) +
             toFiniteNumber(form.financing.pagoAyudaDeDesempleo) +
             toFiniteNumber(form.financing.seguroDeVida)
@@ -311,6 +321,8 @@ export const useFinancing = (
         pagoMensual,
         pagoTotalPorPeriodo,
         pagoTotalModalidad40,
+        percentageModalidad40,
+        pagoRetroactivo,
         inversionTotal,
         financiamiento,
         intereses,

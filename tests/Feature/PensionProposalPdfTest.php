@@ -10,11 +10,11 @@ function pensionProposalPayload(): array
         'contributed_weeks' => 1457,
         'average_daily_salary' => 1862.71,
         'modality_10_value' => 16426.84,
+        'retroactive_modality_40' => 246204.82,
         'total_financing' => 369251.62,
         'pension_retroactive' => 156411.83,
         'modality_40_recovered_amount' => 40058.08,
         'financing' => [
-            'pagoRetroactivo' => 246204.82,
             'pagoAyudaDeDesempleo' => 93860.61,
             'seguroDeVida' => 12759.35,
             'aportacionCliente' => 0,

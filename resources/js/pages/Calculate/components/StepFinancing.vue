@@ -31,6 +31,7 @@ const {
     pagoMensual,
     pagoTotalPorPeriodo,
     pagoTotalModalidad40,
+    pagoRetroactivo,
     inversionTotal,
     financiamiento,
     intereses,
@@ -317,22 +318,16 @@ const handleFinancingChange = (
                 </div>
             </div>
 
-            <AppInput
-                :model-value="props.form.financing.pagoRetroactivo"
-                @update:model-value="
-                    handleFinancingChange('pagoRetroactivo', $event)
-                "
-                label="Pago Retroactivo"
-                type="number"
-                min="0"
-                helper-orientation="horizontal"
-                step="0.01"
-                :helper="
-                    formatCurrency(
-                        toFiniteNumber(props.form.financing.pagoRetroactivo),
-                    )
-                "
-            />
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Pago Retroactivo
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(pagoRetroactivo) }}
+                </div>
+            </div>
         </div>
     </AppCard>
 

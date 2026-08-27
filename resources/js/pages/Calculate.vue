@@ -78,6 +78,7 @@ const {
 const {
     modalidad10Value,
     pagoTotalModalidad40,
+    pagoRetroactivo,
     financiamiento,
     totalCostoDelProyecto,
 } = useFinancing(form, monthlyPension);
@@ -182,7 +183,9 @@ const {
         form.pension_retroactive = firstPensionRetroactiveAndBonus.value;
         form.modality_40_recovered_amount = modality40RecoveredAmount.value;
 
-        void submitCalculate(enableManualMode, returnToClientStep);
+        void submitCalculate(enableManualMode, returnToClientStep, {
+            retroactive_modality_40: pagoRetroactivo.value,
+        });
     },
 });
 
