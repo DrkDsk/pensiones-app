@@ -50,7 +50,6 @@ export interface FinancingData {
     modalidad10CostPercentage: string | number;
     modalidad40CostPercentage: string | number;
     modalidad40UmaMultiplier: number;
-    pagoRetroactivo: string | number;
     modalidad10: string | number;
     pagoAyudaDeDesempleo: string | number;
     seguroDeVida: string | number;
