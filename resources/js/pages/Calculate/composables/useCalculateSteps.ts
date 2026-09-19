@@ -1,5 +1,6 @@
+import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import type { CalculateStep } from '../types/calculate';
+import type { CalculateFormData, CalculateStep } from '../types/calculate';
 
 export const useCalculateSteps = ({
     steps,
@@ -27,7 +28,7 @@ export const useCalculateSteps = ({
     };
 
     const goToNextStep = (form: InertiaForm<CalculateFormData>) => {
-        console.log(form.data());
+
 
         if (currentStep.value === steps.length) {
             for (let step = 1; step <= steps.length; step += 1) {

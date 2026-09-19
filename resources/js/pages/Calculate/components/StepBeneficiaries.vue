@@ -120,7 +120,6 @@ const loadCesantiaEdadAvanzada = async () => {
     if (
         !Number.isFinite(age) ||
         age <= 0 ||
-        !isCesantiaEdadAvanzadaEmpty() ||
         hasUserEditedCesantia.value ||
         isLoadingCesantia.value
     ) {
@@ -135,7 +134,6 @@ const loadCesantiaEdadAvanzada = async () => {
 
         if (
             !Number.isFinite(percentage) ||
-            !isCesantiaEdadAvanzadaEmpty() ||
             hasUserEditedCesantia.value
         ) {
             return;
