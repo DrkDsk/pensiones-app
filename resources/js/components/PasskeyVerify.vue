@@ -46,8 +46,9 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
                 <KeyRound v-if="!isLoading" class="h-4 w-4" />
                 {{
                     isLoading
-                        ? (props.loadingLabel ?? 'Authenticating...')
-                        : (props.label ?? 'Sign in with a passkey')
+                        ? (props.loadingLabel ?? 'Autenticando...')
+                        : (props.label ??
+                          'Iniciar sesión con una clave de acceso')
                 }}
             </AppButton>
 
@@ -62,7 +63,9 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
             </div>
             <div class="relative flex justify-center text-xs uppercase">
                 <span class="bg-surface px-2 text-text-secondary">
-                    {{ props.separator ?? 'Or continue with email' }}
+                    {{
+                        props.separator ?? 'O continuar con correo electrónico'
+                    }}
                 </span>
             </div>
         </div>

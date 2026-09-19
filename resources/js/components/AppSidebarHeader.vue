@@ -31,7 +31,7 @@ const emit = defineEmits<{
                 aria-controls="app-sidebar"
                 :aria-expanded="props.sidebarOpen"
                 :aria-label="
-                    props.sidebarOpen ? 'Close navigation' : 'Open navigation'
+                    props.sidebarOpen ? 'Cerrar navegación' : 'Abrir navegación'
                 "
                 @click="emit('toggleSidebar')"
             >

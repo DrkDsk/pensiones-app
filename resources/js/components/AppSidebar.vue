@@ -21,7 +21,7 @@ const props = withDefaults(
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Panel de control',
         href: dashboard(),
         icon: LayoutGrid,
     },
@@ -56,7 +56,7 @@ const handleSidebarAction = (event: MouseEvent) => {
                 props.isOpen ? 'translate-x-0' : '-translate-x-full',
             )
         "
-        aria-label="Primary navigation"
+        aria-label="Navegación principal"
     >
         <Link
             :href="dashboard()"
@@ -69,9 +69,9 @@ const handleSidebarAction = (event: MouseEvent) => {
         <div
             class="mb-4 px-3 text-xs font-semibold tracking-[0.18em] text-on-primary/70 uppercase"
         >
-            Platform
+            Plataforma
         </div>
-        <nav class="space-y-1" aria-label="Primary navigation">
+        <nav class="space-y-1" aria-label="Navegación principal">
             <SidebarNavItem
                 v-for="item in mainNavItems"
                 :key="item.title"

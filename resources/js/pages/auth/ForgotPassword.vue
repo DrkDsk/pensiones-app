@@ -9,8 +9,9 @@ import { email } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Forgot password',
-        description: 'Enter your email to receive a password reset link',
+        title: 'Olvidé mi contraseña',
+        description:
+            'Ingresa tu correo electrónico para recibir un enlace de restablecimiento',
     },
 });
 
@@ -20,7 +21,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head title="Olvidé mi contraseña" />
 
     <AppAlert v-if="status" variant="success" class="mb-5">
         {{ status }}
@@ -36,7 +37,7 @@ defineProps<{
                     autocomplete="off"
                     autofocus
                     placeholder="email@example.com"
-                    label="Email address"
+                    label="Correo electrónico"
                     :error="errors.email"
                 />
             </div>
@@ -47,14 +48,14 @@ defineProps<{
                     :loading="processing"
                     data-test="email-password-reset-link-button"
                 >
-                    Email password reset link
+                    Enviar enlace para restablecer la contraseña
                 </AppButton>
             </div>
         </Form>
 
         <div class="space-x-1 text-center text-sm text-text-secondary">
-            <span>Or, return to</span>
-            <TextLink :href="login()">log in</TextLink>
+            <span>O regresa a</span>
+            <TextLink :href="login()">iniciar sesión</TextLink>
         </div>
     </div>
 </template>

@@ -7,7 +7,7 @@ import { dashboard, login, register } from '@/routes';
 </script>
 
 <template>
-    <Head title="Welcome" />
+    <Head title="Bienvenido" />
 
     <main class="min-h-screen bg-background text-text-primary">
         <section class="financial-gradient px-6 py-6 text-on-primary">
@@ -26,20 +26,20 @@ import { dashboard, login, register } from '@/routes';
                         :href="dashboard()"
                         class="rounded-md bg-on-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-on-primary/90"
                     >
-                        Dashboard
+                        Panel de control
                     </Link>
                     <template v-else>
                         <Link
                             :href="login()"
                             class="text-sm font-medium text-on-primary/80 transition hover:text-on-primary"
                         >
-                            Log in
+                            Iniciar sesión
                         </Link>
                         <Link
                             :href="register()"
                             class="rounded-md bg-on-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-on-primary/90"
                         >
-                            Register
+                            Registrarse
                         </Link>
                     </template>
                 </nav>
@@ -53,25 +53,26 @@ import { dashboard, login, register } from '@/routes';
                         variant="info"
                         class="border-on-primary/20 bg-on-primary/12 text-on-primary"
                     >
-                        Modern pension intelligence
+                        Inteligencia moderna para pensiones
                     </AppBadge>
                     <h1
                         class="mt-6 max-w-3xl text-5xl leading-tight font-semibold text-on-primary"
                     >
-                        Calculate retirement outcomes with boardroom-level
-                        clarity.
+                        Calcula los resultados de tu retiro con claridad
+                        ejecutiva.
                     </h1>
                     <p
                         class="mt-5 max-w-2xl text-base leading-7 text-on-primary/80"
                     >
-                        A professional workspace for pension projections,
-                        contribution scenarios, and secure financial planning.
+                        Un espacio profesional para proyecciones de pensión,
+                        escenarios de cotización y planificación financiera
+                        segura.
                     </p>
                     <Link
                         :href="$page.props.auth.user ? dashboard() : login()"
                         class="mt-8 inline-flex items-center gap-2 rounded-md bg-secondary px-5 py-3 text-sm font-semibold text-on-primary transition hover:bg-secondary/90"
                     >
-                        Open workspace
+                        Abrir espacio de trabajo
                         <ArrowRight class="size-4" />
                     </Link>
                 </div>
@@ -83,7 +84,7 @@ import { dashboard, login, register } from '@/routes';
                         <div class="mb-6 flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-text-secondary">
-                                    Projected pension
+                                    Pensión proyectada
                                 </p>
                                 <p
                                     class="mt-1 text-3xl font-semibold text-text-primary"
@@ -100,13 +101,13 @@ import { dashboard, login, register } from '@/routes';
                         </div>
                         <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
                             <div class="rounded-md bg-background p-3">
-                                <p class="text-text-secondary">Readiness</p>
+                                <p class="text-text-secondary">Preparación</p>
                                 <p class="mt-1 font-semibold text-text-primary">
                                     86%
                                 </p>
                             </div>
                             <div class="rounded-md bg-background p-3">
-                                <p class="text-text-secondary">Security</p>
+                                <p class="text-text-secondary">Seguridad</p>
                                 <p
                                     class="mt-1 flex items-center gap-1 font-semibold text-text-primary"
                                 >

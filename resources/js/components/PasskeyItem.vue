@@ -49,10 +49,10 @@ const handleDelete = () => {
                     </AppBadge>
                 </div>
                 <p class="text-sm text-text-secondary">
-                    Added {{ passkey.created_at_diff }}
+                    Agregada {{ passkey.created_at_diff }}
                     <template v-if="passkey.last_used_at_diff">
                         <span class="mx-1 text-text-secondary/50">/</span>
-                        Last used {{ passkey.last_used_at_diff }}
+                        Último uso: {{ passkey.last_used_at_diff }}
                     </template>
                 </p>
             </div>
@@ -65,24 +65,24 @@ const handleDelete = () => {
             @click="showModal = true"
         >
             <Trash2 class="size-4" />
-            <span class="sr-only">Remove</span>
+            <span class="sr-only">Eliminar</span>
         </AppButton>
 
         <AppModal
             v-model:open="showModal"
-            title="Remove passkey"
-            :description="`Are you sure you want to remove the &quot;${passkey.name}&quot; passkey? You will no longer be able to use it to sign in.`"
+            title="Eliminar clave de acceso"
+            :description="`¿Seguro que deseas eliminar la clave de acceso &quot;${passkey.name}&quot;? Ya no podrás usarla para iniciar sesión.`"
         >
             <div class="flex justify-end gap-3">
                 <AppButton variant="ghost" @click="showModal = false"
-                    >Cancel</AppButton
+                    >Cancelar</AppButton
                 >
                 <AppButton
                     variant="danger"
                     :loading="isDeleting"
                     @click="handleDelete"
                 >
-                    Remove passkey
+                    Eliminar clave de acceso
                 </AppButton>
             </div>
         </AppModal>

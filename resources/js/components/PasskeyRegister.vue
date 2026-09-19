@@ -21,7 +21,7 @@ const getDefaultPasskeyName = () => {
         new RegExp(os).test(ua),
     );
 
-    return [browser, os].filter(Boolean).join(' on ') || '';
+    return [browser, os].filter(Boolean).join(' en ') || '';
 };
 
 const name = ref(getDefaultPasskeyName());
@@ -53,11 +53,11 @@ const handleCancel = () => {
 
 <template>
     <AppAlert v-if="!isSupported" variant="warning">
-        Passkeys are not supported in this browser.
+        Este navegador no admite claves de acceso.
     </AppAlert>
 
     <AppButton v-else-if="!showForm" variant="ghost" @click="showForm = true">
-        Add passkey
+        Agregar clave de acceso
     </AppButton>
 
     <form
@@ -69,9 +69,9 @@ const handleCancel = () => {
             id="passkey-name"
             v-model="name"
             type="text"
-            placeholder="e.g., MacBook Pro, iPhone"
-            label="Passkey name"
-            helper="A name helps you identify this passkey later."
+            placeholder="Ej.: MacBook Pro, iPhone"
+            label="Nombre de la clave de acceso"
+            helper="Un nombre te ayuda a identificar esta clave de acceso más adelante."
             autofocus
         />
 
@@ -83,10 +83,10 @@ const handleCancel = () => {
                 :loading="isLoading"
                 :disabled="!name.trim()"
             >
-                Register passkey
+                Registrar clave de acceso
             </AppButton>
             <AppButton type="button" variant="ghost" @click="handleCancel">
-                Cancel
+                Cancelar
             </AppButton>
         </div>
     </form>

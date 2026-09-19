@@ -15,7 +15,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Profile settings',
+                title: 'Configuración del perfil',
                 href: edit(),
             },
         ],
@@ -27,15 +27,15 @@ const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <Head title="Profile settings" />
+    <Head title="Configuración del perfil" />
 
-    <h1 class="sr-only">Profile settings</h1>
+    <h1 class="sr-only">Configuración del perfil</h1>
 
     <AppCard class="p-6">
         <div class="mb-6">
-            <h2 class="text-lg font-semibold text-on-surface">Profile</h2>
+            <h2 class="text-lg font-semibold text-on-surface">Perfil</h2>
             <p class="mt-1 text-sm text-text-secondary">
-                Update your name and email address.
+                Actualiza tu nombre y correo electrónico.
             </p>
         </div>
         <Form
@@ -50,8 +50,8 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.name"
                     required
                     autocomplete="name"
-                    placeholder="Full name"
-                    label="Name"
+                    placeholder="Nombre completo"
+                    label="Nombre"
                     :error="errors.name"
                 />
             </div>
@@ -64,21 +64,21 @@ const user = computed(() => page.props.auth.user);
                     :default-value="user.email"
                     required
                     autocomplete="username"
-                    placeholder="Email address"
-                    label="Email address"
+                    placeholder="Correo electrónico"
+                    label="Correo electrónico"
                     :error="errors.email"
                 />
             </div>
 
             <div v-if="page.props.mustVerifyEmail && !user.email_verified_at">
                 <p class="-mt-4 text-sm text-text-secondary">
-                    Your email address is unverified.
+                    Tu correo electrónico no está verificado.
                     <Link
                         :href="send()"
                         as="button"
                         class="text-on-surface underline underline-offset-4 transition hover:text-on-surface/80"
                     >
-                        Click here to re-send the verification email.
+                        Haz clic aquí para reenviar el correo de verificación.
                     </Link>
                 </p>
 
@@ -87,7 +87,8 @@ const user = computed(() => page.props.auth.user);
                     variant="success"
                     class="mt-3"
                 >
-                    A new verification link has been sent to your email address.
+                    Se envió un nuevo enlace de verificación a tu correo
+                    electrónico.
                 </AppAlert>
             </div>
 
@@ -96,7 +97,7 @@ const user = computed(() => page.props.auth.user);
                     :loading="processing"
                     data-test="update-profile-button"
                 >
-                    Save changes
+                    Guardar cambios
                 </AppButton>
             </div>
         </Form>
