@@ -51,18 +51,9 @@ const toggleDevelopmentMode = (): void => {
             >
                 <div>
                     <p
-                        class="text-primary-600 dark:text-primary-300 text-xs font-semibold tracking-[0.24em] uppercase"
+                        class="text-primary-600 dark:text-primary-300 text-4xl font-semibold tracking-[0.24em] uppercase"
                     >
                         Formulario de registro
-                    </p>
-                    <h2
-                        class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"
-                    >
-                        Captura ordenada para el cálculo de pensión
-                    </h2>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Avanza paso a paso y revisa todo antes de finalizar el
-                        registro.
                     </p>
                 </div>
 

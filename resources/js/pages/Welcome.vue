@@ -18,12 +18,6 @@ import { dashboard, login, register } from '@/routes';
                     >
                         <Landmark class="size-6" />
                     </div>
-                    <div>
-                        <p class="font-semibold text-on-primary">PensionFlow</p>
-                        <p class="text-sm text-on-primary/75">
-                            Financial planning
-                        </p>
-                    </div>
                 </div>
 
                 <nav class="flex items-center gap-3">
