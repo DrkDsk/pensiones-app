@@ -6,7 +6,6 @@ import AppInput from '@/components/AppInput.vue';
 import PasskeyVerify from '@/components/PasskeyVerify.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
-import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
@@ -107,11 +106,6 @@ defineProps<{
             >
                 Iniciar sesión
             </AppButton>
-        </div>
-
-        <div class="text-center text-sm text-text-secondary">
-            ¿No tienes una cuenta?
-            <TextLink :href="register()" :tabindex="5">Regístrate</TextLink>
         </div>
     </Form>
 </template>
