@@ -9,7 +9,10 @@ defineProps<{
 </script>
 
 <template>
-    <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-sm">
+    <nav
+        aria-label="Ruta de navegación"
+        class="flex items-center gap-2 text-sm"
+    >
         <template v-for="(item, index) in breadcrumbs" :key="index">
             <Link
                 v-if="index !== breadcrumbs.length - 1"

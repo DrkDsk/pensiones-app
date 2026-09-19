@@ -33,9 +33,12 @@ const handleRegisterSuccess = () => {
 <template>
     <AppCard v-if="canManagePasskeys" class="p-6">
         <div class="mb-6">
-            <h2 class="text-lg font-semibold text-on-surface">Passkeys</h2>
+            <h2 class="text-lg font-semibold text-on-surface">
+                Claves de acceso
+            </h2>
             <p class="mt-1 text-sm text-text-secondary">
-                Manage your passkeys for passwordless sign-in.
+                Administra tus claves de acceso para iniciar sesión sin
+                contraseña.
             </p>
         </div>
 
@@ -51,8 +54,8 @@ const handleRegisterSuccess = () => {
 
             <EmptyState
                 v-else
-                title="No passkeys yet"
-                description="Add a passkey to sign in without a password."
+                title="Aún no hay claves de acceso"
+                description="Agrega una clave de acceso para iniciar sesión sin contraseña."
                 :icon="KeyRound"
                 class="m-4"
             />

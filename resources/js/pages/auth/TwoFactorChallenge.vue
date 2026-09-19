@@ -13,18 +13,18 @@ const code = ref<string>('');
 const authConfigContent = computed<TwoFactorConfigContent>(() => {
     if (showRecoveryInput.value) {
         return {
-            title: 'Recovery code',
+            title: 'Código de recuperación',
             description:
-                'Please confirm access to your account by entering one of your emergency recovery codes.',
-            buttonText: 'login using an authentication code',
+                'Confirma el acceso a tu cuenta ingresando uno de tus códigos de recuperación de emergencia.',
+            buttonText: 'iniciar sesión con un código de autenticación',
         };
     }
 
     return {
-        title: 'Authentication code',
+        title: 'Código de autenticación',
         description:
-            'Enter the authentication code provided by your authenticator application.',
-        buttonText: 'login using a recovery code',
+            'Ingresa el código proporcionado por tu aplicación de autenticación.',
+        buttonText: 'iniciar sesión con un código de recuperación',
     };
 });
 
@@ -43,7 +43,7 @@ const toggleRecoveryMode = (clearErrors: () => void): void => {
 </script>
 
 <template>
-    <Head title="Two-factor authentication" />
+    <Head title="Autenticación de dos factores" />
 
     <div class="space-y-6">
         <template v-if="!showRecoveryInput">
@@ -73,10 +73,10 @@ const toggleRecoveryMode = (clearErrors: () => void): void => {
                     <InputError :message="errors.code" />
                 </div>
                 <AppButton type="submit" class="w-full" :loading="processing">
-                    Continue
+                    Continuar
                 </AppButton>
                 <div class="text-center text-sm text-text-secondary">
-                    <span>or you can </span>
+                    <span>o puedes </span>
                     <button
                         type="button"
                         class="font-medium text-on-surface underline underline-offset-4 transition hover:text-on-surface/80"
@@ -98,17 +98,17 @@ const toggleRecoveryMode = (clearErrors: () => void): void => {
                 <AppInput
                     name="recovery_code"
                     type="text"
-                    placeholder="Enter recovery code"
+                    placeholder="Ingresa el código de recuperación"
                     :autofocus="showRecoveryInput"
                     required
                     :error="errors.recovery_code"
                 />
                 <AppButton type="submit" class="w-full" :loading="processing">
-                    Continue
+                    Continuar
                 </AppButton>
 
                 <div class="text-center text-sm text-text-secondary">
-                    <span>or you can </span>
+                    <span>o puedes </span>
                     <button
                         type="button"
                         class="font-medium text-on-surface underline underline-offset-4 transition hover:text-on-surface/80"

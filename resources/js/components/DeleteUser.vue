@@ -16,15 +16,15 @@ const showModal = ref(false);
     <AppCard class="p-6">
         <div class="mb-5">
             <h2 class="text-lg font-semibold text-on-surface">
-                Delete account
+                Eliminar cuenta
             </h2>
             <p class="mt-1 text-sm text-text-secondary">
-                Delete your account and all of its resources.
+                Elimina tu cuenta y todos sus recursos.
             </p>
         </div>
 
-        <AppAlert variant="danger" title="Warning" class="mb-5">
-            Please proceed with caution, this cannot be undone.
+        <AppAlert variant="danger" title="Advertencia" class="mb-5">
+            Procede con precaución, esta acción no se puede deshacer.
         </AppAlert>
 
         <AppButton
@@ -32,13 +32,13 @@ const showModal = ref(false);
             data-test="delete-user-button"
             @click="showModal = true"
         >
-            Delete account
+            Eliminar cuenta
         </AppButton>
 
         <AppModal
             v-model:open="showModal"
-            title="Are you sure you want to delete your account?"
-            description="Once your account is deleted, all resources and data will be permanently deleted."
+            title="¿Seguro que deseas eliminar tu cuenta?"
+            description="Una vez eliminada tu cuenta, todos los recursos y datos se eliminarán permanentemente."
         >
             <Form
                 v-bind="ProfileController.destroy.form()"
@@ -54,13 +54,13 @@ const showModal = ref(false);
                     <label
                         for="password"
                         class="text-sm font-medium text-text-primary"
-                        >Password</label
+                        >Contraseña</label
                     >
                     <PasswordInput
                         id="password"
                         name="password"
                         ref="passwordInput"
-                        placeholder="Password"
+                        placeholder="Contraseña"
                         :error="errors.password"
                     />
                 </div>
@@ -76,7 +76,7 @@ const showModal = ref(false);
                             }
                         "
                     >
-                        Cancel
+                        Cancelar
                     </AppButton>
                     <AppButton
                         type="submit"
@@ -84,7 +84,7 @@ const showModal = ref(false);
                         :loading="processing"
                         data-test="confirm-delete-user-button"
                     >
-                        Delete account
+                        Eliminar cuenta
                     </AppButton>
                 </div>
             </Form>
