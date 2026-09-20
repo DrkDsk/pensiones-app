@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface ClientRepositoryInterface extends BaseRepositoryInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function findExistingClient(array $data): ?Client;
+
     public function findWithFamilyInformation(int $clientId): ?Client;
 
     /**

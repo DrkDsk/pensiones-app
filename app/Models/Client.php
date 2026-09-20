@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\ClientValidationRules;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -30,6 +32,16 @@ class Client extends Model
             'regime_end_date' => 'date',
             'unemployment_assistance_discounted_weeks' => 'integer',
         ];
+    }
+
+    /**
+     * @return Attribute<string, string>
+     */
+    protected function curp(): Attribute
+    {
+        return Attribute::make(
+            set: ClientValidationRules::normalizeCurp(...),
+        );
     }
 
     /**
