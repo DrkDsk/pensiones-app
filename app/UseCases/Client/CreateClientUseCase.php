@@ -5,6 +5,7 @@ namespace App\UseCases\Client;
 use App\Exceptions\ClientExistsException;
 use App\Models\Client;
 use App\Repositories\Contract\ClientRepositoryInterface;
+use App\Support\ClientValidationRules;
 use LogicException;
 
 readonly class CreateClientUseCase
@@ -19,6 +20,10 @@ readonly class CreateClientUseCase
      */
     public function execute(array $data): Client
     {
+        if (isset($data['curp']) && is_string($data['curp'])) {
+            $data['curp'] = ClientValidationRules::normalizeCurp($data['curp']);
+        }
+
         if ($this->findExistingClient->execute($data) instanceof Client) {
             throw new ClientExistsException;
         }

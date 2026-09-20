@@ -108,7 +108,7 @@ test('calculate store creates a new client from required client fields', functio
             'client' => [
                 'name' => 'Alfredo',
                 'last_name' => 'Palacios',
-                'phone' => '(55) 1234-5678',
+                'phone' => '5512345678',
                 'curp' => 'paaa800101hdflll09',
                 'birthdate' => '1980-01-01',
                 'nss' => '12345678901',
@@ -180,6 +180,36 @@ test('calculate store rejects invalid client contact formats', function () {
             'family_information.minor_or_student_children_count',
             'family_information.parents_count',
         ]);
+});
+
+test('calculate store does not strip formatting from phone or nss', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->from(route('calculate'))
+        ->post(route('calculate.store'), [
+            'client_id' => null,
+            'client' => [
+                'name' => 'Alfredo',
+                'phone' => '961-123-4567',
+                'curp' => 'GOCG850101HDFRRN09',
+                'birthdate' => '1985-01-01',
+                'nss' => '12345-678901',
+                'unemployment_assistance_discounted_weeks' => '0',
+            ],
+            'family_information' => [
+                'has_spouse' => '0',
+                'minor_or_student_children_count' => '0',
+                'parents_count' => '0',
+            ],
+        ]);
+
+    $response
+        ->assertRedirect(route('calculate'))
+        ->assertSessionHasErrors(['client.phone', 'client.nss']);
+
+    $this->assertDatabaseCount('clients', 0);
 });
 
 test('calculate store rejects a new client under 18 years old', function () {
