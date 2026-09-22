@@ -7,6 +7,8 @@ Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::inertia('clients', 'Clients/Index')->name('clients.index');
+    Route::inertia('clients/store', 'Clients/Create')->name('clients.create');
     Route::get('calculate', [CalculateController::class, 'index'])->name('calculate');
     Route::get('calculate/clients/search', [CalculateController::class, 'searchClients'])
         ->name('calculate.clients.search');
