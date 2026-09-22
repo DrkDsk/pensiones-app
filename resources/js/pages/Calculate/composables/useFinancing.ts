@@ -345,3 +345,5 @@ export const useFinancing = (
         totalCostoDelProyecto,
     };
 };
+
+export type FinancingState = ReturnType<typeof useFinancing>;

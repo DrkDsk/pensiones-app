@@ -86,3 +86,5 @@ export const useProjection = ({
         freeCapital,
     };
 };
+
+export type ProjectionState = ReturnType<typeof useProjection>;
