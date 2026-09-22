@@ -216,8 +216,11 @@ export const useFinancing = (
         );
     };
 
-    const valorUma = (row: FinancingRegimeRow | RegimePeriod) =>
-        toFiniteNumber('umaValue' in row ? row.umaValue : row.uma_value_year);
+    const valorUma = (row: FinancingRegimeRow | RegimePeriod) => {
+        return toFiniteNumber(
+            'umaValue' in row ? row.umaValue : row.uma_value_year,
+        );
+    };
 
     const selectedUmaMultiplier = (row: FinancingRegimeRow) => {
         if (row.regimeType !== 'modalidad_40') {
@@ -234,10 +237,20 @@ export const useFinancing = (
             : DEFAULT_UMA_MULTIPLIER;
     };
 
-    const salarioDiarioTopado = (row: FinancingRegimeRow) =>
-        row.regimeType === 'modalidad_10'
-            ? toFiniteNumber(row.integratedBalance)
-            : valorUma(row) * selectedUmaMultiplier(row);
+    const salarioDiarioTopado = (row: FinancingRegimeRow) => {
+        const value =
+            row.regimeType === 'modalidad_10'
+                ? toFiniteNumber(row.integratedBalance)
+                : valorUma(row) * selectedUmaMultiplier(row);
+
+        console.log({
+            salarioDiarioTopado: value,
+            valorUma: valorUma(row),
+            multiplier: selectedUmaMultiplier(row),
+        });
+
+        return value;
+    };
 
     const salarioMensualAlta = (row: FinancingRegimeRow) =>
         salarioDiarioTopado(row) * 30.4;
@@ -245,8 +258,11 @@ export const useFinancing = (
     const costoPorcentual = (row: FinancingRegimeRow) =>
         toFiniteNumber(row.costPercentage) / 100;
 
-    const pagoMensual = (row: FinancingRegimeRow) =>
-        salarioMensualAlta(row) * costoPorcentual(row);
+    const pagoMensual = (row: FinancingRegimeRow) => {
+        return parseFloat(
+            (salarioMensualAlta(row) * costoPorcentual(row)).toFixed(2),
+        );
+    };
 
     const pagoTotalPorPeriodo = (row: FinancingRegimeRow) => {
         if (row.regimeType === 'modalidad_10') {
@@ -254,8 +270,9 @@ export const useFinancing = (
         }
 
         const value = calculateRegimeTime(row.startDate, row.endDate);
+        const pagoMensualValue = pagoMensual(row);
 
-        return pagoMensual(row) * (value * 12);
+        return pagoMensualValue * (value * 12);
     };
 
     const pagoTotalModalidad40 = computed(() => {
@@ -273,16 +290,20 @@ export const useFinancing = (
         () => toFiniteNumber(regimePeriodFor('modalidad_40')?.time) * 13.5,
     );
 
-    const pagoRetroactivo = computed(
-        () =>
-            toFiniteNumber(pagoTotalModalidad40.value) *
-            (percentageModalidad40.value / 100),
-    );
+    const pagoRetroactivo = computed(() => {
+        return (
+            toFiniteNumber(
+                pagoTotalModalidad40.value + modalidad10Value.value,
+            ) *
+            (percentageModalidad40.value / 100)
+        );
+    });
 
     const inversionTotal = computed(() => {
         return (
             pagoRetroactivo.value +
             toFiniteNumber(modalidad10Value.value) +
+            toFiniteNumber(pagoTotalModalidad40.value) +
             toFiniteNumber(form.financing.pagoAyudaDeDesempleo) +
             toFiniteNumber(form.financing.seguroDeVida)
         );
