@@ -89,7 +89,7 @@ export const calculateRegimeTime = (
 };
 
 export const calculateIntegratedBalance = (umaValueYear: number): number =>
-    umaValueYear * 25;
+    parseFloat((umaValueYear * 25).toFixed(2));
 
 const BASE_REGIME_TYPE_VALUES: string[] = BASE_REGIME_TYPES.map(
     (regimeType) => regimeType.value,
