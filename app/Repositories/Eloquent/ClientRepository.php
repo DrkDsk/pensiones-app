@@ -14,7 +14,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public function findExistingClient(array $data): ?Client
     {
