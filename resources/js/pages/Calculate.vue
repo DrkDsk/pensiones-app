@@ -75,23 +75,29 @@ const {
     submitCalculate,
 } = useCalculateForm(props.selectedClient);
 
+const financing = useFinancing(form, monthlyPension);
+
+financing.initializeModality40PercentageCosts();
+
 const {
     modality10Value,
     modality40Value,
     pagoRetroactivo,
     financiamiento,
     totalCostoDelProyecto,
-} = useFinancing(form, monthlyPension);
+} = financing;
+
+const projection = useProjection({
+    monthlyPension,
+    monthlyPayment: () => form.projection.monthlyPayment,
+    retirement97Sar92: () => form.projection.retirement97Sar92,
+    pensionCredit: () => form.projection.pensionCredit,
+    modality40Value,
+    totalCostoDelProyecto,
+});
 
 const { firstPensionRetroactiveAndBonus, modality40RecoveredAmount } =
-    useProjection({
-        monthlyPension,
-        monthlyPayment: () => form.projection.monthlyPayment,
-        retirement97Sar92: () => form.projection.retirement97Sar92,
-        pensionCredit: () => form.projection.pensionCredit,
-        modality40Value: () => modality40Value.value,
-        totalCostoDelProyecto,
-    });
+    projection;
 
 const {
     clientSearch,
@@ -332,15 +338,13 @@ const validateFamilyInformationField = (
                         <StepFinancing
                             v-else-if="currentStep === 4"
                             :form="form"
-                            :monthly-pension="monthlyPension"
+                            :financing="financing"
                         />
 
                         <StepProjection
                             v-else-if="currentStep === 5"
                             :form="form"
-                            :monthly-pension="monthlyPension"
-                            :modality40-value="modality40Value"
-                            :total-costo-del-proyecto="totalCostoDelProyecto"
+                            :projection="projection"
                         />
                     </section>
                 </Transition>

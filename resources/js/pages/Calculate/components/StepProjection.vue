@@ -3,16 +3,14 @@ import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import { formatCurrency } from '../composables/useBeneficiaries';
 import { toFiniteNumber } from '../composables/useFinancing';
-import { useProjection } from '../composables/useProjection';
+import type { ProjectionState } from '../composables/useProjection';
 import type { CalculateForm, ProjectionData } from '../types/calculate';
 
 type AppInputModelValue = string | number | undefined;
 
 const props = defineProps<{
     form: CalculateForm;
-    monthlyPension: number;
-    modality40Value: number;
-    totalCostoDelProyecto: number;
+    projection: ProjectionState;
 }>();
 
 const form = props.form;
@@ -23,14 +21,7 @@ const {
     modality40RecoveredAmount,
     totalRecovered,
     freeCapital,
-} = useProjection({
-    monthlyPension: () => props.monthlyPension,
-    monthlyPayment: () => form.projection.monthlyPayment,
-    retirement97Sar92: () => form.projection.retirement97Sar92,
-    pensionCredit: () => form.projection.pensionCredit,
-    modality40Value: () => props.modality40Value,
-    totalCostoDelProyecto: () => props.totalCostoDelProyecto,
-});
+} = props.projection;
 
 const handleProjectionChange = (
     field: keyof ProjectionData,

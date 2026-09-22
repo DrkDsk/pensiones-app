@@ -299,7 +299,8 @@ export const useFinancing = (
             toFiniteNumber(modality10Value.value) +
             toFiniteNumber(modality40Value.value) +
             toFiniteNumber(form.financing.pagoAyudaDeDesempleo) +
-            toFiniteNumber(form.financing.seguroDeVida)
+            toFiniteNumber(form.financing.seguroDeVida) -
+            toFiniteNumber(aportacionCliente.value)
         );
     });
 
@@ -307,9 +308,7 @@ export const useFinancing = (
         toFiniteNumber(form.financing.aportacionCliente),
     );
 
-    const financiamiento = computed(
-        () => inversionTotal.value - aportacionCliente.value,
-    );
+    const financiamiento = computed(() => inversionTotal.value);
 
     const intereses = computed(() => financiamiento.value * 0.4);
 
@@ -345,3 +344,5 @@ export const useFinancing = (
         totalCostoDelProyecto,
     };
 };
+
+export type FinancingState = ReturnType<typeof useFinancing>;

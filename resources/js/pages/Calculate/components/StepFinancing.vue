@@ -5,14 +5,15 @@ import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
 import { formatContributionDate } from '../composables/splitPeriodByYear';
 import { formatCurrency } from '../composables/useBeneficiaries';
-import { toFiniteNumber, useFinancing } from '../composables/useFinancing';
+import { toFiniteNumber } from '../composables/useFinancing';
+import type { FinancingState } from '../composables/useFinancing';
 import type { CalculateForm, FinancingData } from '../types/calculate';
 
 type AppInputModelValue = string | number | undefined;
 
 const props = defineProps<{
     form: CalculateForm;
-    monthlyPension: number;
+    financing: FinancingState;
 }>();
 
 const form = props.form;
@@ -22,7 +23,6 @@ const umaLabel = `Valor UMA ${currentYear}`;
 const {
     rows,
     isLoadingPercentageCosts,
-    initializeModality40PercentageCosts,
     modality10Value,
     selectedUmaMultiplier,
     valorUma,
@@ -37,10 +37,7 @@ const {
     intereses,
     honorarios,
     totalCostoDelProyecto,
-} = useFinancing(form, () => props.monthlyPension);
-
-initializeModality40PercentageCosts();
-
+} = props.financing;
 const handleFinancingChange = (
     field: keyof FinancingData,
     value: AppInputModelValue,
