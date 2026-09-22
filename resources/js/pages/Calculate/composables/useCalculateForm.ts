@@ -302,6 +302,7 @@ export const useCalculateForm = (selectedClient: Client | null) => {
     const submitCalculate = async (
         enableManualMode: () => void,
         returnToClientStep: () => void,
+        calculatedValues: { retroactive_modality_40: number },
     ): Promise<void> => {
         if (form.client_id === null) {
             applyServerErrors(
@@ -328,7 +329,10 @@ export const useCalculateForm = (selectedClient: Client | null) => {
                         Accept: 'application/pdf, application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(form.data()),
+                    body: JSON.stringify({
+                        ...form.data(),
+                        ...calculatedValues,
+                    }),
                 },
             );
 

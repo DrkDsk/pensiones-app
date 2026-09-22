@@ -76,8 +76,9 @@ const {
 } = useCalculateForm(props.selectedClient);
 
 const {
-    modalidad10Value,
-    pagoTotalModalidad40,
+    modality10Value,
+    modality40Value,
+    pagoRetroactivo,
     financiamiento,
     totalCostoDelProyecto,
 } = useFinancing(form, monthlyPension);
@@ -88,7 +89,7 @@ const { firstPensionRetroactiveAndBonus, modality40RecoveredAmount } =
         monthlyPayment: () => form.projection.monthlyPayment,
         retirement97Sar92: () => form.projection.retirement97Sar92,
         pensionCredit: () => form.projection.pensionCredit,
-        pagoTotal: pagoTotalModalidad40,
+        modality40Value: () => modality40Value.value,
         totalCostoDelProyecto,
     });
 
@@ -177,12 +178,14 @@ const {
         form.monthly_pension = monthlyPension.value;
         form.contributed_weeks = contributed_weeks.value;
         form.average_daily_salary = average_daily_salary_last_250_weeks.value;
-        form.modality_10_value = modalidad10Value.value;
+        form.modality_10_value = modality10Value.value;
         form.total_financing = financiamiento.value;
         form.pension_retroactive = firstPensionRetroactiveAndBonus.value;
         form.modality_40_recovered_amount = modality40RecoveredAmount.value;
 
-        void submitCalculate(enableManualMode, returnToClientStep);
+        void submitCalculate(enableManualMode, returnToClientStep, {
+            retroactive_modality_40: pagoRetroactivo.value,
+        });
     },
 });
 
@@ -336,7 +339,7 @@ const validateFamilyInformationField = (
                             v-else-if="currentStep === 5"
                             :form="form"
                             :monthly-pension="monthlyPension"
-                            :pago-total="pagoTotalModalidad40"
+                            :modality40-value="modality40Value"
                             :total-costo-del-proyecto="totalCostoDelProyecto"
                         />
                     </section>

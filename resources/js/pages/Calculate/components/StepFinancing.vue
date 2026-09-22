@@ -23,14 +23,15 @@ const {
     rows,
     isLoadingPercentageCosts,
     initializeModality40PercentageCosts,
-    modalidad10Value,
+    modality10Value,
     selectedUmaMultiplier,
     valorUma,
     salarioDiarioTopado,
     salarioMensualAlta,
     pagoMensual,
     pagoTotalPorPeriodo,
-    pagoTotalModalidad40,
+    modality40Value,
+    pagoRetroactivo,
     inversionTotal,
     financiamiento,
     intereses,
@@ -303,7 +304,7 @@ const handleFinancingChange = (
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{ formatCurrency(pagoTotalModalidad40) }}
+                    {{ formatCurrency(modality40Value) }}
                 </div>
             </div>
 
@@ -313,26 +314,20 @@ const handleFinancingChange = (
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
-                    {{ formatCurrency(modalidad10Value) }}
+                    {{ formatCurrency(modality10Value) }}
                 </div>
             </div>
 
-            <AppInput
-                :model-value="props.form.financing.pagoRetroactivo"
-                @update:model-value="
-                    handleFinancingChange('pagoRetroactivo', $event)
-                "
-                label="Pago Retroactivo"
-                type="number"
-                min="0"
-                helper-orientation="horizontal"
-                step="0.01"
-                :helper="
-                    formatCurrency(
-                        toFiniteNumber(props.form.financing.pagoRetroactivo),
-                    )
-                "
-            />
+            <div class="grid gap-2">
+                <span class="ui-label text-sm font-medium">
+                    Recargos y Actualizaciones
+                </span>
+                <div
+                    class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                >
+                    {{ formatCurrency(pagoRetroactivo) }}
+                </div>
+            </div>
         </div>
     </AppCard>
 
