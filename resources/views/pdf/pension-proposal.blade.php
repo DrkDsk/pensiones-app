@@ -345,7 +345,7 @@
         </thead>
         <tbody>
         <tr>
-            <td>Pago retroactivo Modalidad 40</td>
+            <td>Pago retroactivo Modalidad 40 (Recargos y Actualizaciones)</td>
             <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['retroactive_modality_40']) }}</td>
         </tr>
         <tr>
