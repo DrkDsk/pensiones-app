@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid, Users } from '@lucide/vue';
+import { LayoutGrid, Percent, Users } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavUser from '@/components/NavUser.vue';
 import SidebarNavItem from '@/components/SidebarNavItem.vue';
@@ -8,6 +8,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { cn } from '@/lib/utils';
 import { dashboard, calculate } from '@/routes';
 import clients from '@/routes/clients';
+import percentage from '@/routes/percentage';
 import type { NavItem } from '@/types';
 
 const props = withDefaults(
@@ -35,6 +36,11 @@ const mainNavItems: NavItem[] = [
         title: 'Clientes',
         href: clients.index(),
         icon: Users,
+    },
+    {
+        title: 'Porcentajes',
+        href: percentage.index(),
+        icon: Percent,
     },
 ];
 

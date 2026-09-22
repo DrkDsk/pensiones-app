@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
     Route::inertia('clients/store', 'Clients/Create')->name('clients.create');
     Route::get('calculate', [CalculateController::class, 'index'])->name('calculate');
+    Route::get('percentage', [CesantiaController::class, 'percentage'])->name('percentage.index');
     Route::get('calculate/clients/search', [CalculateController::class, 'searchClients'])
         ->name('calculate.clients.search');
     Route::post('calculate/store', [CalculateController::class, 'store'])->name('calculate.store');

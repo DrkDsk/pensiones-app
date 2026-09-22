@@ -2,18 +2,41 @@
 
 use App\Models\PercentageCostForModality40;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
 });
 
+test('percentage management page receives records through inertia props', function () {
+    createPercentageCost(['year' => 2025, 'percentage' => 13.347]);
+    createPercentageCost(['year' => 2024, 'percentage' => 12.256]);
+
+    $this->get(route('percentage.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Percentage/Index')
+            ->has('percentages.data', 2)
+            ->where('percentages.data.0.year', 2024)
+            ->where('percentages.data.0.percentage', 12.256)
+            ->has('percentages.data.0', fn (Assert $percentage) => $percentage
+                ->hasAll('id', 'year', 'percentage')));
+});
+
+test('percentage management page requires authentication', function () {
+    auth()->logout();
+
+    $this->get(route('percentage.index'))
+        ->assertRedirect(route('login'));
+});
+
 test('a percentage cost can be created', function () {
-    $this->from(route('calculate'))
+    $this->from(route('percentage.index'))
         ->post(route('cesantia.percentage-costs.store'), [
             'year' => 2031,
             'percentage' => 19.891,
         ])
-        ->assertRedirect(route('calculate'))
+        ->assertRedirect(route('percentage.index'))
         ->assertSessionHas('success');
 
     $this->assertDatabaseHas('percentage_cost_for_modality_40', [
@@ -48,12 +71,12 @@ test('a duplicate year cannot be created', function () {
 test('the year can be updated', function () {
     $percentageCost = createPercentageCost();
 
-    $this->from(route('calculate'))
+    $this->from(route('percentage.index'))
         ->put(route('cesantia.percentage-costs.update', $percentageCost), [
             'year' => 2032,
             'percentage' => 19.891,
         ])
-        ->assertRedirect(route('calculate'));
+        ->assertRedirect(route('percentage.index'));
 
     $this->assertDatabaseHas('percentage_cost_for_modality_40', [
         'id' => $percentageCost->id,
@@ -99,9 +122,9 @@ test('a record cannot use another records year', function () {
 test('a percentage cost can be deleted', function () {
     $percentageCost = createPercentageCost();
 
-    $this->from(route('calculate'))
+    $this->from(route('percentage.index'))
         ->delete(route('cesantia.percentage-costs.destroy', $percentageCost))
-        ->assertRedirect(route('calculate'))
+        ->assertRedirect(route('percentage.index'))
         ->assertSessionHas('success');
 
     $this->assertDatabaseMissing('percentage_cost_for_modality_40', [
