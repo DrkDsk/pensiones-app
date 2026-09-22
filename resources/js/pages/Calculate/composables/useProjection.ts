@@ -13,7 +13,7 @@ type ProjectionOptions = {
     monthlyPayment: MaybeRefOrGetter<string | number>;
     retirement97Sar92: MaybeRefOrGetter<string | number>;
     pensionCredit: MaybeRefOrGetter<string | number>;
-    pagoTotal: MaybeRefOrGetter<number>;
+    modality40Value: MaybeRefOrGetter<number>;
     totalCostoDelProyecto: MaybeRefOrGetter<number>;
 };
 
@@ -22,7 +22,7 @@ export const useProjection = ({
     monthlyPayment,
     retirement97Sar92,
     pensionCredit,
-    pagoTotal,
+    modality40Value,
     totalCostoDelProyecto,
 }: ProjectionOptions) => {
     const monthlyPensionValue = computed(() =>
@@ -61,7 +61,7 @@ export const useProjection = ({
     );
 
     const modality40RecoveredAmount = computed(
-        () => toFiniteNumber(toValue(pagoTotal)) * 0.23,
+        () => toFiniteNumber(toValue(modality40Value)) * 0.23,
     );
 
     const totalRecovered = computed(
