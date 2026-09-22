@@ -46,85 +46,6 @@ const handleProjectionChange = (
             <h3
                 class="text-lg font-semibold text-slate-900 dark:text-slate-100"
             >
-                Proyección de pensión
-            </h3>
-        </div>
-
-        <div class="grid gap-5 p-5">
-            <div class="max-w-md">
-                <AppInput
-                    :model-value="props.form.projection.monthlyPayment"
-                    @update:model-value="
-                        handleProjectionChange('monthlyPayment', $event)
-                    "
-                    label="Pago mensual"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0"
-                    :helper="
-                        formatCurrency(
-                            toFiniteNumber(
-                                props.form.projection.monthlyPayment,
-                            ),
-                        )
-                    "
-                />
-            </div>
-
-            <div
-                class="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800"
-            >
-                <div class="overflow-x-auto">
-                    <table
-                        class="min-w-full divide-y divide-slate-200 text-left text-sm dark:divide-slate-800"
-                    >
-                        <thead class="bg-slate-50 dark:bg-slate-950/60">
-                            <tr>
-                                <th
-                                    class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
-                                >
-                                    Pensión libre
-                                </th>
-                                <th
-                                    class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
-                                >
-                                    Pensión real
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody
-                            class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
-                        >
-                            <tr
-                                v-for="row in projectionRows"
-                                :key="row.year"
-                                class="hover:bg-slate-50/80 dark:hover:bg-slate-900/60"
-                            >
-                                <td
-                                    class="px-4 py-4 font-mono font-semibold text-slate-800 dark:text-slate-100"
-                                >
-                                    {{ formatCurrency(row.freePension) }}
-                                </td>
-                                <td
-                                    class="px-4 py-4 font-mono text-slate-700 dark:text-slate-200"
-                                >
-                                    {{ formatCurrency(row.realPension) }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </AppCard>
-
-    <AppCard variant="bordered" class="overflow-hidden">
-        <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-            <h3
-                class="text-lg font-semibold text-slate-900 dark:text-slate-100"
-            >
                 Recuperación y capital libre
             </h3>
         </div>
@@ -203,6 +124,84 @@ const handleProjectionChange = (
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
                 >
                     {{ formatCurrency(freeCapital) }}
+                </div>
+            </div>
+        </div>
+    </AppCard>
+    <AppCard variant="bordered" class="overflow-hidden">
+        <div class="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <h3
+                class="text-lg font-semibold text-slate-900 dark:text-slate-100"
+            >
+                Proyección de pensión
+            </h3>
+        </div>
+
+        <div class="grid gap-5 p-5">
+            <div class="max-w-md">
+                <AppInput
+                    :model-value="props.form.projection.monthlyPayment"
+                    @update:model-value="
+                        handleProjectionChange('monthlyPayment', $event)
+                    "
+                    label="Pago mensual"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0"
+                    :helper="
+                        formatCurrency(
+                            toFiniteNumber(
+                                props.form.projection.monthlyPayment,
+                            ),
+                        )
+                    "
+                />
+            </div>
+
+            <div
+                class="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800"
+            >
+                <div class="overflow-x-auto">
+                    <table
+                        class="min-w-full divide-y divide-slate-200 text-left text-sm dark:divide-slate-800"
+                    >
+                        <thead class="bg-slate-50 dark:bg-slate-950/60">
+                            <tr>
+                                <th
+                                    class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
+                                >
+                                    Pensión libre
+                                </th>
+                                <th
+                                    class="min-w-44 px-4 py-3 text-xs font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400"
+                                >
+                                    Pensión real
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody
+                            class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950"
+                        >
+                            <tr
+                                v-for="row in projectionRows"
+                                :key="row.year"
+                                class="hover:bg-slate-50/80 dark:hover:bg-slate-900/60"
+                            >
+                                <td
+                                    class="px-4 py-4 font-mono font-semibold text-slate-800 dark:text-slate-100"
+                                >
+                                    {{ formatCurrency(row.freePension) }}
+                                </td>
+                                <td
+                                    class="px-4 py-4 font-mono text-slate-700 dark:text-slate-200"
+                                >
+                                    {{ formatCurrency(row.realPension) }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
