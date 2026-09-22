@@ -53,9 +53,6 @@ const canAddRegimePeriod = computed(
     () => additionalPeriodsCount.value < MAX_ADDITIONAL_REGIME_PERIODS,
 );
 
-const formatTime = (value: number) =>
-    Number.isFinite(value) && value > 0 ? value.toFixed(3) : '0.000';
-
 const formatDate = (dateString: string | null) => {
     if (!dateString) {
         return '';
@@ -64,12 +61,6 @@ const formatDate = (dateString: string | null) => {
     const [year, month, day] = dateString.split('-');
 
     return `${day}/${month}/${year}`;
-};
-
-const formatIntegratedBalance = (value: number) => {
-    return Number.isFinite(value) && value > 0
-        ? `${value.toFixed(2)}`
-        : '$0.00';
 };
 
 const formatCurrency = (value: number) =>
@@ -462,7 +453,7 @@ onBeforeUnmount(() => {
                                     <div
                                         class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                                     >
-                                        {{ formatTime(period.time) }}
+                                        {{ period.time }}
                                     </div>
                                 </div>
                             </td>
@@ -512,11 +503,7 @@ onBeforeUnmount(() => {
                                     <div
                                         class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                                     >
-                                        {{
-                                            formatIntegratedBalance(
-                                                period.integrated_balance ?? 0,
-                                            )
-                                        }}
+                                        {{ period.integrated_balance ?? 0 }}
                                     </div>
                                 </div>
 
