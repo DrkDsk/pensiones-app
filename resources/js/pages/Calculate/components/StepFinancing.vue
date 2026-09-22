@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3';
 import { Settings } from '@lucide/vue';
 import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppInput from '@/components/AppInput.vue';
+import percentage from '@/routes/percentage';
 import { formatContributionDate } from '../composables/splitPeriodByYear';
 import { formatCurrency } from '../composables/useBeneficiaries';
 import { toFiniteNumber } from '../composables/useFinancing';
@@ -52,6 +54,10 @@ const handleFinancingChange = (
 
     form.financing[field] = value ?? '';
 };
+
+const managePercentageCosts = (): void => {
+    router.visit(percentage.index().url);
+};
 </script>
 
 <template>
@@ -100,13 +106,15 @@ const handleFinancingChange = (
                         >
                             <span class="flex items-center gap-1">
                                 <span>Costo Porcentual</span>
-                                <span title="Administrar costos porcentuales">
-                                    <!-- TODO: habilitar la navegación con Inertia cuando exista la ruta de administración. -->
+                                <span
+                                    title="Administrar costos porcentuales"
+                                    class="cursor-pointer"
+                                    @click="managePercentageCosts"
+                                >
                                     <AppButton
                                         variant="ghost"
                                         size="sm"
                                         class="size-8 px-0"
-                                        disabled
                                         aria-label="Administrar costos porcentuales"
                                     >
                                         <Settings class="size-4" />

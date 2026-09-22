@@ -217,10 +217,7 @@ watch(
                     Usa la busqueda para evitar duplicados y conservar historial
                     del cliente.
                 </p>
-                <p>
-                    Si no existe, puedes capturarlo manualmente y continuar sin
-                    friccion.
-                </p>
+                <p>Si no existe, puedes capturarlo manualmente y continuar.</p>
             </div>
         </div>
     </div>
