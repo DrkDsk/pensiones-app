@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\CesantiaController;
-use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PensionProposalController;
 use App\Http\Controllers\PercentageCostModality40Controller;
 use Illuminate\Http\Request;
@@ -12,8 +11,6 @@ Route::get('/user', static function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('cesantia', [CesantiaController::class, 'index']);
-Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
-Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
 Route::get('percentage-cost-modality-40', [PercentageCostModality40Controller::class, 'index']);
 Route::post('clients/{clientId}/pension-proposal/pdf', PensionProposalController::class)
     ->whereNumber('clientId')

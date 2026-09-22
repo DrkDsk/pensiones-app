@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Client;
+use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 function clientListingData(int $index): array
 {
@@ -25,59 +27,67 @@ function createClientsForListing(int $count): void
     }
 }
 
-test('client listing endpoint returns registered clients', function () {
+beforeEach(function () {
+    $this->actingAs(User::factory()->create());
+});
+
+test('client listing page receives registered clients through inertia props', function () {
     createClientsForListing(3);
 
-    $this->getJson(route('clients.index'))
+    $this->get(route('clients.index'))
         ->assertOk()
-        ->assertJsonCount(3, 'data')
-        ->assertJsonPath('data.0.name', 'Client 1')
-        ->assertJsonStructure([
-            'data' => [
-                '*' => [
-                    'id',
-                    'name',
-                    'last_name',
-                    'phone',
-                    'email',
-                    'curp',
-                    'birthdate',
-                    'nss',
-                ],
-            ],
-            'links',
-            'meta',
-        ]);
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Clients/Index')
+            ->has('clients.data', 3)
+            ->where('clients.data.0.name', 'Client 1')
+            ->has('clients.data.0', fn (Assert $client) => $client
+                ->hasAll('id', 'name', 'last_name', 'phone', 'email', 'curp', 'birthdate', 'nss')
+                ->etc())
+            ->has('clients.links')
+            ->has('clients.meta'));
 });
 
-test('client listing endpoint paginates fifteen clients per page', function () {
+test('client listing page paginates fifteen clients per page', function () {
     createClientsForListing(20);
 
-    $this->getJson(route('clients.index'))
+    $this->get(route('clients.index'))
         ->assertOk()
-        ->assertJsonCount(15, 'data')
-        ->assertJsonPath('meta.per_page', 15)
-        ->assertJsonPath('meta.total', 20)
-        ->assertJsonPath('meta.last_page', 2);
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Clients/Index')
+            ->has('clients.data', 15)
+            ->where('clients.meta.per_page', 15)
+            ->where('clients.meta.total', 20)
+            ->where('clients.meta.last_page', 2));
 });
 
-test('client listing endpoint returns the remaining clients on the second page', function () {
+test('client listing page receives the remaining clients on the second page', function () {
     createClientsForListing(20);
 
-    $this->getJson(route('clients.index', ['page' => 2]))
+    $this->get(route('clients.index', ['page' => 2]))
         ->assertOk()
-        ->assertJsonCount(5, 'data')
-        ->assertJsonPath('meta.current_page', 2)
-        ->assertJsonPath('meta.from', 16)
-        ->assertJsonPath('meta.to', 20)
-        ->assertJsonPath('meta.total', 20);
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Clients/Index')
+            ->has('clients.data', 5)
+            ->where('clients.meta.current_page', 2)
+            ->where('clients.meta.from', 16)
+            ->where('clients.meta.to', 20)
+            ->where('clients.meta.total', 20));
 });
 
-test('client listing endpoint returns an empty paginated collection', function () {
-    $this->getJson(route('clients.index'))
+test('client listing page receives an empty paginated collection', function () {
+    $this->get(route('clients.index'))
         ->assertOk()
-        ->assertJsonPath('data', [])
-        ->assertJsonPath('meta.current_page', 1)
-        ->assertJsonPath('meta.per_page', 15)
-        ->assertJsonPath('meta.total', 0);
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Clients/Index')
+            ->where('clients.data', [])
+            ->where('clients.meta.current_page', 1)
+            ->where('clients.meta.per_page', 15)
+            ->where('clients.meta.total', 0));
+});
+
+test('client listing page requires authentication', function () {
+    auth()->logout();
+
+    $this->get(route('clients.index'))
+        ->assertRedirect(route('login'));
 });

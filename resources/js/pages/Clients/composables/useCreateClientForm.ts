@@ -1,16 +1,12 @@
-import { HttpResponseError } from '@inertiajs/core';
-import { router } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import clients from '@/routes/clients';
-import {
-    ClientAlreadyExistsError,
-    useClientService,
-} from '../services/clientService';
-import type { ClientFormField } from '../types/client';
+import { createClientFormDefaults } from '../constants/formDefaults';
+import type { ClientFormData, ClientFormField } from '../types/client';
 import { validateClientForm } from '../validators/clientValidation';
 
 export const useCreateClientForm = () => {
-    const { form, createClient } = useClientService();
+    const form = useForm<ClientFormData>(createClientFormDefaults());
     const duplicateDialogOpen = ref(false);
     const duplicateMessage = ref('El cliente ya existe.');
     const requestError = ref('');
@@ -19,7 +15,7 @@ export const useCreateClientForm = () => {
         form.clearErrors(field);
     };
 
-    const submit = async (): Promise<void> => {
+    const submit = (): void => {
         if (form.processing) {
             return;
         }
@@ -37,27 +33,26 @@ export const useCreateClientForm = () => {
             return;
         }
 
-        try {
-            await createClient();
-            router.visit(clients.index().url);
-        } catch (error) {
-            if (error instanceof ClientAlreadyExistsError) {
-                duplicateMessage.value = error.message;
-                duplicateDialogOpen.value = true;
+        form.post(clients.store().url, {
+            preserveScroll: true,
+            onError: (errors) => {
+                const clientExists = errors.client_exists;
 
-                return;
-            }
-
-            if (
-                error instanceof HttpResponseError &&
-                error.response.status === 422
-            ) {
-                return;
-            }
-
-            requestError.value =
-                'No fue posible guardar el cliente. Inténtalo nuevamente.';
-        }
+                if (typeof clientExists === 'string') {
+                    duplicateMessage.value = clientExists;
+                    form.clearErrors();
+                    duplicateDialogOpen.value = true;
+                }
+            },
+            onHttpException: () => {
+                requestError.value =
+                    'No fue posible guardar el cliente. Inténtalo nuevamente.';
+            },
+            onNetworkError: () => {
+                requestError.value =
+                    'No fue posible guardar el cliente. Inténtalo nuevamente.';
+            },
+        });
     };
 
     const cancel = (): void => {
