@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LayoutGrid } from '@lucide/vue';
+import { LayoutGrid, Users } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavUser from '@/components/NavUser.vue';
 import SidebarNavItem from '@/components/SidebarNavItem.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { cn } from '@/lib/utils';
 import { dashboard, calculate } from '@/routes';
+import clients from '@/routes/clients';
 import type { NavItem } from '@/types';
 
 const props = withDefaults(
@@ -21,7 +22,7 @@ const props = withDefaults(
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Panel de control',
         href: dashboard(),
         icon: LayoutGrid,
     },
@@ -29,6 +30,11 @@ const mainNavItems: NavItem[] = [
         title: 'Formulario',
         href: calculate(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Clientes',
+        href: clients.index(),
+        icon: Users,
     },
 ];
 
@@ -56,7 +62,7 @@ const handleSidebarAction = (event: MouseEvent) => {
                 props.isOpen ? 'translate-x-0' : '-translate-x-full',
             )
         "
-        aria-label="Primary navigation"
+        aria-label="Navegación principal"
     >
         <Link
             :href="dashboard()"
@@ -69,9 +75,9 @@ const handleSidebarAction = (event: MouseEvent) => {
         <div
             class="mb-4 px-3 text-xs font-semibold tracking-[0.18em] text-on-primary/70 uppercase"
         >
-            Platform
+            Plataforma
         </div>
-        <nav class="space-y-1" aria-label="Primary navigation">
+        <nav class="space-y-1" aria-label="Navegación principal">
             <SidebarNavItem
                 v-for="item in mainNavItems"
                 :key="item.title"

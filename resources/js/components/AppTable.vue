@@ -14,8 +14,9 @@ const props = withDefaults(
         class?: HTMLAttributes['class'];
     }>(),
     {
-        emptyTitle: 'No records found',
-        emptyDescription: 'Records will appear here when they are available.',
+        emptyTitle: 'No se encontraron registros',
+        emptyDescription:
+            'Los registros aparecerán aquí cuando estén disponibles.',
     },
 );
 </script>

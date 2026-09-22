@@ -21,7 +21,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Security settings',
+                title: 'Configuración de seguridad',
                 href: edit(),
             },
         ],
@@ -30,18 +30,18 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Security settings" />
+    <Head title="Configuración de seguridad" />
 
-    <h1 class="sr-only">Security settings</h1>
+    <h1 class="sr-only">Configuración de seguridad</h1>
 
     <AppCard class="p-6">
         <div class="mb-6">
             <h2 class="text-lg font-semibold text-on-surface">
-                Update password
+                Actualizar contraseña
             </h2>
             <p class="mt-1 text-sm text-text-secondary">
-                Ensure your account is using a long, random password to stay
-                secure.
+                Asegúrate de usar una contraseña larga y aleatoria para mantener
+                segura tu cuenta.
             </p>
         </div>
         <Form
@@ -62,13 +62,13 @@ defineOptions({
                 <label
                     for="current_password"
                     class="text-sm font-medium text-text-primary"
-                    >Current password</label
+                    >Contraseña actual</label
                 >
                 <PasswordInput
                     id="current_password"
                     name="current_password"
                     autocomplete="current-password"
-                    placeholder="Current password"
+                    placeholder="Contraseña actual"
                     :error="errors.current_password"
                 />
             </div>
@@ -77,13 +77,13 @@ defineOptions({
                 <label
                     for="password"
                     class="text-sm font-medium text-text-primary"
-                    >New password</label
+                    >Nueva contraseña</label
                 >
                 <PasswordInput
                     id="password"
                     name="password"
                     autocomplete="new-password"
-                    placeholder="New password"
+                    placeholder="Nueva contraseña"
                     :passwordrules="props.passwordRules"
                     :error="errors.password"
                 />
@@ -93,13 +93,13 @@ defineOptions({
                 <label
                     for="password_confirmation"
                     class="text-sm font-medium text-text-primary"
-                    >Confirm password</label
+                    >Confirmar contraseña</label
                 >
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     autocomplete="new-password"
-                    placeholder="Confirm password"
+                    placeholder="Confirmar contraseña"
                     :passwordrules="props.passwordRules"
                     :error="errors.password_confirmation"
                 />
@@ -110,7 +110,7 @@ defineOptions({
                     :loading="processing"
                     data-test="update-password-button"
                 >
-                    Save password
+                    Guardar contraseña
                 </AppButton>
             </div>
         </Form>

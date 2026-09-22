@@ -16,7 +16,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Dashboard',
+                title: 'Panel de control',
                 href: dashboard(),
             },
         ],
@@ -25,28 +25,28 @@ defineOptions({
 
 const kpis = [
     {
-        label: 'Projected monthly pension',
+        label: 'Pensión mensual proyectada',
         value: '$42,850',
         delta: '+8.4%',
         icon: CircleDollarSign,
     },
     {
-        label: 'Replacement rate',
+        label: 'Tasa de reemplazo',
         value: '71%',
         delta: '+3.1%',
         icon: TrendingUp,
     },
     {
-        label: 'Contribution runway',
-        value: '18 yrs',
-        delta: 'On track',
+        label: 'Horizonte de cotización',
+        value: '18 años',
+        delta: 'En buen camino',
         icon: Landmark,
     },
 ];
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Panel de control" />
 
     <div class="space-y-8 p-4 md:p-8">
         <section class="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
@@ -60,26 +60,26 @@ const kpis = [
                                 variant="info"
                                 class="border-on-primary/20 bg-on-primary/12 text-on-primary"
                             >
-                                Premium projection
+                                Proyección avanzada
                             </AppBadge>
                             <h1
                                 class="mt-5 max-w-2xl text-3xl leading-tight font-semibold text-on-primary"
                             >
-                                Retirement planning dashboard
+                                Panel de planificación para el retiro
                             </h1>
                             <p
                                 class="mt-3 max-w-xl text-sm leading-6 text-on-primary/80"
                             >
-                                Monitor pension readiness, contribution
-                                velocity, and risk posture from one secure
-                                workspace.
+                                Supervisa la preparación para la pensión, el
+                                ritmo de cotización y el nivel de riesgo desde
+                                un espacio de trabajo seguro.
                             </p>
                         </div>
                         <div
                             class="rounded-lg border border-on-primary/15 bg-on-primary/10 p-4 text-right"
                         >
                             <p class="text-xs text-on-primary/75">
-                                Confidence score
+                                Índice de confianza
                             </p>
                             <p
                                 class="mt-1 text-3xl font-semibold text-on-primary"
@@ -100,18 +100,16 @@ const kpis = [
                     </div>
                     <div>
                         <p class="text-sm font-semibold text-on-surface">
-                            Next calculation
+                            Próximo cálculo
                         </p>
                         <p class="text-sm text-text-secondary">
-                            Ready to simulate updated inputs
+                            Listo para simular con datos actualizados
                         </p>
                     </div>
                 </div>
                 <div class="mt-6 space-y-3">
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-text-secondary"
-                            >Data completeness</span
-                        >
+                        <span class="text-text-secondary">Datos completos</span>
                         <span class="font-semibold text-text-primary">92%</span>
                     </div>
                     <div class="h-2 rounded-full bg-border-muted">
@@ -143,7 +141,7 @@ const kpis = [
                     <span class="font-medium text-success">{{
                         item.delta
                     }}</span>
-                    <span class="text-text-secondary">vs. baseline</span>
+                    <span class="text-text-secondary">vs. referencia</span>
                 </div>
             </AppCard>
         </section>
@@ -153,13 +151,13 @@ const kpis = [
                 <div class="mb-6 flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-on-surface">
-                            Funding curve
+                            Curva de financiamiento
                         </h2>
                         <p class="text-sm text-text-secondary">
-                            Illustrative readiness trend
+                            Tendencia estimada de preparación
                         </p>
                     </div>
-                    <AppBadge variant="success">Healthy</AppBadge>
+                    <AppBadge variant="success">Saludable</AppBadge>
                 </div>
                 <div
                     class="flex h-64 items-end gap-3 rounded-lg bg-background p-4"
@@ -176,16 +174,17 @@ const kpis = [
             <div>
                 <div class="mb-4">
                     <h2 class="text-lg font-semibold text-text-primary">
-                        Recent pension scenarios
+                        Escenarios de pensión recientes
                     </h2>
                     <p class="text-sm text-text-secondary">
-                        Saved records will appear in this workspace.
+                        Los registros guardados aparecerán en este espacio de
+                        trabajo.
                     </p>
                 </div>
                 <AppTable
                     empty
-                    empty-title="No scenarios yet"
-                    empty-description="Create a pension calculation to compare projections here."
+                    empty-title="Aún no hay escenarios"
+                    empty-description="Crea un cálculo de pensión para comparar proyecciones aquí."
                 />
             </div>
         </section>

@@ -13,14 +13,14 @@ defineProps<{
 
 defineOptions({
     layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
+        title: 'Crear una cuenta',
+        description: 'Ingresa tus datos para crear tu cuenta',
     },
 });
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Registro" />
 
     <Form
         v-bind="store.form()"
@@ -38,8 +38,8 @@ defineOptions({
                     :tabindex="1"
                     autocomplete="name"
                     name="name"
-                    placeholder="Full name"
-                    label="Name"
+                    placeholder="Nombre completo"
+                    label="Nombre"
                     :error="errors.name"
                 />
             </div>
@@ -53,7 +53,7 @@ defineOptions({
                     autocomplete="email"
                     name="email"
                     placeholder="email@example.com"
-                    label="Email address"
+                    label="Correo electrónico"
                     :error="errors.email"
                 />
             </div>
@@ -62,7 +62,7 @@ defineOptions({
                 <label
                     for="password"
                     class="text-sm font-medium text-text-primary"
-                    >Password</label
+                    >Contraseña</label
                 >
                 <PasswordInput
                     id="password"
@@ -70,7 +70,7 @@ defineOptions({
                     :tabindex="3"
                     autocomplete="new-password"
                     name="password"
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     :passwordrules="passwordRules"
                     :error="errors.password"
                 />
@@ -80,7 +80,7 @@ defineOptions({
                 <label
                     for="password_confirmation"
                     class="text-sm font-medium text-text-primary"
-                    >Confirm password</label
+                    >Confirmar contraseña</label
                 >
                 <PasswordInput
                     id="password_confirmation"
@@ -88,7 +88,7 @@ defineOptions({
                     :tabindex="4"
                     autocomplete="new-password"
                     name="password_confirmation"
-                    placeholder="Confirm password"
+                    placeholder="Confirmar contraseña"
                     :passwordrules="passwordRules"
                     :error="errors.password_confirmation"
                 />
@@ -101,17 +101,17 @@ defineOptions({
                 :loading="processing"
                 data-test="register-user-button"
             >
-                Create account
+                Crear cuenta
             </AppButton>
         </div>
 
         <div class="text-center text-sm text-text-secondary">
-            Already have an account?
+            ¿Ya tienes una cuenta?
             <TextLink
                 :href="login()"
                 class="underline underline-offset-4"
                 :tabindex="6"
-                >Log in</TextLink
+                >Iniciar sesión</TextLink
             >
         </div>
     </Form>

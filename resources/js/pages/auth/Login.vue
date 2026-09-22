@@ -6,14 +6,14 @@ import AppInput from '@/components/AppInput.vue';
 import PasskeyVerify from '@/components/PasskeyVerify.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
-import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Inicia sesión en tu cuenta',
+        description:
+            'Ingresa tu correo electrónico y contraseña para iniciar sesión',
     },
 });
 
@@ -24,7 +24,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Iniciar sesión" />
 
     <AppAlert v-if="status" variant="success" class="mb-5">
         {{ status }}
@@ -49,7 +49,7 @@ defineProps<{
                     :tabindex="1"
                     autocomplete="email"
                     placeholder="email@example.com"
-                    label="Email address"
+                    label="Correo electrónico"
                     :error="errors.email"
                 />
             </div>
@@ -59,7 +59,7 @@ defineProps<{
                     <label
                         for="password"
                         class="text-sm font-medium text-text-primary"
-                        >Password</label
+                        >Contraseña</label
                     >
                     <TextLink
                         v-if="canResetPassword"
@@ -67,7 +67,7 @@ defineProps<{
                         class="text-sm"
                         :tabindex="5"
                     >
-                        Forgot your password?
+                        ¿Olvidaste tu contraseña?
                     </TextLink>
                 </div>
                 <PasswordInput
@@ -77,7 +77,7 @@ defineProps<{
                     required
                     :tabindex="2"
                     autocomplete="current-password"
-                    placeholder="Password"
+                    placeholder="Contraseña"
                 />
             </div>
 
@@ -93,7 +93,7 @@ defineProps<{
                         :tabindex="3"
                         class="size-4 rounded border-border-default text-primary"
                     />
-                    <span>Remember this device</span>
+                    <span>Recordar este dispositivo</span>
                 </label>
             </div>
 
@@ -104,13 +104,8 @@ defineProps<{
                 :loading="processing"
                 data-test="login-button"
             >
-                Log in
+                Iniciar sesión
             </AppButton>
-        </div>
-
-        <div class="text-center text-sm text-text-secondary">
-            Don't have an account?
-            <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
         </div>
     </Form>
 </template>

@@ -8,8 +8,8 @@ import { update } from '@/routes/password';
 
 defineOptions({
     layout: {
-        title: 'Reset password',
-        description: 'Please enter your new password below',
+        title: 'Restablecer contraseña',
+        description: 'Ingresa tu nueva contraseña',
     },
 });
 
@@ -23,7 +23,7 @@ const inputEmail = ref(props.email);
 </script>
 
 <template>
-    <Head title="Reset password" />
+    <Head title="Restablecer contraseña" />
 
     <Form
         v-bind="update.form()"
@@ -40,7 +40,7 @@ const inputEmail = ref(props.email);
                     autocomplete="email"
                     v-model="inputEmail"
                     readonly
-                    label="Email"
+                    label="Correo electrónico"
                     :error="errors.email"
                 />
             </div>
@@ -49,14 +49,14 @@ const inputEmail = ref(props.email);
                 <label
                     for="password"
                     class="text-sm font-medium text-text-primary"
-                    >Password</label
+                    >Contraseña</label
                 >
                 <PasswordInput
                     id="password"
                     name="password"
                     autocomplete="new-password"
                     autofocus
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     :passwordrules="passwordRules"
                     :error="errors.password"
                 />
@@ -66,13 +66,13 @@ const inputEmail = ref(props.email);
                 <label
                     for="password_confirmation"
                     class="text-sm font-medium text-text-primary"
-                    >Confirm password</label
+                    >Confirmar contraseña</label
                 >
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     autocomplete="new-password"
-                    placeholder="Confirm password"
+                    placeholder="Confirmar contraseña"
                     :passwordrules="passwordRules"
                     :error="errors.password_confirmation"
                 />
@@ -84,7 +84,7 @@ const inputEmail = ref(props.email);
                 :loading="processing"
                 data-test="reset-password-button"
             >
-                Reset password
+                Restablecer contraseña
             </AppButton>
         </div>
     </Form>

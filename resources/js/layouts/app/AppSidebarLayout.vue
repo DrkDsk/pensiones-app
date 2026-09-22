@@ -76,7 +76,7 @@ onUnmounted(() => {
             v-if="isSidebarOpen"
             class="fixed inset-0 z-40 bg-black/55 transition-opacity lg:hidden"
             type="button"
-            aria-label="Close navigation"
+            aria-label="Cerrar navegación"
             @click="closeSidebar"
         />
         <AppContent variant="sidebar" class="overflow-x-hidden">

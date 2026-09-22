@@ -11,17 +11,17 @@ import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Perfil',
         href: editProfile(),
         icon: UserRound,
     },
     {
-        title: 'Security',
+        title: 'Seguridad',
         href: editSecurity(),
         icon: ShieldCheck,
     },
     {
-        title: 'Appearance',
+        title: 'Apariencia',
         href: editAppearance(),
         icon: MonitorCog,
     },
@@ -33,15 +33,18 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 <template>
     <div class="p-4 md:p-8">
         <div class="mb-8">
-            <h1 class="text-2xl font-semibold text-text-primary">Settings</h1>
+            <h1 class="text-2xl font-semibold text-text-primary">
+                Configuración
+            </h1>
             <p class="mt-2 text-sm text-text-secondary">
-                Manage account, authentication, and workspace preferences.
+                Administra la cuenta, la autenticación y las preferencias del
+                espacio de trabajo.
             </p>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-[17rem_1fr]">
             <AppCard class="h-fit p-3">
-                <nav class="grid gap-1" aria-label="Settings">
+                <nav class="grid gap-1" aria-label="Configuración">
                     <Link
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"

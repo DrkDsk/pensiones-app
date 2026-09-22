@@ -19,7 +19,7 @@ defineProps<{
             <button
                 type="button"
                 class="absolute inset-0 bg-sidebar-background/70"
-                aria-label="Close modal"
+                aria-label="Cerrar modal"
                 @click="open = false"
             />
             <section

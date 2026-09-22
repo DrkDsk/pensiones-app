@@ -13,6 +13,32 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
         parent::__construct($model);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function findExistingClient(array $data): ?Client
+    {
+        $criteria = [];
+
+        foreach (['phone', 'email', 'curp', 'nss'] as $field) {
+            if (array_key_exists($field, $data) && $data[$field] !== null && $data[$field] !== '') {
+                $criteria[$field] = $data[$field];
+            }
+        }
+
+        if ($criteria === []) {
+            return null;
+        }
+
+        return Client::query()
+            ->where(function ($query) use ($criteria): void {
+                foreach ($criteria as $field => $value) {
+                    $query->orWhere($field, $value);
+                }
+            })
+            ->first();
+    }
+
     public function findWithFamilyInformation(int $clientId): ?Client
     {
         return Client::query()

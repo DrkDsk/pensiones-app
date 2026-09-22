@@ -2,14 +2,13 @@
 
 namespace App\Http\Requests\Calculate;
 
+use App\Support\ClientValidationRules;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreCalculateRequest extends FormRequest
 {
-    private const string CURP_REGEX = '/^[A-Z][AEIOUX][A-Z]{2}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[HM](AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[A-Z0-9]\d$/i';
-
     public function authorize(): bool
     {
         return true;
@@ -23,16 +22,8 @@ class StoreCalculateRequest extends FormRequest
             return;
         }
 
-        if (isset($client['phone'])) {
-            $client['phone'] = preg_replace('/\D+/', '', (string) $client['phone']);
-        }
-
-        if (isset($client['nss'])) {
-            $client['nss'] = preg_replace('/\D+/', '', (string) $client['nss']);
-        }
-
-        if (isset($client['curp'])) {
-            $client['curp'] = strtoupper((string) $client['curp']);
+        if (isset($client['curp']) && is_string($client['curp'])) {
+            $client['curp'] = ClientValidationRules::normalizeCurp($client['curp']);
         }
 
         $this->merge([
@@ -69,9 +60,7 @@ class StoreCalculateRequest extends FormRequest
             'client.last_name' => [Rule::excludeIf($hasExistingClient), 'nullable', 'string', 'max:255'],
             'client.phone' => [
                 Rule::excludeIf($hasExistingClient),
-                'nullable',
-                'string',
-                'regex:/^\d{10}$/',
+                ...ClientValidationRules::phone(),
             ],
             'client.email' => [
                 Rule::excludeIf($hasExistingClient),
@@ -83,10 +72,7 @@ class StoreCalculateRequest extends FormRequest
             'client.curp' => [
                 Rule::excludeIf($hasExistingClient),
                 Rule::requiredIf(! $hasExistingClient),
-                'nullable',
-                'string',
-                'max:255',
-                'regex:'.self::CURP_REGEX,
+                ...ClientValidationRules::curp(required: false),
             ],
             'client.birthdate' => [
                 Rule::excludeIf($hasExistingClient),
@@ -97,7 +83,7 @@ class StoreCalculateRequest extends FormRequest
             'client.nss' => [
                 Rule::excludeIf($hasExistingClient),
                 Rule::requiredIf(! $hasExistingClient),
-                'digits:11',
+                ...ClientValidationRules::nss(required: false),
             ],
             'client.regime_end_date' => [
                 Rule::excludeIf($hasExistingClient),
@@ -167,10 +153,8 @@ class StoreCalculateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'client.curp.regex' => 'La CURP debe tener un formato mexicano valido.',
+            ...ClientValidationRules::messages('client.'),
             'client.email.email' => 'El correo electronico debe tener un formato valido y un dominio existente.',
-            'client.phone.regex' => 'El telefono debe contener exactamente 10 digitos.',
-            'client.nss.digits' => 'El NSS debe contener exactamente 11 digitos.',
             'client.birthdate.before_or_equal' => 'El cliente debe tener al menos 18 anos cumplidos.',
             'client.regime_end_date.after' => 'La fecha de baja de regimen debe ser posterior a la fecha en que el cliente cumplio 18 anos.',
         ];
