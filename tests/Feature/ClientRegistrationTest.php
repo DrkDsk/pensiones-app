@@ -1,8 +1,8 @@
 <?php
 
 use App\Exceptions\ClientExistsException;
-use App\Http\Resources\ClientResource;
 use App\Models\Client;
+use App\Models\User;
 use App\UseCases\Client\CreateClientUseCase;
 use App\UseCases\Client\FindExistingClientUseCase;
 
@@ -21,6 +21,10 @@ function validClientData(array $overrides = []): array
         'notes' => null,
     ], $overrides);
 }
+
+beforeEach(function () {
+    $this->actingAs(User::factory()->create());
+});
 
 test('creates a client when none of the identifying fields exists', function () {
     $client = app(CreateClientUseCase::class)->execute(validClientData());
@@ -114,34 +118,36 @@ test('create use case normalizes curp before checking duplicates', function () {
     ])))->toThrow(ClientExistsException::class);
 });
 
-test('creation endpoint returns a resource with http 422 for an existing client', function () {
+test('creation redirects back with an inertia error for an existing client', function () {
     Client::query()->create(validClientData());
 
-    $this->postJson(route('clients.store'), validClientData())
-        ->assertUnprocessable()
-        ->assertJsonPath('data.message', ClientExistsException::DEFAULT_MESSAGE);
+    $this->from(route('clients.create'))
+        ->post(route('clients.store'), validClientData())
+        ->assertRedirect(route('clients.create'))
+        ->assertSessionHasErrors([
+            'client_exists' => ClientExistsException::DEFAULT_MESSAGE,
+        ]);
 });
 
-test('creation endpoint returns a client resource after creating a client', function () {
-    $response = $this->postJson(route('clients.store'), validClientData());
+test('creation redirects to the client listing after creating a client', function () {
+    $response = $this->post(route('clients.store'), validClientData());
 
     $response
-        ->assertCreated()
-        ->assertJsonPath('data.name', 'Maria')
-        ->assertJsonPath('data.curp', 'LOMM800101HDFPRR09')
-        ->assertJsonStructure([
-            'data' => array_keys((new ClientResource(new Client))->resolve()),
-        ]);
+        ->assertRedirect(route('clients.index'))
+        ->assertSessionHas('success', 'Cliente registrado correctamente.');
 
     $this->assertDatabaseCount('clients', 1);
+    $this->assertDatabaseHas('clients', [
+        'name' => 'Maria',
+        'curp' => 'LOMM800101HDFPRR09',
+    ]);
 });
 
-test('creation endpoint normalizes curp to uppercase', function () {
-    $this->postJson(route('clients.store'), validClientData([
+test('creation normalizes curp to uppercase', function () {
+    $this->post(route('clients.store'), validClientData([
         'curp' => 'gocg850101hdfrrn09',
     ]))
-        ->assertCreated()
-        ->assertJsonPath('data.curp', 'GOCG850101HDFRRN09');
+        ->assertRedirect(route('clients.index'));
 
     $this->assertDatabaseHas('clients', [
         'curp' => 'GOCG850101HDFRRN09',
@@ -149,9 +155,8 @@ test('creation endpoint normalizes curp to uppercase', function () {
 });
 
 it('rejects an invalid curp on creation', function (string $curp) {
-    $this->postJson(route('clients.store'), validClientData(['curp' => $curp]))
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('curp');
+    $this->post(route('clients.store'), validClientData(['curp' => $curp]))
+        ->assertSessionHasErrors('curp');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -162,9 +167,8 @@ it('rejects an invalid curp on creation', function (string $curp) {
 ]);
 
 it('rejects an invalid nss on creation', function (string $nss) {
-    $this->postJson(route('clients.store'), validClientData(['nss' => $nss]))
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('nss');
+    $this->post(route('clients.store'), validClientData(['nss' => $nss]))
+        ->assertSessionHasErrors('nss');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -174,9 +178,8 @@ it('rejects an invalid nss on creation', function (string $nss) {
 ]);
 
 it('rejects an invalid phone on creation', function (string $phone) {
-    $this->postJson(route('clients.store'), validClientData(['phone' => $phone]))
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('phone');
+    $this->post(route('clients.store'), validClientData(['phone' => $phone]))
+        ->assertSessionHasErrors('phone');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -187,16 +190,25 @@ it('rejects an invalid phone on creation', function (string $phone) {
     'letters' => 'abcdefghij',
 ]);
 
-test('creation endpoint accepts valid mexican identifiers as strings', function () {
-    $this->postJson(route('clients.store'), validClientData([
+test('creation accepts valid mexican identifiers as strings', function () {
+    $this->post(route('clients.store'), validClientData([
         'phone' => '9611234567',
         'curp' => 'GOCG850101HDFRRN09',
         'nss' => '12345678901',
-    ]))->assertCreated();
+    ]))->assertRedirect(route('clients.index'));
 
     $this->assertDatabaseHas('clients', [
         'phone' => '9611234567',
         'curp' => 'GOCG850101HDFRRN09',
         'nss' => '12345678901',
     ]);
+});
+
+test('client creation requires authentication', function () {
+    auth()->logout();
+
+    $this->post(route('clients.store'), validClientData())
+        ->assertRedirect(route('login'));
+
+    $this->assertDatabaseCount('clients', 0);
 });
