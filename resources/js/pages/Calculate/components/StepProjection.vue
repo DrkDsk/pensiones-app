@@ -11,7 +11,7 @@ type AppInputModelValue = string | number | undefined;
 const props = defineProps<{
     form: CalculateForm;
     monthlyPension: number;
-    pagoTotal: number;
+    modality40Value: number;
     totalCostoDelProyecto: number;
 }>();
 
@@ -28,7 +28,7 @@ const {
     monthlyPayment: () => form.projection.monthlyPayment,
     retirement97Sar92: () => form.projection.retirement97Sar92,
     pensionCredit: () => form.projection.pensionCredit,
-    pagoTotal: () => props.pagoTotal,
+    modality40Value: () => props.modality40Value,
     totalCostoDelProyecto: () => props.totalCostoDelProyecto,
 });
 
@@ -53,7 +53,7 @@ const handleProjectionChange = (
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
             <div class="grid gap-2">
                 <span class="ui-label text-sm font-medium">
-                    Primer pensión - retroactivo 6 meses + aguinaldo
+                    Retroactivo Pensión
                 </span>
                 <div
                     class="flex min-h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
@@ -80,7 +80,9 @@ const handleProjectionChange = (
             />
 
             <div class="grid gap-2">
-                <span class="ui-label text-sm font-medium"> Modalidad 40 </span>
+                <span class="ui-label text-sm font-medium">
+                    Retorno Modalidad 40
+                </span>
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                 >
@@ -118,7 +120,7 @@ const handleProjectionChange = (
 
             <div class="grid gap-2">
                 <span class="ui-label text-sm font-medium">
-                    Capital libre
+                    Montos a Recuperar
                 </span>
                 <div
                     class="flex h-11 items-center rounded-md border border-slate-200 bg-slate-50 px-3 font-mono text-sm font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100"
