@@ -179,6 +179,7 @@ export const useClientSearch = ({
 
     const activateManualCustomer = async () => {
         form.client_id = null;
+        clearClientFields();
         selectedClient.value = null;
         clientSearch.value = '';
         manualCustomerMode.value = true;
