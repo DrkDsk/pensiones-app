@@ -16,6 +16,7 @@ import StepNavigation from './Calculate/components/StepNavigation.vue';
 import StepperHeader from './Calculate/components/StepperHeader.vue';
 import StepRegimePeriods from './Calculate/components/StepRegimePeriods.vue';
 import { useCalculateForm } from './Calculate/composables/useCalculateForm';
+import { useCalculateProposal } from './Calculate/composables/useCalculateProposal';
 import { useCalculateSteps } from './Calculate/composables/useCalculateSteps';
 import { useClientSearch } from './Calculate/composables/useClientSearch';
 import { useFinancing } from './Calculate/composables/useFinancing';
@@ -66,18 +67,21 @@ const {
     entitlementRetentionYears,
     years_recognized,
     stepErrors,
-    isGeneratingProposal,
     clearStepError,
     clearStepErrors,
     fillCalculateForm,
     resetCalculateForm,
     clearClientFields,
-    submitCalculate,
+    applyServerErrors,
 } = useCalculateForm(props.selectedClient);
 
 const financing = useFinancing(form, monthlyPension);
 
 financing.initializeModality40PercentageCosts();
+
+let submitProposal: (calculatedValues: {
+    retroactive_modality_40: number;
+}) => Promise<void> = async () => {};
 
 const {
     modality10Value,
@@ -189,11 +193,27 @@ const {
         form.pension_retroactive = firstPensionRetroactiveAndBonus.value;
         form.modality_40_recovered_amount = modality40RecoveredAmount.value;
 
-        void submitCalculate(enableManualMode, returnToClientStep, {
+        void submitProposal({
             retroactive_modality_40: pagoRetroactivo.value,
         });
     },
 });
+
+const proposal = useCalculateProposal({
+    form,
+    applyServerErrors,
+    enableManualMode,
+    returnToClientStep,
+});
+
+submitProposal = proposal.submitProposal;
+
+const {
+    isGeneratingProposal,
+    duplicateClientDialogOpen,
+    duplicateClientMessage,
+    searchExistingClient,
+} = proposal;
 
 ///ESTA IMPLEMENTACIÓN ES PARA DESARROLLO
 ///ELIMINAR DESPUES
@@ -367,6 +387,24 @@ const validateFamilyInformationField = (
             <div class="flex justify-end">
                 <AppButton @click="showRegimeTimeModal = false">
                     Entendido
+                </AppButton>
+            </div>
+        </AppModal>
+
+        <AppModal
+            v-model:open="duplicateClientDialogOpen"
+            title="Cliente ya registrado"
+            :description="duplicateClientMessage"
+        >
+            <div class="flex justify-end gap-3">
+                <AppButton
+                    variant="ghost"
+                    @click="duplicateClientDialogOpen = false"
+                >
+                    Cerrar
+                </AppButton>
+                <AppButton @click="searchExistingClient">
+                    Buscar cliente
                 </AppButton>
             </div>
         </AppModal>

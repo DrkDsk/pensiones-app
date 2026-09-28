@@ -9,9 +9,11 @@ use App\Http\Resources\ClientResource;
 use App\UseCases\Client\CreateClientUseCase;
 use App\UseCases\Client\FindExistingClientUseCase;
 use App\UseCases\Client\GetClientsUseCase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class ClientController extends Controller
 {
@@ -28,16 +30,29 @@ class ClientController extends Controller
         ]);
     }
 
-    public function store(StoreClientRequest $request): RedirectResponse
+    public function store(StoreClientRequest $request): RedirectResponse|JsonResponse
     {
         try {
             $client = $this->createClient->execute($request->validated());
         } catch (ClientExistsException $exception) {
+            if ($request->expectsJson()) {
+                return response()->json(
+                    (new ClientExistsResource($exception))->resolve($request),
+                    HttpResponse::HTTP_CONFLICT,
+                );
+            }
+
             return redirect()
                 ->back()
                 ->withErrors([
                     'client_exists' => (new ClientExistsResource($exception))->resolve($request)['message'],
                 ]);
+        }
+
+        if ($request->expectsJson()) {
+            return (new ClientResource($client))
+                ->response()
+                ->setStatusCode(HttpResponse::HTTP_CREATED);
         }
 
         return redirect()

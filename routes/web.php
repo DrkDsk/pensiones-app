@@ -3,6 +3,7 @@
 use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\CesantiaController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\PensionProposalController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -11,6 +12,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
     Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
     Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::post('clients/{clientId}/pension-proposal/pdf', PensionProposalController::class)
+        ->whereNumber('clientId')
+        ->name('clients.pension-proposal.pdf');
     Route::inertia('clients/store', 'Clients/Create')->name('clients.create');
     Route::get('calculate', [CalculateController::class, 'index'])->name('calculate');
     Route::get('percentage', [CesantiaController::class, 'percentage'])->name('percentage.index');

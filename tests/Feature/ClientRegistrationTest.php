@@ -143,6 +143,39 @@ test('creation redirects to the client listing after creating a client', functio
     ]);
 });
 
+test('json creation returns the newly created client without changing the inertia flow', function () {
+    $response = $this->postJson(route('clients.store'), validClientData());
+
+    $response
+        ->assertCreated()
+        ->assertJsonPath('data.name', 'Maria')
+        ->assertJsonPath('data.curp', 'LOMM800101HDFPRR09')
+        ->assertJsonStructure(['data' => ['id']]);
+
+    $this->assertDatabaseHas('clients', [
+        'id' => $response->json('data.id'),
+        'curp' => 'LOMM800101HDFPRR09',
+    ]);
+});
+
+test('json creation reports a duplicate without creating another client', function () {
+    Client::query()->create(validClientData());
+
+    $this->postJson(route('clients.store'), validClientData())
+        ->assertConflict()
+        ->assertJsonPath('message', ClientExistsException::DEFAULT_MESSAGE);
+
+    $this->assertDatabaseCount('clients', 1);
+});
+
+test('json creation keeps validation errors distinct from duplicate errors', function () {
+    $this->postJson(route('clients.store'), validClientData(['curp' => 'invalid']))
+        ->assertUnprocessable()
+        ->assertJsonStructure(['message', 'errors' => ['curp']]);
+
+    $this->assertDatabaseCount('clients', 0);
+});
+
 test('creation normalizes curp to uppercase', function () {
     $this->post(route('clients.store'), validClientData([
         'curp' => 'gocg850101hdfrrn09',
