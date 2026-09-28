@@ -2,6 +2,11 @@
 
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
+use App\Models\User;
+
+beforeEach(function () {
+    $this->actingAs(User::factory()->create());
+});
 
 function pensionProposalPayload(): array
 {
@@ -74,4 +79,16 @@ test('pension proposal endpoint accepts zero calculation values', function () {
 
     $this->postJson(route('clients.pension-proposal.pdf', $client->id), $payload)
         ->assertOk();
+});
+
+test('pension proposal endpoint uses the authenticated web middleware', function () {
+    auth()->logout();
+
+    $this->post(route('clients.pension-proposal.pdf', 1), pensionProposalPayload())
+        ->assertRedirect(route('login'));
+});
+
+test('pension proposal route is no longer registered under api', function () {
+    expect(route('clients.pension-proposal.pdf', 123, false))
+        ->toBe('/clients/123/pension-proposal/pdf');
 });

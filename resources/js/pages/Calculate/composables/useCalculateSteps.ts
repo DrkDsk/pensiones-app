@@ -11,13 +11,14 @@ export const useCalculateSteps = ({
     submitCalculate: () => void;
 }) => {
     const currentStep = ref(1);
+    const furthestStep = ref(1);
 
     const progressWidth = computed(
         () => `${((currentStep.value - 1) / (steps.length - 1)) * 100}%`,
     );
 
     const goToStep = (step: number) => {
-        if (step <= currentStep.value) {
+        if (step <= furthestStep.value) {
             currentStep.value = step;
         }
     };
@@ -46,6 +47,7 @@ export const useCalculateSteps = ({
         }
 
         currentStep.value = Math.min(currentStep.value + 1, steps.length);
+        furthestStep.value = Math.max(furthestStep.value, currentStep.value);
     };
 
     const returnToClientStep = () => {
@@ -54,6 +56,7 @@ export const useCalculateSteps = ({
 
     return {
         currentStep,
+        furthestStep,
         progressWidth,
         goToStep,
         goToPreviousStep,
