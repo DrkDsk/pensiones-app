@@ -25,12 +25,9 @@ class ClientResource extends JsonResource
             'email' => $client->email,
             'curp' => $client->curp,
             'birthdate' => $this->formatDate($client->birthdate),
-            'social_security_information' => $client->socialSecurityInformation
-                ? new ClientSocialSecurityInformationResource($client->socialSecurityInformation)
-                : null,
+            'social_security_information' => new ClientSocialSecurityInformationResource($this->whenLoaded('socialSecurityInformation')),
             'notes' => $client->notes,
-            'created_at' => $client->created_at?->toISOString(),
-            'updated_at' => $client->updated_at?->toISOString(),
+            'family_information' => new FamilyInformationResource($this->whenLoaded('familyInformation')),
         ];
     }
 
