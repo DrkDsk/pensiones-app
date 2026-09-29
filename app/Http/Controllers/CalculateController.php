@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Calculate\StoreCalculateRequest;
 use App\Http\Resources\ClientResource;
-use App\Models\Client;
 use App\UseCases\Calculate\SearchClientsUseCase;
 use App\UseCases\Calculate\StoreCalculateUseCase;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +18,9 @@ class CalculateController extends Controller
     public function index(SearchClientsUseCase $searchClients): Response
     {
         return Inertia::render('Calculate', [
-            'clients' => $searchClients->execute('', 6)->map(fn (Client $client): array => ClientResource::make($client)->resolve()),
+            'clients' => ClientResource::collection(
+                $searchClients->execute('', 6),
+            )->resolve(),
             'selectedClient' => null,
             'filters' => [
                 'search' => '',
@@ -34,10 +35,9 @@ class CalculateController extends Controller
         ]);
 
         return response()->json([
-            'clients' => $searchClients
-                ->execute((string) ($validated['search'] ?? ''))
-                ->map(fn (Client $client): array => ClientResource::make($client)->resolve())
-                ->values(),
+            'clients' => ClientResource::collection(
+                $searchClients->execute((string) ($validated['search'] ?? '')),
+            )->resolve(),
         ]);
     }
 

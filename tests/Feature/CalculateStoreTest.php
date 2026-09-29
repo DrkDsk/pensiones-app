@@ -4,6 +4,55 @@ use App\Models\Client;
 use App\Models\ClientFamilyInformation;
 use App\Models\ClientSocialSecurityInformation;
 use App\Models\User;
+use App\UseCases\Calculate\SearchClientsUseCase;
+use Inertia\Testing\AssertableInertia as Assert;
+
+test('calculate page includes eager loaded client information', function () {
+    $user = User::factory()->create();
+    $client = Client::query()->create([
+        'name' => 'Juan',
+        'last_name' => 'Perez',
+        'curp' => 'PEPJ800101HDFRRL09',
+        'birthdate' => '1980-01-01',
+    ]);
+
+    ClientSocialSecurityInformation::query()->create([
+        'client_id' => $client->id,
+        'nss' => '98765432101',
+        'regime_end_date' => '2024-12-31',
+        'unemployment_assistance_discounted_weeks' => 4,
+        'total_contributed_weeks' => 1200,
+    ]);
+
+    ClientFamilyInformation::query()->create([
+        'client_id' => $client->id,
+        'has_spouse' => true,
+        'minor_or_student_children_count' => 2,
+        'parents_count' => 0,
+    ]);
+
+    $loadedClient = app(SearchClientsUseCase::class)
+        ->execute('', 6)
+        ->firstWhere('id', $client->id);
+
+    expect($loadedClient)->not->toBeNull()
+        ->and($loadedClient->relationLoaded('socialSecurityInformation'))->toBeTrue()
+        ->and($loadedClient->relationLoaded('familyInformation'))->toBeTrue()
+        ->and($loadedClient->socialSecurityInformation?->nss)->toBe('98765432101')
+        ->and($loadedClient->familyInformation?->has_spouse)->toBeTrue();
+
+    $this->actingAs($user)
+        ->get(route('calculate'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Calculate')
+            ->where('clients.0.id', $client->id)
+            ->where('clients.0.social_security_information.nss', '98765432101')
+            ->where('clients.0.social_security_information.total_contributed_weeks', 1200)
+            ->where('clients.0.family_information.has_spouse', true)
+            ->where('clients.0.family_information.minor_or_student_children_count', 2)
+            ->where('clients.0.family_information.parents_count', 0));
+});
 
 test('client search includes family information', function () {
     $user = User::factory()->create();
