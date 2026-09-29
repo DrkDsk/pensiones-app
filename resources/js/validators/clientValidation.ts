@@ -1,9 +1,64 @@
-import type {
-    CalculateForm,
-    ClientValidationField,
-    FamilyInformationField,
-    StepErrors,
-} from '../types/calculate';
+export interface FamilyInformationForm {
+    has_spouse: string;
+    minor_or_student_children_count: string;
+    parents_count: string | number;
+}
+
+export type FamilyInformationField = keyof FamilyInformationForm;
+
+export type FamilyInformationErrors = Partial<
+    Record<FamilyInformationField, string>
+>;
+
+export interface ClientValidationForm {
+    client: {
+        name: string;
+        last_name: string;
+        phone: string;
+        email: string;
+        curp: string;
+        birthdate: string;
+        notes: string;
+    };
+    social_security_information: {
+        nss: string;
+        regime_end_date: string;
+        unemployment_assistance_discounted_weeks: string;
+        total_contributed_weeks: string;
+    };
+    family_information: FamilyInformationForm;
+}
+
+type ClientValidationField =
+    | 'name'
+    | 'phone'
+    | 'email'
+    | 'curp'
+    | 'birthdate'
+    | 'nss'
+    | 'regime_end_date'
+    | 'unemployment_assistance_discounted_weeks'
+    | 'total_contributed_weeks';
+
+type ClientValidationErrors = Partial<
+    Record<
+        ClientValidationField | FamilyInformationField | 'last_name' | 'notes',
+        string
+    >
+>;
+
+type ClientFormField =
+    | `client.${keyof ClientValidationForm['client']}`
+    | `social_security_information.${keyof ClientValidationForm['social_security_information']}`
+    | `family_information.${keyof ClientValidationForm['family_information']}`;
+
+export type ClientFormErrors = Partial<Record<ClientFormField, string>>;
+
+export const createEmptyFamilyInformation = (): FamilyInformationForm => ({
+    has_spouse: '',
+    minor_or_student_children_count: '',
+    parents_count: '',
+});
 
 const curpPattern =
     /^[A-Z][AEIOUX][A-Z]{2}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[HM](AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[A-Z0-9]\d$/i;
@@ -82,8 +137,8 @@ const isNonNegativeInteger = (value: string | number) =>
     /^\d+$/.test(String(value)) && Number(value) >= 0;
 
 export const validateClientField = (
-    form: CalculateForm,
-    stepErrors: StepErrors,
+    form: ClientValidationForm,
+    stepErrors: ClientValidationErrors,
     field: ClientValidationField,
     options: { requireRequiredFields?: boolean } = {},
 ) => {
@@ -225,8 +280,8 @@ export const validateClientField = (
 };
 
 export const validateClientFormatFields = (
-    form: CalculateForm,
-    stepErrors: StepErrors,
+    form: ClientValidationForm,
+    stepErrors: ClientValidationErrors,
 ) => {
     const phoneIsValid = validateClientField(form, stepErrors, 'phone');
     const emailIsValid = validateClientField(form, stepErrors, 'email');
@@ -279,8 +334,8 @@ export const validateClientFormatFields = (
 };
 
 export const validateFamilyInformationField = (
-    form: CalculateForm,
-    stepErrors: StepErrors,
+    form: ClientValidationForm,
+    stepErrors: ClientValidationErrors,
     field: FamilyInformationField,
     options: { requireRequiredFields?: boolean } = {},
 ) => {
@@ -313,33 +368,80 @@ export const validateFamilyInformationField = (
 };
 
 export const validateFamilyInformation = (
-    form: CalculateForm,
-    stepErrors: StepErrors,
+    form: ClientValidationForm,
+    stepErrors: ClientValidationErrors,
 ) => {
     const hasSpouseIsValid = validateFamilyInformationField(
         form,
         stepErrors,
         'has_spouse',
-        {
-            requireRequiredFields: true,
-        },
+        { requireRequiredFields: true },
     );
     const childrenCountIsValid = validateFamilyInformationField(
         form,
         stepErrors,
         'minor_or_student_children_count',
-        {
-            requireRequiredFields: true,
-        },
+        { requireRequiredFields: true },
     );
     const parentsCountIsValid = validateFamilyInformationField(
         form,
         stepErrors,
         'parents_count',
-        {
-            requireRequiredFields: true,
-        },
+        { requireRequiredFields: true },
     );
 
     return hasSpouseIsValid && childrenCountIsValid && parentsCountIsValid;
+};
+
+export const validateClientForm = (
+    form: ClientValidationForm,
+): ClientFormErrors => {
+    const fieldErrors: ClientValidationErrors = {};
+
+    validateClientField(form, fieldErrors, 'name', {
+        requireRequiredFields: true,
+    });
+    validateClientFormatFields(form, fieldErrors);
+    validateFamilyInformation(form, fieldErrors);
+
+    if (form.client.name.length > 255) {
+        fieldErrors.name = 'El nombre no puede exceder 255 caracteres.';
+    }
+
+    if (form.client.last_name.length > 255) {
+        fieldErrors.last_name =
+            'Los apellidos no pueden exceder 255 caracteres.';
+    }
+
+    if (form.client.email.length > 255) {
+        fieldErrors.email = 'El correo no puede exceder 255 caracteres.';
+    }
+
+    const errors: ClientFormErrors = {};
+
+    for (const [field, message] of Object.entries(fieldErrors)) {
+        if (!message) {
+            continue;
+        }
+
+        if (
+            field === 'nss' ||
+            field === 'regime_end_date' ||
+            field === 'unemployment_assistance_discounted_weeks' ||
+            field === 'total_contributed_weeks'
+        ) {
+            errors[`social_security_information.${field}` as ClientFormField] =
+                message;
+        } else if (
+            field === 'has_spouse' ||
+            field === 'minor_or_student_children_count' ||
+            field === 'parents_count'
+        ) {
+            errors[`family_information.${field}` as ClientFormField] = message;
+        } else {
+            errors[`client.${field}` as ClientFormField] = message;
+        }
+    }
+
+    return errors;
 };
