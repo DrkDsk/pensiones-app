@@ -2,6 +2,10 @@ import { computed, nextTick, ref } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
 import {
+    validateClientField,
+    validateFamilyInformationField,
+} from '@/validators/clientValidation';
+import {
     createFamilyInformationDefaults,
     createSocialSecurityInformationDefaults,
 } from '../constants/formDefaults';
@@ -13,10 +17,6 @@ import type {
     SocialSecurityInformationField,
     StepErrors,
 } from '../types/calculate';
-import {
-    validateClientField,
-    validateFamilyInformationField,
-} from '../validators/clientValidation';
 
 const normalizeDateValue = (value: string | null | undefined): string => {
     if (!value) {
