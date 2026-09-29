@@ -2,6 +2,7 @@
 
 use App\Exceptions\ClientExistsException;
 use App\Models\Client;
+use App\Models\ClientFamilyInformation;
 use App\Models\User;
 use App\UseCases\Client\CreateClientUseCase;
 use App\UseCases\Client\FindExistingClientUseCase;
@@ -23,6 +24,11 @@ function validClientData(array $overrides = []): array
             'regime_end_date' => null,
             'unemployment_assistance_discounted_weeks' => 0,
             'total_contributed_weeks' => 1200,
+        ],
+        'family_information' => [
+            'has_spouse' => true,
+            'minor_or_student_children_count' => 2,
+            'parents_count' => 1,
         ],
     ];
 
@@ -180,6 +186,12 @@ test('creation redirects to the client listing after creating a client', functio
         'name' => 'Maria',
         'curp' => 'LOMM800101HDFPRR09',
     ]);
+    $this->assertDatabaseHas('client_family_information', [
+        'client_id' => Client::query()->sole()->id,
+        'has_spouse' => true,
+        'minor_or_student_children_count' => 2,
+        'parents_count' => 1,
+    ]);
 });
 
 test('json creation returns the newly created client without changing the inertia flow', function () {
@@ -189,6 +201,9 @@ test('json creation returns the newly created client without changing the inerti
         ->assertCreated()
         ->assertJsonPath('data.name', 'Maria')
         ->assertJsonPath('data.curp', 'LOMM800101HDFPRR09')
+        ->assertJsonPath('data.family_information.has_spouse', true)
+        ->assertJsonPath('data.family_information.minor_or_student_children_count', 2)
+        ->assertJsonPath('data.family_information.parents_count', 1)
         ->assertJsonStructure(['data' => ['id']]);
 
     $this->assertDatabaseHas('clients', [
@@ -213,6 +228,31 @@ test('json creation keeps validation errors distinct from duplicate errors', fun
         ->assertJsonStructure(['message', 'errors' => ['client.curp']]);
 
     $this->assertDatabaseCount('clients', 0);
+});
+
+test('creation requires complete family information', function () {
+    $data = validClientData();
+    unset($data['family_information']['parents_count']);
+
+    $this->post(route('clients.store'), $data)
+        ->assertSessionHasErrors('family_information.parents_count');
+
+    $this->assertDatabaseCount('clients', 0);
+});
+
+test('creation rolls back the client when family information cannot be stored', function () {
+    $this->withoutExceptionHandling();
+
+    ClientFamilyInformation::creating(
+        static fn () => throw new RuntimeException('Family information failed.'),
+    );
+
+    expect(fn () => $this->post(route('clients.store'), validClientData()))
+        ->toThrow(RuntimeException::class, 'Family information failed.');
+
+    $this->assertDatabaseCount('clients', 0);
+    $this->assertDatabaseCount('client_social_security_information', 0);
+    $this->assertDatabaseCount('client_family_information', 0);
 });
 
 test('creation normalizes curp to uppercase', function () {
