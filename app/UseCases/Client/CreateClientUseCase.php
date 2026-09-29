@@ -10,6 +10,7 @@ use App\Repositories\Contract\ClientSocialSecurityInformationRepositoryInterface
 use App\Support\ClientValidationRules;
 use Illuminate\Support\Facades\DB;
 use LogicException;
+use Throwable;
 
 readonly class CreateClientUseCase
 {
@@ -21,6 +22,8 @@ readonly class CreateClientUseCase
 
     /**
      * @param  array<string, mixed>  $data
+     *
+     * @throws Throwable
      */
     public function execute(array $data): Client
     {
