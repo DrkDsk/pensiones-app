@@ -21,27 +21,27 @@ import { dashboard, login, register } from '@/routes';
                 </div>
 
                 <nav class="flex items-center gap-3">
-                    <Link
-                        v-if="$page.props.auth.user"
-                        :href="dashboard()"
-                        class="rounded-md bg-on-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-on-primary/90"
-                    >
-                        Panel de control
-                    </Link>
-                    <template v-else>
-                        <Link
-                            :href="login()"
-                            class="text-sm font-medium text-on-primary/80 transition hover:text-on-primary"
-                        >
-                            Iniciar sesión
-                        </Link>
+                    <template v-if="$page.props.auth.user">
                         <Link
                             :href="register()"
+                            class="text-sm font-medium text-on-primary/80 transition hover:text-on-primary"
+                        >
+                            Registrar usuario
+                        </Link>
+                        <Link
+                            :href="dashboard()"
                             class="rounded-md bg-on-primary px-4 py-2 text-sm font-medium text-primary transition hover:bg-on-primary/90"
                         >
-                            Registrarse
+                            Panel de control
                         </Link>
                     </template>
+                    <Link
+                        v-else
+                        :href="login()"
+                        class="text-sm font-medium text-on-primary/80 transition hover:text-on-primary"
+                    >
+                        Iniciar sesión
+                    </Link>
                 </nav>
             </header>
 
