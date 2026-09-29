@@ -6,11 +6,13 @@ use App\Exceptions\ClientExistsException;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Resources\ClientExistsResource;
 use App\Http\Resources\ClientResource;
+use App\UseCases\Client\CreateClientFamilyInformationUseCase;
 use App\UseCases\Client\CreateClientUseCase;
 use App\UseCases\Client\FindExistingClientUseCase;
 use App\UseCases\Client\GetClientsUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -19,6 +21,7 @@ class ClientController extends Controller
 {
     public function __construct(
         private readonly CreateClientUseCase $createClient,
+        private readonly CreateClientFamilyInformationUseCase $createClientFamilyInformation,
         protected readonly FindExistingClientUseCase $findExistingClient,
         private readonly GetClientsUseCase $getClients,
     ) {}
@@ -33,7 +36,24 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request): RedirectResponse|JsonResponse
     {
         try {
-            $client = $this->createClient->execute($request->validated());
+            $validated = $request->validated();
+            $clientData = [
+                'client' => $validated['client'],
+                'social_security_information' => $validated['social_security_information'],
+            ];
+            /** @var array<string, mixed> $familyInformation */
+            $familyInformation = $validated['family_information'];
+
+            $client = DB::transaction(function () use ($clientData, $familyInformation) {
+                $client = $this->createClient->execute($clientData);
+
+                $this->createClientFamilyInformation->execute(
+                    $client,
+                    $familyInformation,
+                );
+
+                return $client;
+            });
         } catch (ClientExistsException $exception) {
             if ($request->expectsJson()) {
                 return response()->json(
@@ -50,6 +70,8 @@ class ClientController extends Controller
         }
 
         if ($request->expectsJson()) {
+            $client->loadMissing('familyInformation');
+
             return (new ClientResource($client))
                 ->response()
                 ->setStatusCode(HttpResponse::HTTP_CREATED);
