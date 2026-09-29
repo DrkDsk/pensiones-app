@@ -20,7 +20,7 @@ class GetClientInformationUseCase
         return [
             'full_name' => trim(implode(' ', array_filter([$client->name, $client->last_name]))),
             'curp' => $client->curp,
-            'nss' => $client->nss,
+            'nss' => $client->socialSecurityInformation?->nss,
             'birthdate' => $client->birthdate,
             'age' => AgeFormatter::format($client->birthdate, $asOf),
             'marital_status' => $this->maritalStatus($familyInformation),

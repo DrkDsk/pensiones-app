@@ -2,6 +2,7 @@
 
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
+use App\Models\ClientSocialSecurityInformation;
 use App\Models\User;
 
 beforeEach(function () {
@@ -36,8 +37,13 @@ test('pension proposal endpoint downloads a pdf for an existing client', functio
         'last_name' => 'Palacios',
         'curp' => 'PAAA650315HQTRLR00',
         'birthdate' => '1965-03-15',
+    ]);
+
+    ClientSocialSecurityInformation::query()->create([
+        'client_id' => $client->id,
         'nss' => '14816514849',
         'unemployment_assistance_discounted_weeks' => 0,
+        'total_contributed_weeks' => 1200,
     ]);
 
     ClientFamilyInformation::query()->create([
@@ -70,8 +76,12 @@ test('pension proposal endpoint accepts zero calculation values', function () {
         'name' => 'Cliente',
         'birthdate' => '1965-03-15',
         'curp' => 'PAAA650315HQTRLR00',
+    ]);
+    ClientSocialSecurityInformation::query()->create([
+        'client_id' => $client->id,
         'nss' => '14816514849',
         'unemployment_assistance_discounted_weeks' => 0,
+        'total_contributed_weeks' => 1200,
     ]);
     $payload = pensionProposalPayload();
     $payload['monthly_pension'] = 0;

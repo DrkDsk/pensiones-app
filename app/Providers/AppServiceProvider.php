@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Repositories\Contract\ClientFamilyInformationRepositoryInterface;
 use App\Repositories\Contract\ClientRepositoryInterface;
+use App\Repositories\Contract\ClientSocialSecurityInformationRepositoryInterface;
 use App\Repositories\Contract\PercentageCostForModality40RepositoryInterface;
 use App\Repositories\Eloquent\ClientFamilyInformationRepository;
 use App\Repositories\Eloquent\ClientRepository;
+use App\Repositories\Eloquent\ClientSocialSecurityInformationRepository;
 use App\Repositories\Eloquent\PercentageCostForModality40Repository;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -23,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(ClientRepositoryInterface::class, ClientRepository::class);
         $this->app->bind(ClientFamilyInformationRepositoryInterface::class, ClientFamilyInformationRepository::class);
+        $this->app->bind(ClientSocialSecurityInformationRepositoryInterface::class, ClientSocialSecurityInformationRepository::class);
         $this->app->bind(
             PercentageCostForModality40RepositoryInterface::class,
             PercentageCostForModality40Repository::class,

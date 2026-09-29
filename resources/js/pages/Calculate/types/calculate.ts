@@ -7,10 +7,14 @@ export interface CalculateClientForm {
     email: string;
     curp: string;
     birthdate: string;
+    notes: string;
+}
+
+export interface CalculateSocialSecurityInformationForm {
     nss: string;
     regime_end_date: string;
     unemployment_assistance_discounted_weeks: string;
-    notes: string;
+    total_contributed_weeks: string;
 }
 
 export interface CalculateFamilyInformationForm {
@@ -73,6 +77,7 @@ export interface BeneficieresData {
 export interface CalculateFormData {
     client_id: number | null;
     client: CalculateClientForm;
+    social_security_information: CalculateSocialSecurityInformationForm;
     family_information: CalculateFamilyInformationForm;
     regime_periods: RegimePeriod[];
     financing: FinancingData;
@@ -92,6 +97,7 @@ export type CalculateForm = InertiaForm<CalculateFormData>;
 export type ClientStepField =
     | 'client_id'
     | keyof CalculateClientForm
+    | keyof CalculateSocialSecurityInformationForm
     | keyof CalculateFamilyInformationForm;
 
 export type ClientValidationField = Exclude<
@@ -105,15 +111,11 @@ export type ClientValidationField = Exclude<
 >;
 
 export type ManualClientField =
-    | Exclude<
-          ClientStepField,
-          | 'client_id'
-          | 'notes'
-          | 'has_spouse'
-          | 'minor_or_student_children_count'
-          | 'parents_count'
-      >
+    | Exclude<keyof CalculateClientForm, 'notes'>
     | 'client_notes';
+
+export type SocialSecurityInformationField =
+    keyof CalculateSocialSecurityInformationForm;
 
 export type FamilyInformationField =
     | 'has_spouse'

@@ -19,9 +19,6 @@ return new class extends Migration
             $table->string('email')->nullable()->index();
             $table->string('curp', 18);
             $table->date('birthdate');
-            $table->string('nss', 11);
-            $table->date('regime_end_date')->nullable();
-            $table->unsignedInteger('unemployment_assistance_discounted_weeks');
             $table->text('notes')->nullable();
             $table->timestamps();
 

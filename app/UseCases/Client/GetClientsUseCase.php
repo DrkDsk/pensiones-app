@@ -18,7 +18,7 @@ readonly class GetClientsUseCase
     public function execute(): LengthAwarePaginator
     {
         /** @var LengthAwarePaginator<int, Client> $clients */
-        $clients = $this->clientRepository->paginate(15);
+        $clients = $this->clientRepository->paginateWithSocialSecurityInformation(15);
 
         return $clients;
     }

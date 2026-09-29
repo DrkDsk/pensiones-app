@@ -1,6 +1,9 @@
 import type { Client } from '@/models/client';
 import clients from '@/routes/clients';
-import type { CalculateClientForm } from '../types/calculate';
+import type {
+    CalculateClientForm,
+    CalculateSocialSecurityInformationForm,
+} from '../types/calculate';
 import { jsonHeaders, readJson } from './http';
 
 type ErrorResponse = {
@@ -20,16 +23,17 @@ export class ClientValidationError extends Error {
 
 export class ClientCreationError extends Error {}
 
-export const storeClient = async (
-    client: CalculateClientForm,
-): Promise<StoredClient> => {
+export const storeClient = async (data: {
+    client: CalculateClientForm;
+    social_security_information: CalculateSocialSecurityInformationForm;
+}): Promise<StoredClient> => {
     let response: Response;
 
     try {
         response = await fetch(clients.store().url, {
             method: 'POST',
             headers: jsonHeaders(),
-            body: JSON.stringify(client),
+            body: JSON.stringify(data),
         });
     } catch {
         throw new ClientCreationError(

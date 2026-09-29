@@ -128,6 +128,7 @@ export const createStepErrors = () =>
         nss: '',
         regime_end_date: '',
         unemployment_assistance_discounted_weeks: '',
+        total_contributed_weeks: '',
         notes: '',
         has_spouse: '',
         minor_or_student_children_count: '',
@@ -195,7 +196,13 @@ export const useCalculateForm = (selectedClient: Client | null) => {
             return 0;
         }
 
-        return Number((1293 + modalidad40.time * 52 + 4).toFixed(0));
+        const totalContributedWeeks =
+            Number(form.social_security_information.total_contributed_weeks) ||
+            0;
+
+        return Number(
+            (totalContributedWeeks + modalidad40.time * 52 + 4).toFixed(0),
+        );
     });
 
     const years_recognized = computed(() => {
@@ -224,11 +231,14 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         const leapYear = leapDaysAdjustment + 1;
         const adjustment = daysFromRetentionYears + leapYear;
 
-        return addDays(form.client.regime_end_date, adjustment);
+        return addDays(
+            form.social_security_information.regime_end_date,
+            adjustment,
+        );
     });
 
     const entitlementExpirationDateModalidad40 = computed(() =>
-        addDays(form.client.regime_end_date, 365 * 5),
+        addDays(form.social_security_information.regime_end_date, 365 * 5),
     );
 
     const clearStepError = (field: ClientStepField) => {
@@ -267,10 +277,12 @@ export const useCalculateForm = (selectedClient: Client | null) => {
         form.client.email = '';
         form.client.curp = '';
         form.client.birthdate = '';
-        form.client.nss = '';
-        form.client.regime_end_date = '';
-        form.client.unemployment_assistance_discounted_weeks = '';
         form.client.notes = '';
+        form.social_security_information.nss = '';
+        form.social_security_information.regime_end_date = '';
+        form.social_security_information.unemployment_assistance_discounted_weeks =
+            '';
+        form.social_security_information.total_contributed_weeks = '';
         form.family_information.has_spouse = '';
         form.family_information.minor_or_student_children_count = '';
         form.family_information.parents_count = '';

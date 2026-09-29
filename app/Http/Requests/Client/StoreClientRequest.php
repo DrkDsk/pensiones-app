@@ -14,9 +14,14 @@ class StoreClientRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if (is_string($this->input('curp'))) {
+        $client = $this->input('client');
+
+        if (is_array($client) && isset($client['curp']) && is_string($client['curp'])) {
             $this->merge([
-                'curp' => ClientValidationRules::normalizeCurp($this->input('curp')),
+                'client' => [
+                    ...$client,
+                    'curp' => ClientValidationRules::normalizeCurp($client['curp']),
+                ],
             ]);
         }
     }
@@ -27,16 +32,19 @@ class StoreClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'last_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ClientValidationRules::phone(),
-            'email' => ['nullable', 'email', 'max:255'],
-            'curp' => ClientValidationRules::curp(),
-            'birthdate' => ['required', 'date'],
-            'nss' => ClientValidationRules::nss(),
-            'regime_end_date' => ['nullable', 'date'],
-            'unemployment_assistance_discounted_weeks' => ['required', 'integer', 'min:0'],
-            'notes' => ['nullable', 'string'],
+            'client' => ['required', 'array'],
+            'client.name' => ['required', 'string', 'max:255'],
+            'client.last_name' => ['nullable', 'string', 'max:255'],
+            'client.phone' => ClientValidationRules::phone(),
+            'client.email' => ['nullable', 'email', 'max:255'],
+            'client.curp' => ClientValidationRules::curp(),
+            'client.birthdate' => ['required', 'date'],
+            'client.notes' => ['nullable', 'string'],
+            'social_security_information' => ['required', 'array'],
+            'social_security_information.nss' => ClientValidationRules::nss(),
+            'social_security_information.regime_end_date' => ['nullable', 'date'],
+            'social_security_information.unemployment_assistance_discounted_weeks' => ['required', 'integer', 'min:0'],
+            'social_security_information.total_contributed_weeks' => ['required', 'integer', 'min:0'],
         ];
     }
 
@@ -45,6 +53,9 @@ class StoreClientRequest extends FormRequest
      */
     public function messages(): array
     {
-        return ClientValidationRules::messages();
+        return [
+            ...ClientValidationRules::messages('client.'),
+            ...ClientValidationRules::messages('social_security_information.'),
+        ];
     }
 }

@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use App\Support\ClientValidationRules;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property CarbonImmutable $birthdate
+ */
 class Client extends Model
 {
     protected $fillable = [
@@ -16,9 +20,6 @@ class Client extends Model
         'email',
         'curp',
         'birthdate',
-        'nss',
-        'regime_end_date',
-        'unemployment_assistance_discounted_weeks',
         'notes',
     ];
 
@@ -29,8 +30,6 @@ class Client extends Model
     {
         return [
             'birthdate' => 'date',
-            'regime_end_date' => 'date',
-            'unemployment_assistance_discounted_weeks' => 'integer',
         ];
     }
 
@@ -50,5 +49,13 @@ class Client extends Model
     public function familyInformation(): HasOne
     {
         return $this->hasOne(ClientFamilyInformation::class);
+    }
+
+    /**
+     * @return HasOne<ClientSocialSecurityInformation, $this>
+     */
+    public function socialSecurityInformation(): HasOne
+    {
+        return $this->hasOne(ClientSocialSecurityInformation::class);
     }
 }

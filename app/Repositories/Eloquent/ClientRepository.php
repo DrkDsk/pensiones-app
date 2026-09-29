@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Client;
 use App\Repositories\Contract\ClientRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientRepository extends BaseRepository implements ClientRepositoryInterface
 {
@@ -20,20 +21,34 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
     {
         $criteria = [];
 
-        foreach (['phone', 'email', 'curp', 'nss'] as $field) {
-            if (array_key_exists($field, $data) && $data[$field] !== null && $data[$field] !== '') {
-                $criteria[$field] = $data[$field];
+        $clientData = is_array($data['client'] ?? null) ? $data['client'] : $data;
+
+        foreach (['phone', 'email', 'curp'] as $field) {
+            if (array_key_exists($field, $clientData) && $clientData[$field] !== null && $clientData[$field] !== '') {
+                $criteria[$field] = $clientData[$field];
             }
         }
 
-        if ($criteria === []) {
+        $socialSecurityInformation = is_array($data['social_security_information'] ?? null)
+            ? $data['social_security_information']
+            : [];
+        $nss = $socialSecurityInformation['nss'] ?? null;
+
+        if ($criteria === [] && ($nss === null || $nss === '')) {
             return null;
         }
 
         return Client::query()
-            ->where(function ($query) use ($criteria): void {
+            ->where(function ($query) use ($criteria, $nss): void {
                 foreach ($criteria as $field => $value) {
                     $query->orWhere($field, $value);
+                }
+
+                if ($nss !== null && $nss !== '') {
+                    $query->orWhereHas(
+                        'socialSecurityInformation',
+                        fn ($query) => $query->where('nss', $nss),
+                    );
                 }
             })
             ->first();
@@ -42,7 +57,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
     public function findWithFamilyInformation(int $clientId): ?Client
     {
         return Client::query()
-            ->with('familyInformation')
+            ->with(['familyInformation', 'socialSecurityInformation'])
             ->find($clientId);
     }
 
@@ -55,7 +70,7 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
 
         /** @var Collection<int, Client> $clients */
         $clients = Client::query()
-            ->with('familyInformation')
+            ->with(['familyInformation', 'socialSecurityInformation'])
             ->when($normalizedTerm !== '', function ($query) use ($normalizedTerm): void {
                 $query->where(function ($query) use ($normalizedTerm): void {
                     $query
@@ -63,7 +78,11 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
                         ->orWhere('last_name', 'like', "%{$normalizedTerm}%")
                         ->orWhere('phone', 'like', "%{$normalizedTerm}%")
                         ->orWhere('email', 'like', "%{$normalizedTerm}%")
-                        ->orWhere('curp', 'like', "%{$normalizedTerm}%");
+                        ->orWhere('curp', 'like', "%{$normalizedTerm}%")
+                        ->orWhereHas(
+                            'socialSecurityInformation',
+                            fn ($query) => $query->where('nss', 'like', "%{$normalizedTerm}%"),
+                        );
                 });
             })
             ->orderBy('name')
@@ -71,5 +90,15 @@ class ClientRepository extends BaseRepository implements ClientRepositoryInterfa
             ->get();
 
         return $clients;
+    }
+
+    /**
+     * @return LengthAwarePaginator<int, Client>
+     */
+    public function paginateWithSocialSecurityInformation(int $perPage = 10): LengthAwarePaginator
+    {
+        return Client::query()
+            ->with('socialSecurityInformation')
+            ->paginate($perPage);
     }
 }

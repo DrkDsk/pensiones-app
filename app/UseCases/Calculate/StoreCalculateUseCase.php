@@ -4,8 +4,10 @@ namespace App\UseCases\Calculate;
 
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
+use App\Models\ClientSocialSecurityInformation;
 use App\Repositories\Contract\ClientFamilyInformationRepositoryInterface;
 use App\Repositories\Contract\ClientRepositoryInterface;
+use App\Repositories\Contract\ClientSocialSecurityInformationRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -15,6 +17,7 @@ readonly class StoreCalculateUseCase
     public function __construct(
         private ClientRepositoryInterface $clientRepository,
         private ClientFamilyInformationRepositoryInterface $clientFamilyInformationRepository,
+        private ClientSocialSecurityInformationRepositoryInterface $socialSecurityInformationRepository,
     ) {}
 
     /**
@@ -38,6 +41,14 @@ readonly class StoreCalculateUseCase
             $client = $this->clientRepository->create($this->clientData($data));
 
             if (! $client instanceof Client) {
+                throw new ModelNotFoundException;
+            }
+
+            $socialSecurityInformation = $this->socialSecurityInformationRepository->create(
+                $this->socialSecurityInformationData($data, $client),
+            );
+
+            if (! $socialSecurityInformation instanceof ClientSocialSecurityInformation) {
                 throw new ModelNotFoundException;
             }
 
@@ -67,9 +78,6 @@ readonly class StoreCalculateUseCase
             'email',
             'curp',
             'birthdate',
-            'nss',
-            'regime_end_date',
-            'unemployment_assistance_discounted_weeks',
             'notes',
         ]);
 
@@ -80,6 +88,29 @@ readonly class StoreCalculateUseCase
         }
 
         return $clientData;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function socialSecurityInformationData(array $data, Client $client): array
+    {
+        $socialSecurityInformation = is_array($data['social_security_information'] ?? null)
+            ? $data['social_security_information']
+            : [];
+
+        $allowedFields = array_flip([
+            'nss',
+            'regime_end_date',
+            'unemployment_assistance_discounted_weeks',
+            'total_contributed_weeks',
+        ]);
+
+        return [
+            'client_id' => $client->id,
+            ...array_intersect_key($socialSecurityInformation, $allowedFields),
+        ];
     }
 
     /**

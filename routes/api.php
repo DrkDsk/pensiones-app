@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalculateController;
 use App\Http\Controllers\CesantiaController;
 use App\Http\Controllers\PercentageCostModality40Controller;
 use Illuminate\Http\Request;
@@ -9,5 +10,6 @@ Route::get('/user', static function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('search/clients', [CalculateController::class, 'searchClients']);
 Route::post('cesantia', [CesantiaController::class, 'index']);
 Route::get('percentage-cost-modality-40', [PercentageCostModality40Controller::class, 'index']);

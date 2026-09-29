@@ -45,7 +45,10 @@ export const useCalculateProposal = ({
             return form.client_id;
         }
 
-        const client = await services.storeClient(form.client);
+        const client = await services.storeClient({
+            client: form.client,
+            social_security_information: form.social_security_information,
+        });
         form.client_id = client.id;
 
         return client.id;
@@ -79,7 +82,10 @@ export const useCalculateProposal = ({
             if (error instanceof ClientValidationError) {
                 const errors = Object.fromEntries(
                     Object.entries(error.errors).map(([field, messages]) => [
-                        field.replace(/^client\./, '') as ClientStepField,
+                        field.replace(
+                            /^(client|social_security_information)\./,
+                            '',
+                        ) as ClientStepField,
                         messages,
                     ]),
                 );

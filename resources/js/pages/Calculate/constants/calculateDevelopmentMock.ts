@@ -11,10 +11,13 @@ export const calculateDevelopmentMock = {
         email: 'joseaph.1998@gmail.com',
         curp: 'PAHA981205HCSLRL07',
         birthdate: '1965-03-15',
+        notes: '',
+    },
+    social_security_information: {
         nss: '14816514849',
         regime_end_date: '2023-07-08',
         unemployment_assistance_discounted_weeks: '158',
-        notes: '',
+        total_contributed_weeks: '1200',
     },
     family_information: {
         has_spouse: '',

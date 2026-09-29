@@ -1,12 +1,16 @@
 import { computed, nextTick, ref } from 'vue';
 import type { Client } from '@/models/client';
 import calculate from '@/routes/calculate';
-import { createFamilyInformationDefaults } from '../constants/formDefaults';
+import {
+    createFamilyInformationDefaults,
+    createSocialSecurityInformationDefaults,
+} from '../constants/formDefaults';
 import type {
     CalculateForm,
     ClientStepField,
     FamilyInformationField,
     ManualClientField,
+    SocialSecurityInformationField,
     StepErrors,
 } from '../types/calculate';
 import {
@@ -31,11 +35,6 @@ const hydrateClientForm = (form: CalculateForm, client: Client) => {
     form.client.email = client.email ?? '';
     form.client.curp = client.curp ?? '';
     form.client.birthdate = normalizeDateValue(client.birthdate);
-    form.client.nss = client.nss ?? '';
-    form.client.regime_end_date = normalizeDateValue(client.regime_end_date);
-    form.client.unemployment_assistance_discounted_weeks = String(
-        client.unemployment_assistance_discounted_weeks ?? '',
-    );
     form.client.notes = client.notes ?? '';
 };
 
@@ -85,12 +84,15 @@ export const useClientSearch = ({
                 const phone = `${client.phone ?? ''}`.toLowerCase();
                 const email = `${client.email ?? ''}`.toLowerCase();
                 const curp = `${client.curp ?? ''}`.toLowerCase();
+                const nss =
+                    `${client.social_security_information?.nss ?? ''}`.toLowerCase();
 
                 return (
                     fullName.includes(normalizedSearch.value) ||
                     phone.includes(normalizedSearch.value) ||
                     email.includes(normalizedSearch.value) ||
-                    curp.includes(normalizedSearch.value)
+                    curp.includes(normalizedSearch.value) ||
+                    nss.includes(normalizedSearch.value)
                 );
             })
             .slice(0, 6);
@@ -106,9 +108,11 @@ export const useClientSearch = ({
             !!form.client.email ||
             !!form.client.curp ||
             !!form.client.birthdate ||
-            !!form.client.nss ||
-            !!form.client.regime_end_date ||
-            !!form.client.unemployment_assistance_discounted_weeks ||
+            !!form.social_security_information.nss ||
+            !!form.social_security_information.regime_end_date ||
+            !!form.social_security_information
+                .unemployment_assistance_discounted_weeks ||
+            !!form.social_security_information.total_contributed_weeks ||
             form.family_information.has_spouse !== '' ||
             !!form.family_information.minor_or_student_children_count ||
             !!form.family_information.parents_count ||
@@ -168,6 +172,8 @@ export const useClientSearch = ({
         form.client_id = client.id;
         clearClientFields();
         hydrateClientForm(form, client);
+        form.social_security_information =
+            createSocialSecurityInformationDefaults(client);
         form.family_information = createFamilyInformationDefaults(client);
         selectedClient.value = client;
         clientSearch.value =
@@ -213,10 +219,7 @@ export const useClientSearch = ({
             clientField === 'phone' ||
             clientField === 'email' ||
             clientField === 'curp' ||
-            clientField === 'birthdate' ||
-            clientField === 'nss' ||
-            clientField === 'regime_end_date' ||
-            clientField === 'unemployment_assistance_discounted_weeks'
+            clientField === 'birthdate'
         ) {
             validateClientField(form, stepErrors, clientField);
 
@@ -224,6 +227,18 @@ export const useClientSearch = ({
         }
 
         clearStepError(clientField);
+    };
+
+    const handleSocialSecurityInformationInput = (
+        field: SocialSecurityInformationField,
+        value: string | number | undefined,
+    ) => {
+        form.client_id = null;
+        selectedClient.value = null;
+        form.social_security_information[field] = String(value ?? '');
+        manualCustomerMode.value = true;
+        stepErrors.client_id = '';
+        validateClientField(form, stepErrors, field);
     };
 
     const handleFamilyInformationInput = (
@@ -258,6 +273,7 @@ export const useClientSearch = ({
         activateManualCustomer,
         hideDropdown,
         handleManualInput,
+        handleSocialSecurityInformationInput,
         handleFamilyInformationInput,
     };
 };

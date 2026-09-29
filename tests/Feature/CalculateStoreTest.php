@@ -2,6 +2,7 @@
 
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
+use App\Models\ClientSocialSecurityInformation;
 use App\Models\User;
 
 test('client search includes family information', function () {
@@ -11,8 +12,13 @@ test('client search includes family information', function () {
         'last_name' => 'Lopez',
         'curp' => 'LOMM800101HDFPRR09',
         'birthdate' => '1980-01-01',
+    ]);
+
+    ClientSocialSecurityInformation::query()->create([
+        'client_id' => $client->id,
         'nss' => '12345678901',
         'unemployment_assistance_discounted_weeks' => 0,
+        'total_contributed_weeks' => 1200,
     ]);
 
     ClientFamilyInformation::query()->create([
@@ -32,6 +38,15 @@ test('client search includes family information', function () {
         ->assertJsonPath('clients.0.family_information.has_spouse', true)
         ->assertJsonPath('clients.0.family_information.minor_or_student_children_count', 2)
         ->assertJsonPath('clients.0.family_information.parents_count', 1);
+    $response->assertJsonPath(
+        'clients.0.social_security_information.nss',
+        '12345678901',
+    );
+
+    $this->actingAs($user)
+        ->getJson(route('calculate.clients.search', ['search' => '12345678901']))
+        ->assertOk()
+        ->assertJsonPath('clients.0.id', $client->id);
 });
 
 test('calculate store accepts an existing client id', function () {
@@ -40,8 +55,6 @@ test('calculate store accepts an existing client id', function () {
         'name' => 'Maria',
         'curp' => 'LOMM800101HDFPRR09',
         'birthdate' => '1980-01-01',
-        'nss' => '12345678901',
-        'unemployment_assistance_discounted_weeks' => 0,
     ]);
 
     $response = $this
@@ -90,8 +103,9 @@ test('calculate store rejects missing required new client fields', function () {
             'client.name',
             'client.curp',
             'client.birthdate',
-            'client.nss',
-            'client.unemployment_assistance_discounted_weeks',
+            'social_security_information.nss',
+            'social_security_information.unemployment_assistance_discounted_weeks',
+            'social_security_information.total_contributed_weeks',
             'family_information.has_spouse',
             'family_information.minor_or_student_children_count',
             'family_information.parents_count',
@@ -111,10 +125,13 @@ test('calculate store creates a new client from required client fields', functio
                 'phone' => '5512345678',
                 'curp' => 'paaa800101hdflll09',
                 'birthdate' => '1980-01-01',
+                'notes' => 'Cliente nuevo para calculo.',
+            ],
+            'social_security_information' => [
                 'nss' => '12345678901',
                 'regime_end_date' => '2024-12-31',
                 'unemployment_assistance_discounted_weeks' => '4',
-                'notes' => 'Cliente nuevo para calculo.',
+                'total_contributed_weeks' => '1200',
             ],
             'family_information' => [
                 'has_spouse' => '1',
@@ -131,10 +148,14 @@ test('calculate store creates a new client from required client fields', functio
         'phone' => '5512345678',
         'curp' => 'PAAA800101HDFLLL09',
         'birthdate' => '1980-01-01 00:00:00',
+        'notes' => 'Cliente nuevo para calculo.',
+    ]);
+
+    $this->assertDatabaseHas('client_social_security_information', [
         'nss' => '12345678901',
         'regime_end_date' => '2024-12-31 00:00:00',
         'unemployment_assistance_discounted_weeks' => 4,
-        'notes' => 'Cliente nuevo para calculo.',
+        'total_contributed_weeks' => 1200,
     ]);
 
     $this->assertDatabaseHas('client_family_information', [
@@ -158,8 +179,11 @@ test('calculate store rejects invalid client contact formats', function () {
                 'email' => 'alfredo',
                 'curp' => 'CURP_INVALIDA',
                 'birthdate' => now()->addDay()->toDateString(),
+            ],
+            'social_security_information' => [
                 'nss' => '123',
                 'unemployment_assistance_discounted_weeks' => '-1',
+                'total_contributed_weeks' => '-1',
             ],
             'family_information' => [
                 'has_spouse' => '1',
@@ -175,8 +199,9 @@ test('calculate store rejects invalid client contact formats', function () {
             'client.email',
             'client.curp',
             'client.birthdate',
-            'client.nss',
-            'client.unemployment_assistance_discounted_weeks',
+            'social_security_information.nss',
+            'social_security_information.unemployment_assistance_discounted_weeks',
+            'social_security_information.total_contributed_weeks',
             'family_information.minor_or_student_children_count',
             'family_information.parents_count',
         ]);
@@ -195,8 +220,11 @@ test('calculate store does not strip formatting from phone or nss', function () 
                 'phone' => '961-123-4567',
                 'curp' => 'GOCG850101HDFRRN09',
                 'birthdate' => '1985-01-01',
+            ],
+            'social_security_information' => [
                 'nss' => '12345-678901',
                 'unemployment_assistance_discounted_weeks' => '0',
+                'total_contributed_weeks' => '1200',
             ],
             'family_information' => [
                 'has_spouse' => '0',
@@ -207,7 +235,10 @@ test('calculate store does not strip formatting from phone or nss', function () 
 
     $response
         ->assertRedirect(route('calculate'))
-        ->assertSessionHasErrors(['client.phone', 'client.nss']);
+        ->assertSessionHasErrors([
+            'client.phone',
+            'social_security_information.nss',
+        ]);
 
     $this->assertDatabaseCount('clients', 0);
 });
@@ -224,8 +255,11 @@ test('calculate store rejects a new client under 18 years old', function () {
                 'name' => 'Menor',
                 'curp' => 'PAAA800101HDFLLL09',
                 'birthdate' => now()->subYears(18)->addDay()->toDateString(),
+            ],
+            'social_security_information' => [
                 'nss' => '12345678901',
                 'unemployment_assistance_discounted_weeks' => '0',
+                'total_contributed_weeks' => '1200',
             ],
             'family_information' => [
                 'has_spouse' => '0',
@@ -251,9 +285,12 @@ test('calculate store rejects regime end date that is not after birthdate', func
                 'name' => 'Alfredo',
                 'curp' => 'PAAA800101HDFLLL09',
                 'birthdate' => '1980-01-01',
+            ],
+            'social_security_information' => [
                 'nss' => '12345678901',
                 'regime_end_date' => '1980-01-01',
                 'unemployment_assistance_discounted_weeks' => '0',
+                'total_contributed_weeks' => '1200',
             ],
             'family_information' => [
                 'has_spouse' => '0',
@@ -264,7 +301,7 @@ test('calculate store rejects regime end date that is not after birthdate', func
 
     $response
         ->assertRedirect(route('calculate'))
-        ->assertSessionHasErrors('client.regime_end_date');
+        ->assertSessionHasErrors('social_security_information.regime_end_date');
 });
 
 test('calculate store rejects regime end date that is not after eighteenth birthday', function () {
@@ -279,9 +316,12 @@ test('calculate store rejects regime end date that is not after eighteenth birth
                 'name' => 'Alfredo',
                 'curp' => 'PAAA800101HDFLLL09',
                 'birthdate' => '1980-01-01',
+            ],
+            'social_security_information' => [
                 'nss' => '12345678901',
                 'regime_end_date' => '1998-01-01',
                 'unemployment_assistance_discounted_weeks' => '0',
+                'total_contributed_weeks' => '1200',
             ],
             'family_information' => [
                 'has_spouse' => '0',
@@ -292,5 +332,5 @@ test('calculate store rejects regime end date that is not after eighteenth birth
 
     $response
         ->assertRedirect(route('calculate'))
-        ->assertSessionHasErrors('client.regime_end_date');
+        ->assertSessionHasErrors('social_security_information.regime_end_date');
 });

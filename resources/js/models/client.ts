@@ -4,6 +4,13 @@ export interface ClientFamilyInformation {
     parents_count: number;
 }
 
+export interface ClientSocialSecurityInformation {
+    nss: string;
+    regime_end_date: string | null;
+    unemployment_assistance_discounted_weeks: number;
+    total_contributed_weeks: number;
+}
+
 export interface Client {
     id: number;
     name: string;
@@ -12,9 +19,7 @@ export interface Client {
     email: string | null;
     curp: string;
     birthdate: string | null;
-    nss: string;
-    regime_end_date: string | null;
-    unemployment_assistance_discounted_weeks: number;
     notes: string | null;
+    social_security_information: ClientSocialSecurityInformation | null;
     family_information: ClientFamilyInformation | null;
 }

@@ -27,58 +27,78 @@ const isValidDate = (value: string): boolean => {
 
 export const validateClientForm = (form: ClientFormData): ClientFormErrors => {
     const errors: ClientFormErrors = {};
-    const name = form.name.trim();
-    const lastName = form.last_name.trim();
-    const phone = form.phone.trim();
-    const email = form.email.trim();
-    const curp = form.curp.trim().toUpperCase();
-    const nss = form.nss.trim();
+    const name = form.client.name.trim();
+    const lastName = form.client.last_name.trim();
+    const phone = form.client.phone.trim();
+    const email = form.client.email.trim();
+    const curp = form.client.curp.trim().toUpperCase();
+    const nss = form.social_security_information.nss.trim();
 
     if (!name) {
-        errors.name = 'El nombre es obligatorio.';
+        errors['client.name'] = 'El nombre es obligatorio.';
     } else if (name.length > 255) {
-        errors.name = 'El nombre no puede exceder 255 caracteres.';
+        errors['client.name'] = 'El nombre no puede exceder 255 caracteres.';
     }
 
     if (lastName.length > 255) {
-        errors.last_name = 'Los apellidos no pueden exceder 255 caracteres.';
+        errors['client.last_name'] =
+            'Los apellidos no pueden exceder 255 caracteres.';
     }
 
     if (phone && !/^\d{10}$/.test(phone)) {
-        errors.phone = 'El teléfono debe contener exactamente 10 dígitos.';
+        errors['client.phone'] =
+            'El teléfono debe contener exactamente 10 dígitos.';
     }
 
     if (email.length > 255) {
-        errors.email = 'El correo no puede exceder 255 caracteres.';
+        errors['client.email'] = 'El correo no puede exceder 255 caracteres.';
     } else if (email && !emailPattern.test(email)) {
-        errors.email = 'El correo debe tener un formato válido.';
+        errors['client.email'] = 'El correo debe tener un formato válido.';
     }
 
     if (!curp) {
-        errors.curp = 'La CURP es obligatoria.';
+        errors['client.curp'] = 'La CURP es obligatoria.';
     } else if (!curpPattern.test(curp)) {
-        errors.curp = 'El formato de la CURP no es válido.';
+        errors['client.curp'] = 'El formato de la CURP no es válido.';
     }
 
-    if (!form.birthdate) {
-        errors.birthdate = 'La fecha de nacimiento es obligatoria.';
-    } else if (!isValidDate(form.birthdate)) {
-        errors.birthdate = 'La fecha de nacimiento no es válida.';
+    if (!form.client.birthdate) {
+        errors['client.birthdate'] = 'La fecha de nacimiento es obligatoria.';
+    } else if (!isValidDate(form.client.birthdate)) {
+        errors['client.birthdate'] = 'La fecha de nacimiento no es válida.';
     }
 
     if (!nss) {
-        errors.nss = 'El NSS es obligatorio.';
+        errors['social_security_information.nss'] = 'El NSS es obligatorio.';
     } else if (!/^\d{11}$/.test(nss)) {
-        errors.nss = 'El NSS debe contener exactamente 11 dígitos.';
+        errors['social_security_information.nss'] =
+            'El NSS debe contener exactamente 11 dígitos.';
     }
 
-    if (form.regime_end_date && !isValidDate(form.regime_end_date)) {
-        errors.regime_end_date = 'La fecha de baja no es válida.';
+    if (
+        form.social_security_information.regime_end_date &&
+        !isValidDate(form.social_security_information.regime_end_date)
+    ) {
+        errors['social_security_information.regime_end_date'] =
+            'La fecha de baja no es válida.';
     }
 
-    if (!/^\d+$/.test(form.unemployment_assistance_discounted_weeks)) {
-        errors.unemployment_assistance_discounted_weeks =
-            'Las semanas descontadas deben ser un entero mayor o igual a 0.';
+    if (
+        !/^\d+$/.test(
+            form.social_security_information
+                .unemployment_assistance_discounted_weeks,
+        )
+    ) {
+        errors[
+            'social_security_information.unemployment_assistance_discounted_weeks'
+        ] = 'Las semanas descontadas deben ser un entero mayor o igual a 0.';
+    }
+
+    if (
+        !/^\d+$/.test(form.social_security_information.total_contributed_weeks)
+    ) {
+        errors['social_security_information.total_contributed_weeks'] =
+            'El total de semanas cotizadas debe ser un entero mayor o igual a 0.';
     }
 
     return errors;
