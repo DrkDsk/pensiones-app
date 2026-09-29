@@ -8,6 +8,7 @@ import AppInput from '@/components/AppInput.vue';
 import AppModal from '@/components/AppModal.vue';
 import AppTextArea from '@/components/AppTextArea.vue';
 import clients from '@/routes/clients';
+import CreatePersonalInformation from './components/CreatePersonalInformation.vue';
 import { useCreateClientForm } from './composables/useCreateClientForm';
 
 defineOptions({
@@ -31,6 +32,8 @@ const {
     duplicateMessage,
     requestError,
     clearFieldError,
+    handleFamilyInformationInput,
+    validateFamilyField,
     submit,
     cancel,
 } = useCreateClientForm();
@@ -202,6 +205,14 @@ const {
                             )
                         "
                     />
+
+                    <CreatePersonalInformation
+                        :family-information="form.family_information"
+                        :errors="form.errors"
+                        :handle-input="handleFamilyInformationInput"
+                        :validate-field="validateFamilyField"
+                    />
+
                     <div class="md:col-span-2">
                         <AppTextArea
                             v-model="form.client.notes"

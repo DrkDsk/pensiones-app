@@ -1,4 +1,5 @@
 import type { Client } from '@/models/client';
+import { createEmptyFamilyInformation } from '@/validators/clientValidation';
 import type {
     BeneficieresData,
     CalculateFormData,
@@ -27,16 +28,18 @@ export const createFamilyInformationDefaults = (
 ): CalculateFamilyInformationForm => {
     const familyInformation = selectedClient?.family_information;
 
+    if (!familyInformation) {
+        return createEmptyFamilyInformation();
+    }
+
     return {
-        has_spouse: familyInformation
-            ? String(Number(familyInformation.has_spouse))
-            : '',
+        has_spouse: String(Number(familyInformation.has_spouse)),
         minor_or_student_children_count:
-            familyInformation?.minor_or_student_children_count === undefined
+            familyInformation.minor_or_student_children_count === undefined
                 ? ''
                 : String(familyInformation.minor_or_student_children_count),
         parents_count:
-            familyInformation?.parents_count === undefined
+            familyInformation.parents_count === undefined
                 ? ''
                 : familyInformation.parents_count,
     };

@@ -1,3 +1,5 @@
+import type { FamilyInformationForm } from '@/validators/clientValidation';
+
 export interface ClientFormData {
     client: {
         name: string;
@@ -14,11 +16,13 @@ export interface ClientFormData {
         unemployment_assistance_discounted_weeks: string;
         total_contributed_weeks: string;
     };
+    family_information: FamilyInformationForm;
 }
 
 export type ClientFormField =
     | `client.${keyof ClientFormData['client']}`
-    | `social_security_information.${keyof ClientFormData['social_security_information']}`;
+    | `social_security_information.${keyof ClientFormData['social_security_information']}`
+    | `family_information.${keyof ClientFormData['family_information']}`;
 
 export interface ClientListItem {
     id: number;
