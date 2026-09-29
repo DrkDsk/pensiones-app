@@ -121,7 +121,7 @@ export const useFinancing = (
             },
         );
 
-        return [modality10Row, ...modality40Rows];
+        return [...modality40Rows, modality10Row];
     });
 
     const modality40Years = computed(() => [
@@ -263,7 +263,17 @@ export const useFinancing = (
             return pagoMensual(row);
         }
 
-        const value = calculateRegimeTime(row.startDate, row.endDate);
+        const startDate = row.startDate;
+        const endDate = row.endDate;
+
+        const [startMonthYear, startMonth] = startDate.split('-').map(Number);
+        const [endMonthYear, endMonth] = endDate.split('-').map(Number);
+
+        const endLastDay = new Date(endMonthYear, endMonth, 0).getDate();
+        const startYearMonth = `${startMonthYear}-${String(startMonth).padStart(2, '0')}-01`;
+        const endYearMonth = `${endMonthYear}-${String(endMonth).padStart(2, '0')}-${String(endLastDay).padStart(2, '0')}`;
+
+        const value = calculateRegimeTime(startYearMonth, endYearMonth);
         const pagoMensualValue = pagoMensual(row);
 
         return pagoMensualValue * (value * 12);
