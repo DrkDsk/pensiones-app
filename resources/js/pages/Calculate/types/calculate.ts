@@ -1,4 +1,7 @@
 import type { InertiaForm } from '@inertiajs/vue3';
+import type { FamilyInformationForm } from '@/validators/clientValidation';
+
+export type { FamilyInformationField } from '@/validators/clientValidation';
 
 export interface CalculateClientForm {
     name: string;
@@ -17,11 +20,7 @@ export interface CalculateSocialSecurityInformationForm {
     total_contributed_weeks: string;
 }
 
-export interface CalculateFamilyInformationForm {
-    has_spouse: string;
-    minor_or_student_children_count: string;
-    parents_count: string | number;
-}
+export type CalculateFamilyInformationForm = FamilyInformationForm;
 
 export type RegimePeriod = {
     id?: string | number;
@@ -116,11 +115,6 @@ export type ManualClientField =
 
 export type SocialSecurityInformationField =
     keyof CalculateSocialSecurityInformationForm;
-
-export type FamilyInformationField =
-    | 'has_spouse'
-    | 'minor_or_student_children_count'
-    | 'parents_count';
 
 export type RegimePeriodField =
     | 'regime_type'

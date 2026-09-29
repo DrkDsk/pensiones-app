@@ -9,6 +9,10 @@ import AppCard from '@/components/AppCard.vue';
 import AppModal from '@/components/AppModal.vue';
 import type { Client } from '@/models/client';
 import StepProjection from '@/pages/Calculate/components/StepProjection.vue';
+import {
+    validateClientField as validateClientFieldValue,
+    validateFamilyInformationField as validateFamilyInformationFieldValue,
+} from '@/validators/clientValidation';
 import StepBeneficiaries from './Calculate/components/StepBeneficiaries.vue';
 import StepClient from './Calculate/components/StepClient.vue';
 import StepFinancing from './Calculate/components/StepFinancing.vue';
@@ -28,10 +32,6 @@ import type {
     FamilyInformationField,
 } from './Calculate/types/calculate';
 import { validateCalculateStep } from './Calculate/validators/calculateValidation';
-import {
-    validateClientField as validateClientFieldValue,
-    validateFamilyInformationField as validateFamilyInformationFieldValue,
-} from './Calculate/validators/clientValidation';
 
 const props = defineProps<{
     clients: Client[];

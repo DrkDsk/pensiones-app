@@ -25,9 +25,19 @@ class ClientResource extends JsonResource
             'email' => $client->email,
             'curp' => $client->curp,
             'birthdate' => $this->formatDate($client->birthdate),
-            'social_security_information' => new ClientSocialSecurityInformationResource($this->whenLoaded('socialSecurityInformation')),
+            'social_security_information' => $this->whenLoaded(
+                'socialSecurityInformation',
+                fn (): ?array => $client->socialSecurityInformation
+                    ? ClientSocialSecurityInformationResource::make($client->socialSecurityInformation)->resolve($request)
+                    : null,
+            ),
             'notes' => $client->notes,
-            'family_information' => new FamilyInformationResource($this->whenLoaded('familyInformation')),
+            'family_information' => $this->whenLoaded(
+                'familyInformation',
+                fn (): ?array => $client->familyInformation
+                    ? FamilyInformationResource::make($client->familyInformation)->resolve($request)
+                    : null,
+            ),
         ];
     }
 

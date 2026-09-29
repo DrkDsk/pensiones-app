@@ -1,9 +1,9 @@
-import type { CalculateForm, StepErrors } from '../types/calculate';
 import {
     validateClientField,
     validateClientFormatFields,
     validateFamilyInformation,
-} from './clientValidation';
+} from '@/validators/clientValidation';
+import type { CalculateForm, StepErrors } from '../types/calculate';
 import { validateRegimePeriods } from './regimePeriodsValidation';
 
 export const validateClientStep = (

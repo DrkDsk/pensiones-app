@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Support\ClientFamilyInformationValidationRules;
 use App\Support\ClientValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -45,7 +46,19 @@ class StoreClientRequest extends FormRequest
             'social_security_information.regime_end_date' => ['nullable', 'date'],
             'social_security_information.unemployment_assistance_discounted_weeks' => ['required', 'integer', 'min:0'],
             'social_security_information.total_contributed_weeks' => ['required', 'integer', 'min:0'],
+            'family_information' => ['required', ...ClientFamilyInformationValidationRules::information()],
+            'family_information.has_spouse' => ['required', ...ClientFamilyInformationValidationRules::hasSpouse()],
+            'family_information.minor_or_student_children_count' => ['required', ...ClientFamilyInformationValidationRules::dependentCount()],
+            'family_information.parents_count' => ['required', ...ClientFamilyInformationValidationRules::dependentCount()],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return ClientFamilyInformationValidationRules::attributes('family_information.');
     }
 
     /**

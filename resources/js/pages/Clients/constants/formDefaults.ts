@@ -1,3 +1,4 @@
+import { createEmptyFamilyInformation } from '@/validators/clientValidation';
 import type { ClientFormData } from '../types/client';
 
 export const createClientFormDefaults = (): ClientFormData => ({
@@ -16,4 +17,5 @@ export const createClientFormDefaults = (): ClientFormData => ({
         unemployment_assistance_discounted_weeks: '0',
         total_contributed_weeks: '',
     },
+    family_information: createEmptyFamilyInformation(),
 });

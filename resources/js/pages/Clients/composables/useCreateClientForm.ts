@@ -1,9 +1,16 @@
 import { router, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import clients from '@/routes/clients';
+import {
+    validateClientForm,
+    validateFamilyInformationField,
+} from '@/validators/clientValidation';
+import type {
+    FamilyInformationErrors,
+    FamilyInformationField,
+} from '@/validators/clientValidation';
 import { createClientFormDefaults } from '../constants/formDefaults';
 import type { ClientFormData, ClientFormField } from '../types/client';
-import { validateClientForm } from '../validators/clientValidation';
 
 export const useCreateClientForm = () => {
     const form = useForm<ClientFormData>(createClientFormDefaults());
@@ -13,6 +20,37 @@ export const useCreateClientForm = () => {
 
     const clearFieldError = (field: ClientFormField): void => {
         form.clearErrors(field);
+    };
+
+    const validateFamilyField = (field: FamilyInformationField): boolean => {
+        const errors: FamilyInformationErrors = {};
+        const isValid = validateFamilyInformationField(form, errors, field, {
+            requireRequiredFields: true,
+        });
+        const formField = `family_information.${field}` as ClientFormField;
+        const message = errors[field];
+
+        if (message) {
+            form.setError(formField, message);
+        } else {
+            form.clearErrors(formField);
+        }
+
+        return isValid;
+    };
+
+    const handleFamilyInformationInput = (
+        field: FamilyInformationField,
+        value: string | number | undefined,
+    ): void => {
+        if (field === 'parents_count') {
+            form.family_information.parents_count =
+                value !== undefined && value !== '' ? Number(value) : '';
+        } else {
+            form.family_information[field] = String(value ?? '');
+        }
+
+        form.clearErrors(`family_information.${field}` as ClientFormField);
     };
 
     const submit = (): void => {
@@ -65,6 +103,8 @@ export const useCreateClientForm = () => {
         duplicateMessage,
         requestError,
         clearFieldError,
+        handleFamilyInformationInput,
+        validateFamilyField,
         submit,
         cancel,
     };
