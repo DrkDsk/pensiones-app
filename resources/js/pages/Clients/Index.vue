@@ -92,7 +92,7 @@ defineOptions({
                         {{ client.curp }}
                     </td>
                     <td class="px-6 py-4 font-mono text-xs">
-                        {{ client.nss }}
+                        {{ client.social_security_information?.nss ?? '—' }}
                     </td>
                 </tr>
             </tbody>

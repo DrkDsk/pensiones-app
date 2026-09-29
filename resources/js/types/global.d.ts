@@ -1,3 +1,14 @@
+import type { Auth } from './auth';
+
+declare module '@inertiajs/core' {
+    interface PageProps {
+        auth: Auth;
+        debug?: boolean;
+        mustVerifyEmail?: boolean;
+        status?: string;
+    }
+}
+
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
     interface ImportMetaEnv {

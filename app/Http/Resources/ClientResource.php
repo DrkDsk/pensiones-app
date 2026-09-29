@@ -25,9 +25,9 @@ class ClientResource extends JsonResource
             'email' => $client->email,
             'curp' => $client->curp,
             'birthdate' => $this->formatDate($client->birthdate),
-            'nss' => $client->nss,
-            'regime_end_date' => $this->formatDate($client->regime_end_date),
-            'unemployment_assistance_discounted_weeks' => $client->unemployment_assistance_discounted_weeks,
+            'social_security_information' => $client->socialSecurityInformation
+                ? new ClientSocialSecurityInformationResource($client->socialSecurityInformation)
+                : null,
             'notes' => $client->notes,
             'created_at' => $client->created_at?->toISOString(),
             'updated_at' => $client->updated_at?->toISOString(),

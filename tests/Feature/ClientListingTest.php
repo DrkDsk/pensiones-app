@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Client;
+use App\Models\ClientSocialSecurityInformation;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -13,9 +14,6 @@ function clientListingData(int $index): array
         'email' => "client{$index}@example.com",
         'curp' => 'GOCG850101HDFRRN09',
         'birthdate' => '1985-01-01',
-        'nss' => str_pad((string) $index, 11, '0', STR_PAD_LEFT),
-        'regime_end_date' => null,
-        'unemployment_assistance_discounted_weeks' => 0,
         'notes' => null,
     ];
 }
@@ -23,7 +21,14 @@ function clientListingData(int $index): array
 function createClientsForListing(int $count): void
 {
     foreach (range(1, $count) as $index) {
-        Client::query()->create(clientListingData($index));
+        $client = Client::query()->create(clientListingData($index));
+        ClientSocialSecurityInformation::query()->create([
+            'client_id' => $client->id,
+            'nss' => str_pad((string) $index, 11, '0', STR_PAD_LEFT),
+            'regime_end_date' => null,
+            'unemployment_assistance_discounted_weeks' => 0,
+            'total_contributed_weeks' => 1200,
+        ]);
     }
 }
 
@@ -41,7 +46,7 @@ test('client listing page receives registered clients through inertia props', fu
             ->has('clients.data', 3)
             ->where('clients.data.0.name', 'Client 1')
             ->has('clients.data.0', fn (Assert $client) => $client
-                ->hasAll('id', 'name', 'last_name', 'phone', 'email', 'curp', 'birthdate', 'nss')
+                ->hasAll('id', 'name', 'last_name', 'phone', 'email', 'curp', 'birthdate', 'social_security_information')
                 ->etc())
             ->has('clients.links')
             ->has('clients.meta'));

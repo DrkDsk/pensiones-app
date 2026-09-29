@@ -13,10 +13,13 @@ const client = (id: number): Client => ({
     email: 'maria@example.com',
     curp: 'LOMM800101HDFPRR09',
     birthdate: '1980-01-01',
-    nss: '12345678901',
-    regime_end_date: null,
-    unemployment_assistance_discounted_weeks: 0,
     notes: null,
+    social_security_information: {
+        nss: '12345678901',
+        regime_end_date: null,
+        unemployment_assistance_discounted_weeks: 0,
+        total_contributed_weeks: 1200,
+    },
     family_information: null,
 });
 
@@ -30,10 +33,13 @@ const calculateForm = (clientId: number | null): CalculateForm => {
         email: 'maria@example.com',
         curp: 'LOMM800101HDFPRR09',
         birthdate: '1980-01-01',
+        notes: '',
+    };
+    data.social_security_information = {
         nss: '12345678901',
         regime_end_date: '',
         unemployment_assistance_discounted_weeks: '0',
-        notes: '',
+        total_contributed_weeks: '1200',
     };
 
     const form = { ...data } as CalculateForm;
@@ -94,7 +100,10 @@ describe('useCalculateProposal', () => {
 
         await proposal.submitProposal({ retroactive_modality_40: 100 });
 
-        expect(storeClient).toHaveBeenCalledWith(form.client);
+        expect(storeClient).toHaveBeenCalledWith({
+            client: form.client,
+            social_security_information: form.social_security_information,
+        });
         expect(form.client_id).toBe(25);
         expect(generatePensionProposal).toHaveBeenCalledWith(
             25,

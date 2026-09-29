@@ -74,7 +74,9 @@ const resolveValidationContext = (
     context: RegimePeriodsValidationContext = {},
 ): RegimePeriodsValidationContext => ({
     birthdate: context.birthdate ?? form.client.birthdate,
-    regimeEndDate: context.regimeEndDate ?? form.client.regime_end_date,
+    regimeEndDate:
+        context.regimeEndDate ??
+        form.social_security_information.regime_end_date,
 });
 
 export const validateRegimePeriods = (

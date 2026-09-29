@@ -132,10 +132,7 @@ const loadCesantiaEdadAvanzada = async () => {
         const response = await getCesantiaByAge(age);
         const percentage = Number(response.data);
 
-        if (
-            !Number.isFinite(percentage) ||
-            hasUserEditedCesantia.value
-        ) {
+        if (!Number.isFinite(percentage) || hasUserEditedCesantia.value) {
             return;
         }
 
@@ -497,13 +494,6 @@ watch(
             >
                 Ayuda Padres
             </h3>
-        </div>
-
-        <div
-            v-if="!aplicaAyudaPadres"
-            class="border-b border-slate-200 px-5 py-3 text-sm text-slate-600 dark:border-slate-800 dark:text-slate-300"
-        >
-            No aplica por existir viuda y/o huérfanos.
         </div>
 
         <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">

@@ -8,18 +8,42 @@ use App\UseCases\Client\FindExistingClientUseCase;
 
 function validClientData(array $overrides = []): array
 {
-    return array_merge([
-        'name' => 'Maria',
-        'last_name' => 'Lopez',
-        'phone' => '5512345678',
-        'email' => 'maria@example.com',
-        'curp' => 'LOMM800101HDFPRR09',
-        'birthdate' => '1980-01-01',
-        'nss' => '12345678901',
-        'regime_end_date' => null,
-        'unemployment_assistance_discounted_weeks' => 0,
-        'notes' => null,
-    ], $overrides);
+    $data = [
+        'client' => [
+            'name' => 'Maria',
+            'last_name' => 'Lopez',
+            'phone' => '5512345678',
+            'email' => 'maria@example.com',
+            'curp' => 'LOMM800101HDFPRR09',
+            'birthdate' => '1980-01-01',
+            'notes' => null,
+        ],
+        'social_security_information' => [
+            'nss' => '12345678901',
+            'regime_end_date' => null,
+            'unemployment_assistance_discounted_weeks' => 0,
+            'total_contributed_weeks' => 1200,
+        ],
+    ];
+
+    foreach ($overrides as $field => $value) {
+        if (array_key_exists($field, $data['social_security_information'])) {
+            $data['social_security_information'][$field] = $value;
+        } else {
+            $data['client'][$field] = $value;
+        }
+    }
+
+    return $data;
+}
+
+function createRegisteredClient(array $overrides = []): Client
+{
+    $data = validClientData($overrides);
+    $client = Client::query()->create($data['client']);
+    $client->socialSecurityInformation()->create($data['social_security_information']);
+
+    return $client;
 }
 
 beforeEach(function () {
@@ -31,10 +55,15 @@ test('creates a client when none of the identifying fields exists', function () 
 
     expect($client)->toBeInstanceOf(Client::class);
     $this->assertDatabaseHas('clients', ['id' => $client->id]);
+    $this->assertDatabaseHas('client_social_security_information', [
+        'client_id' => $client->id,
+        'nss' => '12345678901',
+        'total_contributed_weeks' => 1200,
+    ]);
 });
 
 it('throws when an identifying field already belongs to a client', function (string $field, string $value) {
-    Client::query()->create(validClientData());
+    createRegisteredClient();
 
     $newData = validClientData([
         'phone' => '5587654321',
@@ -54,7 +83,7 @@ it('throws when an identifying field already belongs to a client', function (str
 ]);
 
 test('a null phone does not match another null phone', function () {
-    Client::query()->create(validClientData(['phone' => null]));
+    createRegisteredClient(['phone' => null]);
 
     $client = app(CreateClientUseCase::class)->execute(validClientData([
         'phone' => null,
@@ -68,7 +97,7 @@ test('a null phone does not match another null phone', function () {
 });
 
 test('a null email does not match another null email', function () {
-    Client::query()->create(validClientData(['email' => null]));
+    createRegisteredClient(['email' => null]);
 
     $client = app(CreateClientUseCase::class)->execute(validClientData([
         'phone' => '5587654321',
@@ -81,34 +110,44 @@ test('a null email does not match another null email', function () {
     $this->assertDatabaseCount('clients', 2);
 });
 
-test('find existing client returns the matching client', function () {
-    $existing = Client::query()->create(validClientData());
+test('deleting a client cascades its social security information', function () {
+    $client = createRegisteredClient();
 
-    $found = app(FindExistingClientUseCase::class)->execute([
+    $client->delete();
+
+    $this->assertDatabaseMissing('client_social_security_information', [
+        'client_id' => $client->id,
+    ]);
+});
+
+test('find existing client returns the matching client', function () {
+    $existing = createRegisteredClient();
+
+    $found = app(FindExistingClientUseCase::class)->execute(validClientData([
         'curp' => $existing->curp,
         'nss' => '10987654321',
-    ]);
+    ]));
 
     expect($found?->is($existing))->toBeTrue();
 });
 
 test('find existing client returns null when no field matches', function () {
-    Client::query()->create(validClientData());
+    createRegisteredClient();
 
-    $found = app(FindExistingClientUseCase::class)->execute([
+    $found = app(FindExistingClientUseCase::class)->execute(validClientData([
         'phone' => null,
         'email' => null,
         'curp' => 'GODE900202MDFNRS08',
         'nss' => '10987654321',
-    ]);
+    ]));
 
     expect($found)->toBeNull();
 });
 
 test('create use case normalizes curp before checking duplicates', function () {
-    Client::query()->create(validClientData([
+    createRegisteredClient([
         'curp' => 'GOCG850101HDFRRN09',
-    ]));
+    ]);
 
     expect(fn () => app(CreateClientUseCase::class)->execute(validClientData([
         'phone' => '5587654321',
@@ -119,7 +158,7 @@ test('create use case normalizes curp before checking duplicates', function () {
 });
 
 test('creation redirects back with an inertia error for an existing client', function () {
-    Client::query()->create(validClientData());
+    createRegisteredClient();
 
     $this->from(route('clients.create'))
         ->post(route('clients.store'), validClientData())
@@ -159,7 +198,7 @@ test('json creation returns the newly created client without changing the inerti
 });
 
 test('json creation reports a duplicate without creating another client', function () {
-    Client::query()->create(validClientData());
+    createRegisteredClient();
 
     $this->postJson(route('clients.store'), validClientData())
         ->assertConflict()
@@ -171,7 +210,7 @@ test('json creation reports a duplicate without creating another client', functi
 test('json creation keeps validation errors distinct from duplicate errors', function () {
     $this->postJson(route('clients.store'), validClientData(['curp' => 'invalid']))
         ->assertUnprocessable()
-        ->assertJsonStructure(['message', 'errors' => ['curp']]);
+        ->assertJsonStructure(['message', 'errors' => ['client.curp']]);
 
     $this->assertDatabaseCount('clients', 0);
 });
@@ -189,7 +228,7 @@ test('creation normalizes curp to uppercase', function () {
 
 it('rejects an invalid curp on creation', function (string $curp) {
     $this->post(route('clients.store'), validClientData(['curp' => $curp]))
-        ->assertSessionHasErrors('curp');
+        ->assertSessionHasErrors('client.curp');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -201,7 +240,7 @@ it('rejects an invalid curp on creation', function (string $curp) {
 
 it('rejects an invalid nss on creation', function (string $nss) {
     $this->post(route('clients.store'), validClientData(['nss' => $nss]))
-        ->assertSessionHasErrors('nss');
+        ->assertSessionHasErrors('social_security_information.nss');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -212,7 +251,7 @@ it('rejects an invalid nss on creation', function (string $nss) {
 
 it('rejects an invalid phone on creation', function (string $phone) {
     $this->post(route('clients.store'), validClientData(['phone' => $phone]))
-        ->assertSessionHasErrors('phone');
+        ->assertSessionHasErrors('client.phone');
 
     $this->assertDatabaseCount('clients', 0);
 })->with([
@@ -233,6 +272,8 @@ test('creation accepts valid mexican identifiers as strings', function () {
     $this->assertDatabaseHas('clients', [
         'phone' => '9611234567',
         'curp' => 'GOCG850101HDFRRN09',
+    ]);
+    $this->assertDatabaseHas('client_social_security_information', [
         'nss' => '12345678901',
     ]);
 });

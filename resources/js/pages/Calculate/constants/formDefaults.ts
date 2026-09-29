@@ -3,6 +3,7 @@ import type {
     BeneficieresData,
     CalculateFormData,
     CalculateFamilyInformationForm,
+    CalculateSocialSecurityInformationForm,
     FinancingData,
     ProjectionData,
     RegimePeriod,
@@ -38,6 +39,25 @@ export const createFamilyInformationDefaults = (
             familyInformation?.parents_count === undefined
                 ? ''
                 : familyInformation.parents_count,
+    };
+};
+
+export const createSocialSecurityInformationDefaults = (
+    selectedClient: Client | null,
+): CalculateSocialSecurityInformationForm => {
+    const information = selectedClient?.social_security_information;
+
+    return {
+        nss: information?.nss ?? '',
+        regime_end_date: information?.regime_end_date?.slice(0, 10) ?? '',
+        unemployment_assistance_discounted_weeks:
+            information?.unemployment_assistance_discounted_weeks === undefined
+                ? ''
+                : String(information.unemployment_assistance_discounted_weeks),
+        total_contributed_weeks:
+            information?.total_contributed_weeks === undefined
+                ? ''
+                : String(information.total_contributed_weeks),
     };
 };
 
@@ -82,11 +102,10 @@ export const createCalculateFormDefaults = (
         email: '',
         curp: '',
         birthdate: '',
-        nss: '',
-        regime_end_date: '',
-        unemployment_assistance_discounted_weeks: '',
         notes: '',
     },
+    social_security_information:
+        createSocialSecurityInformationDefaults(selectedClient),
     family_information: createFamilyInformationDefaults(selectedClient),
     regime_periods: createBaseRegimePeriods(),
     financing: createFinancingDefaults(),

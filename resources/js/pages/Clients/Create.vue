@@ -71,24 +71,24 @@ const {
 
                 <div class="grid gap-5 p-6 md:grid-cols-2">
                     <AppInput
-                        v-model="form.name"
+                        v-model="form.client.name"
                         label="Nombre"
                         autocomplete="given-name"
                         maxlength="255"
                         required
-                        :error="form.errors.name"
-                        @input="clearFieldError('name')"
+                        :error="form.errors['client.name']"
+                        @input="clearFieldError('client.name')"
                     />
                     <AppInput
-                        v-model="form.last_name"
+                        v-model="form.client.last_name"
                         label="Apellidos"
                         autocomplete="family-name"
                         maxlength="255"
-                        :error="form.errors.last_name"
-                        @input="clearFieldError('last_name')"
+                        :error="form.errors['client.last_name']"
+                        @input="clearFieldError('client.last_name')"
                     />
                     <AppInput
-                        v-model="form.phone"
+                        v-model="form.client.phone"
                         label="Teléfono"
                         helper="10 dígitos"
                         type="tel"
@@ -96,31 +96,31 @@ const {
                         autocomplete="tel"
                         maxlength="10"
                         pattern="[0-9]{10}"
-                        :error="form.errors.phone"
-                        @input="clearFieldError('phone')"
+                        :error="form.errors['client.phone']"
+                        @input="clearFieldError('client.phone')"
                     />
                     <AppInput
-                        v-model="form.email"
+                        v-model="form.client.email"
                         label="Correo electrónico"
                         type="email"
                         autocomplete="email"
                         maxlength="255"
-                        :error="form.errors.email"
-                        @input="clearFieldError('email')"
+                        :error="form.errors['client.email']"
+                        @input="clearFieldError('client.email')"
                     />
                     <AppInput
-                        v-model="form.curp"
+                        v-model="form.client.curp"
                         label="CURP"
                         helper="18 caracteres"
                         autocomplete="off"
                         maxlength="18"
                         class="uppercase"
                         required
-                        :error="form.errors.curp"
-                        @input="clearFieldError('curp')"
+                        :error="form.errors['client.curp']"
+                        @input="clearFieldError('client.curp')"
                     />
                     <AppInput
-                        v-model="form.nss"
+                        v-model="form.social_security_information.nss"
                         label="NSS"
                         helper="11 dígitos"
                         inputmode="numeric"
@@ -128,26 +128,41 @@ const {
                         maxlength="11"
                         pattern="[0-9]{11}"
                         required
-                        :error="form.errors.nss"
-                        @input="clearFieldError('nss')"
+                        :error="form.errors['social_security_information.nss']"
+                        @input="
+                            clearFieldError('social_security_information.nss')
+                        "
                     />
                     <AppInput
-                        v-model="form.birthdate"
+                        v-model="form.client.birthdate"
                         label="Fecha de nacimiento"
                         type="date"
                         required
-                        :error="form.errors.birthdate"
-                        @input="clearFieldError('birthdate')"
+                        :error="form.errors['client.birthdate']"
+                        @input="clearFieldError('client.birthdate')"
                     />
                     <AppInput
-                        v-model="form.regime_end_date"
+                        v-model="
+                            form.social_security_information.regime_end_date
+                        "
                         label="Fecha de baja del régimen"
                         type="date"
-                        :error="form.errors.regime_end_date"
-                        @input="clearFieldError('regime_end_date')"
+                        :error="
+                            form.errors[
+                                'social_security_information.regime_end_date'
+                            ]
+                        "
+                        @input="
+                            clearFieldError(
+                                'social_security_information.regime_end_date',
+                            )
+                        "
                     />
                     <AppInput
-                        v-model="form.unemployment_assistance_discounted_weeks"
+                        v-model="
+                            form.social_security_information
+                                .unemployment_assistance_discounted_weeks
+                        "
                         label="Semanas descontadas por ayuda de desempleo"
                         type="number"
                         inputmode="numeric"
@@ -155,20 +170,44 @@ const {
                         step="1"
                         required
                         :error="
-                            form.errors.unemployment_assistance_discounted_weeks
+                            form.errors[
+                                'social_security_information.unemployment_assistance_discounted_weeks'
+                            ]
                         "
                         @input="
                             clearFieldError(
-                                'unemployment_assistance_discounted_weeks',
+                                'social_security_information.unemployment_assistance_discounted_weeks',
+                            )
+                        "
+                    />
+                    <AppInput
+                        v-model="
+                            form.social_security_information
+                                .total_contributed_weeks
+                        "
+                        label="Total de Semanas Cotizadas al día"
+                        type="number"
+                        inputmode="numeric"
+                        min="0"
+                        step="1"
+                        required
+                        :error="
+                            form.errors[
+                                'social_security_information.total_contributed_weeks'
+                            ]
+                        "
+                        @input="
+                            clearFieldError(
+                                'social_security_information.total_contributed_weeks',
                             )
                         "
                     />
                     <div class="md:col-span-2">
                         <AppTextArea
-                            v-model="form.notes"
+                            v-model="form.client.notes"
                             label="Notas"
-                            :error="form.errors.notes"
-                            @input="clearFieldError('notes')"
+                            :error="form.errors['client.notes']"
+                            @input="clearFieldError('client.notes')"
                         />
                     </div>
                 </div>

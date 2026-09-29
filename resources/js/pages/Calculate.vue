@@ -116,6 +116,7 @@ const {
     activateManualCustomer,
     hideDropdown,
     handleManualInput,
+    handleSocialSecurityInformationInput,
     handleFamilyInformationInput,
 } = useClientSearch({
     clients: props.clients ?? [],
@@ -310,6 +311,9 @@ const validateFamilyInformationField = (
                             :activate-manual-customer="activateManualCustomer"
                             :hide-dropdown="hideDropdown"
                             :handle-manual-input="handleManualInput"
+                            :handle-social-security-information-input="
+                                handleSocialSecurityInformationInput
+                            "
                             :handle-family-information-input="
                                 handleFamilyInformationInput
                             "

@@ -80,19 +80,30 @@ class StoreCalculateRequest extends FormRequest
                 'date',
                 'before_or_equal:'.now()->subYears(18)->toDateString(),
             ],
-            'client.nss' => [
+            'social_security_information' => [
+                Rule::excludeIf($hasExistingClient),
+                Rule::requiredIf(! $hasExistingClient),
+                'array',
+            ],
+            'social_security_information.nss' => [
                 Rule::excludeIf($hasExistingClient),
                 Rule::requiredIf(! $hasExistingClient),
                 ...ClientValidationRules::nss(required: false),
             ],
-            'client.regime_end_date' => [
+            'social_security_information.regime_end_date' => [
                 Rule::excludeIf($hasExistingClient),
                 'nullable',
                 'date',
                 'after:client.birthdate',
                 ...($eighteenthBirthday !== null ? ['after:'.$eighteenthBirthday] : []),
             ],
-            'client.unemployment_assistance_discounted_weeks' => [
+            'social_security_information.unemployment_assistance_discounted_weeks' => [
+                Rule::excludeIf($hasExistingClient),
+                Rule::requiredIf(! $hasExistingClient),
+                'integer',
+                'min:0',
+            ],
+            'social_security_information.total_contributed_weeks' => [
                 Rule::excludeIf($hasExistingClient),
                 Rule::requiredIf(! $hasExistingClient),
                 'integer',
@@ -137,9 +148,10 @@ class StoreCalculateRequest extends FormRequest
             'client.email' => 'correo electronico',
             'client.curp' => 'CURP',
             'client.birthdate' => 'fecha de nacimiento',
-            'client.nss' => 'NSS',
-            'client.regime_end_date' => 'fecha de baja de regimen',
-            'client.unemployment_assistance_discounted_weeks' => 'semanas descontadas por ayuda de desempleo',
+            'social_security_information.nss' => 'NSS',
+            'social_security_information.regime_end_date' => 'fecha de baja de regimen',
+            'social_security_information.unemployment_assistance_discounted_weeks' => 'semanas descontadas por ayuda de desempleo',
+            'social_security_information.total_contributed_weeks' => 'total de semanas cotizadas al dia',
             'client.notes' => 'notas',
             'family_information.has_spouse' => 'esposo/a',
             'family_information.minor_or_student_children_count' => 'hijos menores o estudiando',
@@ -153,10 +165,10 @@ class StoreCalculateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            ...ClientValidationRules::messages('client.'),
+            ...ClientValidationRules::messages('social_security_information.'),
             'client.email.email' => 'El correo electronico debe tener un formato valido y un dominio existente.',
             'client.birthdate.before_or_equal' => 'El cliente debe tener al menos 18 anos cumplidos.',
-            'client.regime_end_date.after' => 'La fecha de baja de regimen debe ser posterior a la fecha en que el cliente cumplio 18 anos.',
+            'social_security_information.regime_end_date.after' => 'La fecha de baja de regimen debe ser posterior a la fecha en que el cliente cumplio 18 anos.',
         ];
     }
 

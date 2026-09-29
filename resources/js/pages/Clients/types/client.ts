@@ -1,17 +1,24 @@
 export interface ClientFormData {
-    name: string;
-    last_name: string;
-    phone: string;
-    email: string;
-    curp: string;
-    birthdate: string;
-    nss: string;
-    regime_end_date: string;
-    unemployment_assistance_discounted_weeks: string;
-    notes: string;
+    client: {
+        name: string;
+        last_name: string;
+        phone: string;
+        email: string;
+        curp: string;
+        birthdate: string;
+        notes: string;
+    };
+    social_security_information: {
+        nss: string;
+        regime_end_date: string;
+        unemployment_assistance_discounted_weeks: string;
+        total_contributed_weeks: string;
+    };
 }
 
-export type ClientFormField = keyof ClientFormData;
+export type ClientFormField =
+    | `client.${keyof ClientFormData['client']}`
+    | `social_security_information.${keyof ClientFormData['social_security_information']}`;
 
 export interface ClientListItem {
     id: number;
@@ -21,9 +28,12 @@ export interface ClientListItem {
     email: string | null;
     curp: string;
     birthdate: string | null;
-    nss: string;
-    regime_end_date: string | null;
-    unemployment_assistance_discounted_weeks: number;
+    social_security_information: {
+        nss: string;
+        regime_end_date: string | null;
+        unemployment_assistance_discounted_weeks: number;
+        total_contributed_weeks: number;
+    } | null;
     notes: string | null;
     created_at: string | null;
     updated_at: string | null;

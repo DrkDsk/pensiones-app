@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Calculate\StoreCalculateRequest;
 use App\Models\Client;
 use App\Models\ClientFamilyInformation;
+use App\Models\ClientSocialSecurityInformation;
 use App\UseCases\Calculate\SearchClientsUseCase;
 use App\UseCases\Calculate\StoreCalculateUseCase;
 use DateTimeInterface;
@@ -65,15 +66,34 @@ class CalculateController extends Controller
             'email' => $client->email,
             'curp' => $client->curp,
             'birthdate' => $this->serializeDate($client->getAttribute('birthdate')),
-            'nss' => $client->nss,
-            'regime_end_date' => $this->serializeDate($client->getAttribute('regime_end_date')),
-            'unemployment_assistance_discounted_weeks' => $client->unemployment_assistance_discounted_weeks,
             'notes' => $client->notes,
+            'social_security_information' => $this->serializeSocialSecurityInformation(
+                $client->relationLoaded('socialSecurityInformation')
+                    ? $client->socialSecurityInformation
+                    : null,
+            ),
             'family_information' => $this->serializeFamilyInformation(
                 $client->relationLoaded('familyInformation')
                     ? $client->familyInformation
                     : null,
             ),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function serializeSocialSecurityInformation(?ClientSocialSecurityInformation $information): ?array
+    {
+        if (! $information instanceof ClientSocialSecurityInformation) {
+            return null;
+        }
+
+        return [
+            'nss' => $information->nss,
+            'regime_end_date' => $this->serializeDate($information->getAttribute('regime_end_date')),
+            'unemployment_assistance_discounted_weeks' => $information->unemployment_assistance_discounted_weeks,
+            'total_contributed_weeks' => $information->total_contributed_weeks,
         ];
     }
 

@@ -130,7 +130,7 @@ export const validateClientField = (
                 ? 'El cliente debe tener al menos 18 anos cumplidos.'
                 : '';
 
-        if (form.client.regime_end_date) {
+        if (form.social_security_information.regime_end_date) {
             validateClientField(form, stepErrors, 'regime_end_date');
         }
 
@@ -138,13 +138,15 @@ export const validateClientField = (
     }
 
     if (field === 'nss') {
-        form.client.nss = normalizeDigits(form.client.nss);
+        form.social_security_information.nss = normalizeDigits(
+            form.social_security_information.nss,
+        );
 
-        stepErrors.nss = !form.client.nss
+        stepErrors.nss = !form.social_security_information.nss
             ? options.requireRequiredFields
                 ? 'El NSS es obligatorio.'
                 : ''
-            : form.client.nss.length === 11
+            : form.social_security_information.nss.length === 11
               ? ''
               : 'El NSS debe contener exactamente 11 digitos.';
 
@@ -153,22 +155,22 @@ export const validateClientField = (
 
     if (field === 'regime_end_date') {
         stepErrors.regime_end_date =
-            form.client.regime_end_date &&
-            !isValidDateValue(form.client.regime_end_date)
+            form.social_security_information.regime_end_date &&
+            !isValidDateValue(form.social_security_information.regime_end_date)
                 ? 'La fecha de baja de regimen no es valida.'
-                : form.client.regime_end_date &&
+                : form.social_security_information.regime_end_date &&
                     form.client.birthdate &&
                     isValidDateValue(form.client.birthdate) &&
                     !isAfterDate(
-                        form.client.regime_end_date,
+                        form.social_security_information.regime_end_date,
                         form.client.birthdate,
                     )
                   ? 'La fecha de baja de regimen debe ser posterior a la fecha de nacimiento.'
-                  : form.client.regime_end_date &&
+                  : form.social_security_information.regime_end_date &&
                       form.client.birthdate &&
                       isValidDateValue(form.client.birthdate) &&
                       !isAfterEighteenthBirthday(
-                          form.client.regime_end_date,
+                          form.social_security_information.regime_end_date,
                           form.client.birthdate,
                       )
                     ? 'La fecha de baja de regimen debe ser posterior a la fecha en que el cliente cumplio 18 anos.'
@@ -178,18 +180,35 @@ export const validateClientField = (
     }
 
     if (field === 'unemployment_assistance_discounted_weeks') {
-        stepErrors.unemployment_assistance_discounted_weeks = !form.client
+        stepErrors.unemployment_assistance_discounted_weeks = !form
+            .social_security_information
             .unemployment_assistance_discounted_weeks
             ? options.requireRequiredFields
                 ? 'Las semanas descontadas son obligatorias.'
                 : ''
             : isNonNegativeInteger(
-                    form.client.unemployment_assistance_discounted_weeks,
+                    form.social_security_information
+                        .unemployment_assistance_discounted_weeks,
                 )
               ? ''
               : 'Las semanas descontadas deben ser un entero mayor o igual a 0.';
 
         return !stepErrors.unemployment_assistance_discounted_weeks;
+    }
+
+    if (field === 'total_contributed_weeks') {
+        stepErrors.total_contributed_weeks = !form.social_security_information
+            .total_contributed_weeks
+            ? options.requireRequiredFields
+                ? 'El total de semanas cotizadas es obligatorio.'
+                : ''
+            : isNonNegativeInteger(
+                    form.social_security_information.total_contributed_weeks,
+                )
+              ? ''
+              : 'El total de semanas cotizadas debe ser un entero mayor o igual a 0.';
+
+        return !stepErrors.total_contributed_weeks;
     }
 
     form.client.curp = form.client.curp.toUpperCase();
@@ -238,6 +257,14 @@ export const validateClientFormatFields = (
             requireRequiredFields: true,
         },
     );
+    const totalContributedWeeksAreValid = validateClientField(
+        form,
+        stepErrors,
+        'total_contributed_weeks',
+        {
+            requireRequiredFields: true,
+        },
+    );
 
     return (
         phoneIsValid &&
@@ -246,7 +273,8 @@ export const validateClientFormatFields = (
         birthdateIsValid &&
         nssIsValid &&
         regimeEndDateIsValid &&
-        unemploymentWeeksAreValid
+        unemploymentWeeksAreValid &&
+        totalContributedWeeksAreValid
     );
 };
 
@@ -272,13 +300,14 @@ export const validateFamilyInformationField = (
             ? 'hijos menores o estudiando'
             : 'padres';
 
-    stepErrors[field] = value === null || value === undefined
-        ? options.requireRequiredFields && field !== 'parents_count'
-            ? `El numero de ${fieldLabel} es obligatorio.`
-            : ''
-        : isNonNegativeInteger(value)
-          ? ''
-          : `El numero de ${fieldLabel} debe ser un entero`;
+    stepErrors[field] =
+        value === null || value === undefined
+            ? options.requireRequiredFields && field !== 'parents_count'
+                ? `El numero de ${fieldLabel} es obligatorio.`
+                : ''
+            : isNonNegativeInteger(value)
+              ? ''
+              : `El numero de ${fieldLabel} debe ser un entero`;
 
     return !stepErrors[field];
 };

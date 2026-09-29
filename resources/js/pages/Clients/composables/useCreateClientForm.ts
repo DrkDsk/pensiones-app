@@ -22,7 +22,7 @@ export const useCreateClientForm = () => {
 
         requestError.value = '';
         duplicateDialogOpen.value = false;
-        form.curp = form.curp.trim().toUpperCase();
+        form.client.curp = form.client.curp.trim().toUpperCase();
 
         const clientErrors = validateClientForm(form.data());
 

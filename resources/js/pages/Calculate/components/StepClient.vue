@@ -11,6 +11,7 @@ import type {
     ClientValidationField,
     FamilyInformationField,
     ManualClientField,
+    SocialSecurityInformationField,
     StepErrors,
 } from '../types/calculate';
 
@@ -30,6 +31,10 @@ const props = defineProps<{
     hideDropdown: () => void;
     handleManualInput: (
         field: ManualClientField,
+        value: string | number | undefined,
+    ) => void;
+    handleSocialSecurityInformationInput: (
+        field: SocialSecurityInformationField,
         value: string | number | undefined,
     ) => void;
     handleFamilyInformationInput: (
@@ -90,7 +95,7 @@ watch(
                     <input
                         :value="clientSearch"
                         type="text"
-                        placeholder="Nombre, apellido, telefono, correo o CURP"
+                        placeholder="Nombre, apellido, telefono, correo, CURP o NSS"
                         class="focus:border-primary-500 focus:ring-primary-500/15 block w-full rounded-sm border bg-white py-2 pr-4 pl-10 text-sm text-slate-900 transition duration-200 ease-in-out placeholder:text-slate-400 focus:ring-2 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                         :class="
                             stepErrors.client_id
@@ -297,13 +302,15 @@ watch(
         />
 
         <AppInput
-            :model-value="form.client.nss"
+            :model-value="form.social_security_information.nss"
             label="NSS"
             placeholder="11 digitos"
             inputmode="numeric"
             :required="!form.client_id"
             :error="stepErrors.nss"
-            @update:model-value="handleManualInput('nss', $event)"
+            @update:model-value="
+                handleSocialSecurityInformationInput('nss', $event)
+            "
             @blur="
                 validateClientField('nss', {
                     requireRequiredFields: true,
@@ -312,16 +319,21 @@ watch(
         />
 
         <AppInput
-            :model-value="form.client.regime_end_date"
+            :model-value="form.social_security_information.regime_end_date"
             label="Fecha de baja de regimen"
             type="date"
             :error="stepErrors.regime_end_date"
-            @update:model-value="handleManualInput('regime_end_date', $event)"
+            @update:model-value="
+                handleSocialSecurityInformationInput('regime_end_date', $event)
+            "
             @blur="validateClientField('regime_end_date')"
         />
 
         <AppInput
-            :model-value="form.client.unemployment_assistance_discounted_weeks"
+            :model-value="
+                form.social_security_information
+                    .unemployment_assistance_discounted_weeks
+            "
             label="Semanas descontadas por ayuda de desempleo"
             type="number"
             min="0"
@@ -329,7 +341,7 @@ watch(
             :required="!form.client_id"
             :error="stepErrors.unemployment_assistance_discounted_weeks"
             @update:model-value="
-                handleManualInput(
+                handleSocialSecurityInformationInput(
                     'unemployment_assistance_discounted_weeks',
                     $event,
                 )
@@ -341,6 +353,29 @@ watch(
                         requireRequiredFields: true,
                     },
                 )
+            "
+        />
+
+        <AppInput
+            :model-value="
+                form.social_security_information.total_contributed_weeks
+            "
+            label="Total de Semanas Cotizadas al día"
+            type="number"
+            min="0"
+            step="1"
+            :required="!form.client_id"
+            :error="stepErrors.total_contributed_weeks"
+            @update:model-value="
+                handleSocialSecurityInformationInput(
+                    'total_contributed_weeks',
+                    $event,
+                )
+            "
+            @blur="
+                validateClientField('total_contributed_weeks', {
+                    requireRequiredFields: true,
+                })
             "
         />
 
