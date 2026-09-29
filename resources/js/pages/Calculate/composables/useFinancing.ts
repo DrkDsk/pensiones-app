@@ -274,10 +274,12 @@ export const useFinancing = (
             (value) => value.regimeType === 'modalidad_40',
         );
 
-        return modality40Rows.reduce(
+        const result = modality40Rows.reduce(
             (total, row) => total + pagoTotalPorPeriodo(row),
             0,
         );
+
+        return toFiniteNumber(result.toFixed(2));
     });
 
     const percentageModality40 = computed(
@@ -288,7 +290,7 @@ export const useFinancing = (
 
     const pagoRetroactivo = computed(() => {
         return (
-            toFiniteNumber(modality40Value.value + modality10Value.value) *
+            toFiniteNumber(modality40Value.value) *
             (percentageModality40.value / 100)
         );
     });
