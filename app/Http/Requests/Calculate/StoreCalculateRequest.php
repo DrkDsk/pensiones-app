@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Calculate;
 
+use App\Support\ClientFamilyInformationValidationRules;
 use App\Support\ClientValidationRules;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
@@ -113,24 +114,22 @@ class StoreCalculateRequest extends FormRequest
             'family_information' => [
                 Rule::excludeIf($hasExistingClient),
                 Rule::requiredIf(! $hasExistingClient),
-                'array',
+                ...ClientFamilyInformationValidationRules::information(),
             ],
             'family_information.has_spouse' => [
                 Rule::excludeIf($hasExistingClient),
                 'required',
-                'boolean',
+                ...ClientFamilyInformationValidationRules::hasSpouse(),
             ],
             'family_information.minor_or_student_children_count' => [
                 Rule::excludeIf($hasExistingClient),
                 'required',
-                'integer',
-                'min:0',
+                ...ClientFamilyInformationValidationRules::dependentCount(),
             ],
             'family_information.parents_count' => [
                 Rule::excludeIf($hasExistingClient),
                 'required',
-                'integer',
-                'min:0',
+                ...ClientFamilyInformationValidationRules::dependentCount(),
             ],
         ];
     }
@@ -153,9 +152,7 @@ class StoreCalculateRequest extends FormRequest
             'social_security_information.unemployment_assistance_discounted_weeks' => 'semanas descontadas por ayuda de desempleo',
             'social_security_information.total_contributed_weeks' => 'total de semanas cotizadas al dia',
             'client.notes' => 'notas',
-            'family_information.has_spouse' => 'esposo/a',
-            'family_information.minor_or_student_children_count' => 'hijos menores o estudiando',
-            'family_information.parents_count' => 'padres',
+            ...ClientFamilyInformationValidationRules::attributes('family_information.'),
         ];
     }
 
