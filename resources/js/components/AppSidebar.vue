@@ -22,11 +22,11 @@ const props = withDefaults(
 );
 
 const mainNavItems: NavItem[] = [
-    {
+    /*{
         title: 'Panel de control',
         href: dashboard(),
         icon: LayoutGrid,
-    },
+    },*/
     {
         title: 'Formulario',
         href: calculate(),
