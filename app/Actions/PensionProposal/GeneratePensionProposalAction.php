@@ -33,12 +33,20 @@ readonly class GeneratePensionProposalAction
      */
     public function execute(int $clientId, array $calculation): GeneratedPdfDTO
     {
-        $generatedAt = CarbonImmutable::now();
         $client = $this->clients->findWithFamilyInformation($clientId);
 
         if (! $client instanceof Client) {
             throw (new ModelNotFoundException)->setModel(Client::class, [$clientId]);
         }
+
+        $regimePeriods = $calculation['regime_periods'];
+
+        $modality40 = collect($regimePeriods)
+            ->firstWhere('regime_type', 'modalidad_40');
+
+        $modality40ContributionEndDate = CarbonImmutable::parse($modality40['contribution_end_date']);
+
+        $generatedAt = $modality40ContributionEndDate;
 
         $clientInformation = $this->getClientInformation->execute($client, $generatedAt);
         $monthlyPension = (float) $calculation['monthly_pension'];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PensionProposal;
 
+use App\Support\RegimePeriodRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GeneratePensionProposalRequest extends FormRequest
@@ -31,6 +32,7 @@ class GeneratePensionProposalRequest extends FormRequest
             'financing.aportacionCliente' => ['present', 'numeric', 'min:0'],
             'projection' => ['present', 'array'],
             'projection.retirement97Sar92' => ['present', 'numeric', 'min:0'],
+            ...RegimePeriodRules::rules(),
         ];
     }
 }

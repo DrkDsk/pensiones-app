@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+@php use App\Helpers\CurrencyFormatter; @endphp
+    <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -30,7 +31,7 @@
             color: #2f6f67;
             font-size: 8px;
             font-weight: bold;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
@@ -116,7 +117,7 @@
             color: #2f6f67;
             font-size: 9px;
             font-weight: bold;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
             margin: 0 0 6px;
             text-transform: uppercase;
         }
@@ -255,13 +256,13 @@
             <td class="hero-main">
                 <div class="hero-label">Pensión mensual alcanzada</div>
                 <div
-                    class="hero-amount">{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['monthly_pension']) }}</div>
+                    class="hero-amount">{{ CurrencyFormatter::format($proposal->pensionScenario['monthly_pension']) }}</div>
             </td>
             <td class="metric"><span class="meta-label">Semanas cotizadas</span><br><span
                     class="metric-value">{{ number_format($proposal->pensionScenario['contributed_weeks'], 2) }}</span>
             </td>
             <td class="metric"><span class="meta-label">Salario diario promedio</span><br><span
-                    class="metric-value">{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['average_daily_salary']) }}</span>
+                    class="metric-value">{{ CurrencyFormatter::format($proposal->pensionScenario['average_daily_salary']) }}</span>
             </td>
             <td class="metric"><span class="meta-label">Edad estimada</span><br><span
                     class="metric-value">{{ $proposal->pensionScenario['first_deposit_age'] }}</span></td>
@@ -309,7 +310,7 @@
         </tr>
         <tr>
             <td>Salario diario promedio (últimas 250 semanas)</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['average_daily_salary']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->pensionScenario['average_daily_salary']) }}</td>
         </tr>
         <tr>
             <td>Edad al recibir primer depósito de pensión</td>
@@ -321,15 +322,11 @@
         </tr>
         <tr>
             <td>Pensión mensual alcanzada</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['monthly_pension']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->pensionScenario['monthly_pension']) }}</td>
         </tr>
         <tr>
             <td>Pensión proyectada al siguiente año</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['next_year_pension']) }}</td>
-        </tr>
-        <tr>
-            <td>Aguinaldo</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->pensionScenario['christmas_bonus']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->pensionScenario['next_year_pension']) }}</td>
         </tr>
     </table>
 </div>
@@ -346,39 +343,39 @@
         <tbody>
         <tr>
             <td>Pago retroactivo Modalidad 40 (Recargos y Actualizaciones)</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['retroactive_modality_40']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['retroactive_modality_40']) }}</td>
         </tr>
         <tr>
             <td>Modalidad 10</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['modality_10']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['modality_10']) }}</td>
         </tr>
         <tr>
             <td>Ayuda por desempleo</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['unemployment_assistance']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['unemployment_assistance']) }}</td>
         </tr>
         <tr>
             <td>Seguro de vida</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['life_insurance']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['life_insurance']) }}</td>
         </tr>
         <tr>
             <td>Aportación del cliente</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['client_contribution']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['client_contribution']) }}</td>
         </tr>
         <tr class="subtotal">
             <td>Total financiamiento</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['total_financing']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['total_financing']) }}</td>
         </tr>
         <tr>
-            <td>Costo de financiamiento ({{ number_format($proposal->projectCost['financing_rate'] * 100, 0) }}%)</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['financing_cost']) }}</td>
+            <td>Costo de financiamiento ({{ number_format($proposal->projectCost['financing_rate'] * 100) }}%)</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['financing_cost']) }}</td>
         </tr>
         <tr>
             <td>Honorarios</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['fees']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['fees']) }}</td>
         </tr>
         <tr class="grand-total">
             <td>Costo total del proyecto</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->projectCost['total_project_cost']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->projectCost['total_project_cost']) }}</td>
         </tr>
         </tbody>
     </table>
@@ -389,19 +386,19 @@
     <table class="data-table">
         <tr>
             <td>Retroactivo de pensión</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->recoveredResources['pension_retroactive']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->recoveredResources['pension_retroactive']) }}</td>
         </tr>
         <tr>
             <td>Retorno Modalidad 40</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->recoveredResources['modality_40_return']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->recoveredResources['modality_40_return']) }}</td>
         </tr>
         <tr>
             <td>AFORE + INFONAVIT</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->recoveredResources['afore_and_infonavit']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->recoveredResources['afore_and_infonavit']) }}</td>
         </tr>
         <tr class="grand-total">
             <td>Total recursos recuperados</td>
-            <td>{{ \App\Helpers\CurrencyFormatter::format($proposal->recoveredResources['total_recovered_resources']) }}</td>
+            <td>{{ CurrencyFormatter::format($proposal->recoveredResources['total_recovered_resources']) }}</td>
         </tr>
     </table>
 </div>
@@ -413,7 +410,7 @@
                 <div class="capital-label">Capital libre estimado</div>
                 <div class="capital-note">Recursos estimados menos costo total del proyecto</div>
             </td>
-            <td class="capital-amount">{{ \App\Helpers\CurrencyFormatter::format($proposal->freeCapital) }}</td>
+            <td class="capital-amount">{{ CurrencyFormatter::format($proposal->freeCapital) }}</td>
         </tr>
     </table>
 </div>
