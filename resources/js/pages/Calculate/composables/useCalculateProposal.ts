@@ -49,6 +49,7 @@ export const useCalculateProposal = ({
             client: form.client,
             social_security_information: form.social_security_information,
         });
+
         form.client_id = client.id;
 
         return client.id;

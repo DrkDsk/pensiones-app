@@ -24,7 +24,7 @@ class GetPensionScenarioUseCase
             'first_deposit_age' => AgeFormatter::format($birthdate, $asOf),
             'process_start_date' => $asOf,
             'monthly_pension' => $monthlyPension,
-            'next_year_pension' => $monthlyPension * 1.15,
+            'next_year_pension' => $monthlyPension * 1.05,
             'christmas_bonus' => 32737.36,
         ];
     }
